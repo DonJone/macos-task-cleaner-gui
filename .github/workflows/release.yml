@@ -111,13 +111,13 @@ jobs:
           body: |
             ### 架构与下载说明 / Architecture & Downloads
 
-            推荐下载 **DMG** 格式安装盘，双击打开后拖拽至 Applications 快捷安装。
+            双击打开 DMG 安装盘后，直接拖拽应用图标至 Applications 目录即可完成安装。
 
-            | 架构 / Architecture | 适用设备 / Applicable Devices | 推荐拖拽安装包 (DMG) | 归档压缩包 (ZIP) |
-            | :--- | :--- | :--- | :--- |
-            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | `TaskCleaner-macOS-arm64.dmg` | `TaskCleaner-macOS-arm64.zip` |
-            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | `TaskCleaner-macOS-x86_64.dmg` | `TaskCleaner-macOS-x86_64.zip` |
-            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | `TaskCleaner-macOS-universal.dmg` | `TaskCleaner-macOS-universal.zip` |
+            | 架构 / Architecture | 适用设备 / Applicable Devices | 安装包直链下载 / Download DMG |
+            | :--- | :--- | :--- |
+            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-arm64.dmg) |
+            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-x86_64.dmg) |
+            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-universal.dmg) |
           files: |
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg.sha256
