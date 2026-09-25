@@ -17,7 +17,9 @@ public class TaskCleanerViewModel: ObservableObject {
     @Published public var isWorking: Bool = false
     @Published public var statusMessage: String?
     @Published public var selectedTab: CleanerTab = .targets
+    @Published public var initialTargetCapacity: Int = 3
 
+    private var hasCapturedSessionCapacity: Bool = false
     private var timerCancellable: AnyCancellable?
     private var workspaceObservers: [NSObjectProtocol] = []
 
@@ -33,6 +35,14 @@ public class TaskCleanerViewModel: ObservableObject {
         }
     }
 
+    private func updateInitialCapacityIfNeeded(from summary: DryRunSummary?) {
+        guard !hasCapturedSessionCapacity else { return }
+        if let count = summary?.target_count {
+            self.initialTargetCapacity = min(6, max(3, count))
+            self.hasCapturedSessionCapacity = true
+        }
+    }
+
     public func refresh(silent: Bool = false) {
         Task {
             if !silent {
@@ -44,6 +54,7 @@ public class TaskCleanerViewModel: ObservableObject {
             }.value
 
             self.summary = result
+            self.updateInitialCapacityIfNeeded(from: result)
 
             if !silent {
                 self.isWorking = false
@@ -53,6 +64,10 @@ public class TaskCleanerViewModel: ObservableObject {
 
     // MARK: - 实时前台进程监听系统 (Live Monitoring)
     public func startLiveMonitoring() {
+        // 每次托盘面板重新打开时，重置会话锁，捕获第一次打开时的待结束进程数量
+        hasCapturedSessionCapacity = false
+        updateInitialCapacityIfNeeded(from: summary)
+
         // 1. 弹出瞬间立即执行一次静默刷新
         refresh(silent: true)
 
@@ -103,6 +118,7 @@ public class TaskCleanerViewModel: ObservableObject {
     }
 
     public func stopLiveMonitoring() {
+        hasCapturedSessionCapacity = false
         timerCancellable?.cancel()
         timerCancellable = nil
         stopWorkspaceObservers()

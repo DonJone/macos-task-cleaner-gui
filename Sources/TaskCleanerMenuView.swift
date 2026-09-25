@@ -34,7 +34,7 @@ public struct TaskCleanerMenuView: View {
             .padding(.top, 12)
             .padding(.bottom, 8)
         }
-        .frame(width: 340)
+        .frame(width: 310)
         // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
             viewModel.startLiveMonitoring()
@@ -202,9 +202,12 @@ public struct TaskCleanerMenuView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - 加长型应用列表区 (放宽至 380pt 最大高度，确保充足的滚动阅览空间)
+    // MARK: - 动态自适应应用列表区 (最少容纳 3 个，最多容纳 6 个，高度由首次打开时的待结束进程数量锁定)
     private var appListView: some View {
-        SystemCard(cornerRadius: 10) {
+        let capacity = viewModel.initialTargetCapacity
+        let listHeight = CGFloat(capacity) * 38.0 + CGFloat(capacity - 1) * 1.0 + 8.0
+
+        return SystemCard(cornerRadius: 10) {
             ScrollView(.vertical, showsIndicators: true) {
                 switch viewModel.selectedTab {
                 case .targets:
@@ -215,7 +218,7 @@ public struct TaskCleanerMenuView: View {
                     allAppsList
                 }
             }
-            .frame(minHeight: 260, maxHeight: 380)
+            .frame(height: listHeight)
         }
     }
 
@@ -223,17 +226,17 @@ public struct TaskCleanerMenuView: View {
         let targets = viewModel.summary?.targets ?? []
         return VStack(spacing: 0) {
             if targets.isEmpty {
-                VStack(spacing: 8) {
+                VStack(spacing: 5) {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: 20))
                         .foregroundStyle(Color(nsColor: .systemBlue))
 
                     Text("当前无待结束进程")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11.5, weight: .semibold))
                         .foregroundStyle(.primary)
 
                     Text("所有前台图形应用均受白名单保护")
-                        .font(.system(size: 10.5))
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
 
                     Button(action: {
@@ -242,14 +245,14 @@ public struct TaskCleanerMenuView: View {
                         }
                     }) {
                         Text("查看全部 \(viewModel.summary?.scanned_total ?? 0) 个活动进程")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.system(size: 10, weight: .medium))
                     }
                     .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .padding(.top, 4)
+                    .controlSize(.mini)
+                    .padding(.top, 2)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 8)
             } else {
                 ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
                     NativeTargetRow(
@@ -281,8 +284,8 @@ public struct TaskCleanerMenuView: View {
                 Text("暂无匹配的白名单规则")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.vertical, 16)
             } else {
                 ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
                     NativeProtectedRow(app: app, isWorking: viewModel.isWorking) {
@@ -310,8 +313,8 @@ public struct TaskCleanerMenuView: View {
                 Text("未检测到前台图形进程")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.vertical, 16)
             } else {
                 // 1. 待结束进程组 (若有)
                 if !targets.isEmpty {
