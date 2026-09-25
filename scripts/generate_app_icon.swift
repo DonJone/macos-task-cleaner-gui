@@ -52,18 +52,77 @@ func renderAppIcon(size: CGFloat) -> NSImage {
         innerBorder.stroke()
         ctx.restoreGState()
 
-        // 2. Bold, Pristine White 'X' Symbol directly on the squircle (no capsule badge)
-        let xSpan: CGFloat = 390.0 * s
+        // 2. Circular Frosted Acrylic Lens / Backing Disc (590 diameter)
+        let circleRadius: CGFloat = 295.0 * s
+        let centerX = baseRect.midX
+        let centerY = baseRect.midY
+        let circleRect = NSRect(x: centerX - circleRadius, y: centerY - circleRadius, width: circleRadius * 2, height: circleRadius * 2)
+
+        // Acrylic Disc Shadow onto base
+        ctx.saveGState()
+        let discShadow = NSShadow()
+        discShadow.shadowColor = NSColor.black.withAlphaComponent(0.48)
+        discShadow.shadowOffset = NSSize(width: 0, height: -16 * s)
+        discShadow.shadowBlurRadius = 26 * s
+        discShadow.set()
+        NSColor(white: 0.05, alpha: 0.5).setFill()
+        NSBezierPath(ovalIn: circleRect).fill()
+        ctx.restoreGState()
+
+        // Acrylic Body (Frosted Translucent Glass Gradient)
+        ctx.saveGState()
+        let circleClip = NSBezierPath(ovalIn: circleRect)
+        circleClip.addClip()
+
+        let glassGradColors = [
+            NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.50).cgColor,
+            NSColor(red: 0.90, green: 0.93, blue: 0.98, alpha: 0.25).cgColor,
+            NSColor(red: 0.20, green: 0.24, blue: 0.32, alpha: 0.20).cgColor,
+            NSColor(red: 0.08, green: 0.10, blue: 0.14, alpha: 0.40).cgColor
+        ] as CFArray
+        let glassLocations: [CGFloat] = [0.0, 0.35, 0.75, 1.0]
+        if let glassGrad = CGGradient(colorsSpace: colorSpace, colors: glassGradColors, locations: glassLocations) {
+            ctx.drawLinearGradient(
+                glassGrad,
+                start: CGPoint(x: centerX, y: circleRect.maxY),
+                end: CGPoint(x: centerX, y: circleRect.minY),
+                options: []
+            )
+        }
+
+        // Acrylic Specular Chamfer Rim (Top highlight, bottom reflection)
+        let rimPath = CGPath(ellipseIn: circleRect.insetBy(dx: 1.5 * s, dy: 1.5 * s), transform: nil)
+        let strokedRim = rimPath.copy(strokingWithWidth: 2.5 * s, lineCap: .round, lineJoin: .round, miterLimit: 10.0)
+        ctx.addPath(strokedRim)
+        ctx.clip()
+
+        let rimGradColors = [
+            NSColor(white: 1.0, alpha: 0.70).cgColor,
+            NSColor(white: 1.0, alpha: 0.25).cgColor,
+            NSColor(white: 1.0, alpha: 0.08).cgColor,
+            NSColor(white: 1.0, alpha: 0.30).cgColor
+        ] as CFArray
+        let rimLocations: [CGFloat] = [0.0, 0.35, 0.75, 1.0]
+        if let rimGrad = CGGradient(colorsSpace: colorSpace, colors: rimGradColors, locations: rimLocations) {
+            ctx.drawLinearGradient(
+                rimGrad,
+                start: CGPoint(x: centerX, y: circleRect.maxY),
+                end: CGPoint(x: centerX, y: circleRect.minY),
+                options: []
+            )
+        }
+        ctx.restoreGState()
+
+        // 3. Crisp Dimensional White 'X' Symbol on top of the acrylic disc
+        let xSpan: CGFloat = 310.0 * s
         let xHalf = xSpan / 2.0
-        let xCenterX = baseRect.midX
-        let xCenterY = baseRect.midY
-        let strokeW: CGFloat = 90.0 * s
+        let strokeW: CGFloat = 78.0 * s
 
         let cgPath = CGMutablePath()
-        let p1 = CGPoint(x: xCenterX - xHalf, y: xCenterY - xHalf)
-        let p2 = CGPoint(x: xCenterX + xHalf, y: xCenterY + xHalf)
-        let p3 = CGPoint(x: xCenterX - xHalf, y: xCenterY + xHalf)
-        let p4 = CGPoint(x: xCenterX + xHalf, y: xCenterY - xHalf)
+        let p1 = CGPoint(x: centerX - xHalf, y: centerY - xHalf)
+        let p2 = CGPoint(x: centerX + xHalf, y: centerY + xHalf)
+        let p3 = CGPoint(x: centerX - xHalf, y: centerY + xHalf)
+        let p4 = CGPoint(x: centerX + xHalf, y: centerY - xHalf)
 
         cgPath.move(to: p1)
         cgPath.addLine(to: p2)
@@ -72,60 +131,60 @@ func renderAppIcon(size: CGFloat) -> NSImage {
 
         let strokedCGPath = cgPath.copy(strokingWithWidth: strokeW, lineCap: .round, lineJoin: .round, miterLimit: 10.0)
 
-        // Layer 1: Ambient Contact Shadow (tight & deep)
+        // Contact shadow onto acrylic surface
         ctx.saveGState()
         let contactShadow = NSShadow()
-        contactShadow.shadowColor = NSColor.black.withAlphaComponent(0.40)
-        contactShadow.shadowOffset = NSSize(width: 0, height: -4 * s)
-        contactShadow.shadowBlurRadius = 8 * s
+        contactShadow.shadowColor = NSColor.black.withAlphaComponent(0.42)
+        contactShadow.shadowOffset = NSSize(width: 0, height: -3 * s)
+        contactShadow.shadowBlurRadius = 6 * s
         contactShadow.set()
         ctx.addPath(strokedCGPath)
         ctx.setFillColor(NSColor.black.withAlphaComponent(0.4).cgColor)
         ctx.fillPath()
         ctx.restoreGState()
 
-        // Layer 2: Soft Diffuse Elevation Shadow
+        // Soft elevation shadow onto acrylic surface
         ctx.saveGState()
-        let diffuseShadow = NSShadow()
-        diffuseShadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
-        diffuseShadow.shadowOffset = NSSize(width: 0, height: -18 * s)
-        diffuseShadow.shadowBlurRadius = 28 * s
-        diffuseShadow.set()
+        let elevationShadow = NSShadow()
+        elevationShadow.shadowColor = NSColor.black.withAlphaComponent(0.38)
+        elevationShadow.shadowOffset = NSSize(width: 0, height: -14 * s)
+        elevationShadow.shadowBlurRadius = 22 * s
+        elevationShadow.set()
         ctx.addPath(strokedCGPath)
         ctx.setFillColor(NSColor.black.withAlphaComponent(0.3).cgColor)
         ctx.fillPath()
         ctx.restoreGState()
 
-        // Layer 3: Solid White Body with Subtle Top-to-Bottom Lighting
+        // Solid White Body with Subtle Top-to-Bottom Lighting
         ctx.saveGState()
         ctx.addPath(strokedCGPath)
         ctx.clip()
 
         let xGradColors = [
             NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0).cgColor,
-            NSColor(red: 0.95, green: 0.96, blue: 0.98, alpha: 1.0).cgColor,
+            NSColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.0).cgColor,
             NSColor(red: 0.88, green: 0.90, blue: 0.93, alpha: 1.0).cgColor
         ] as CFArray
         let xLocations: [CGFloat] = [0.0, 0.45, 1.0]
         if let xGrad = CGGradient(colorsSpace: colorSpace, colors: xGradColors, locations: xLocations) {
             ctx.drawLinearGradient(
                 xGrad,
-                start: CGPoint(x: xCenterX, y: xCenterY + xHalf + strokeW/2),
-                end: CGPoint(x: xCenterX, y: xCenterY - xHalf - strokeW/2),
+                start: CGPoint(x: centerX, y: centerY + xHalf + strokeW/2),
+                end: CGPoint(x: centerX, y: centerY - xHalf - strokeW/2),
                 options: []
             )
         }
 
-        // Layer 4: Subtle Top Specular Rim on the X
+        // Subtle Top Specular Rim on the X
         let highlightGradColors = [
-            NSColor.white.withAlphaComponent(0.6).cgColor,
+            NSColor.white.withAlphaComponent(0.60).cgColor,
             NSColor.white.withAlphaComponent(0.0).cgColor
         ] as CFArray
         if let hGrad = CGGradient(colorsSpace: colorSpace, colors: highlightGradColors, locations: [0.0, 1.0]) {
             ctx.drawLinearGradient(
                 hGrad,
-                start: CGPoint(x: xCenterX, y: xCenterY + xHalf + strokeW/2),
-                end: CGPoint(x: xCenterX, y: xCenterY),
+                start: CGPoint(x: centerX, y: centerY + xHalf + strokeW/2),
+                end: CGPoint(x: centerX, y: centerY),
                 options: []
             )
         }
