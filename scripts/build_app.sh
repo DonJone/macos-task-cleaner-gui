@@ -20,6 +20,14 @@ ensure_app_icon() {
     fi
 }
 
+# 确保 DMG 背景图存在
+ensure_dmg_background() {
+    if [ ! -f "$DIR/Resources/dmg_background.png" ] || [ "$DIR/scripts/generate_dmg_background.swift" -nt "$DIR/Resources/dmg_background.png" ]; then
+        echo "[DMG] 正在生成 Retina 分辨率 DMG 背景图..."
+        swift "$DIR/scripts/generate_dmg_background.swift" "$DIR/Resources/dmg_background.png"
+    fi
+}
+
 # 动态定位 TaskCleanerGUI 编译输出二进制
 locate_gui_binary() {
     local scratch_dir="$1"
@@ -192,24 +200,116 @@ EOF
     done
 }
 
-# 压缩归档并计算 SHA256
+# 压缩 Zip 归档并计算 SHA256
 package_zip() {
     local target_arch="$1"
     local source_app_dir="$2"
     local zip_file="$DIR/build/TaskCleaner-macOS-${target_arch}.zip"
 
-    echo "[归档] 正在打包 $(basename "$zip_file")..."
+    echo "[Zip] 正在打包 $(basename "$zip_file")..."
     (
         cd "$(dirname "$source_app_dir")"
         rm -f "$zip_file" "${zip_file}.sha256"
         zip -r -y -q "$zip_file" "$(basename "$source_app_dir")"
         cd "$DIR/build"
         shasum -a 256 "TaskCleaner-macOS-${target_arch}.zip" > "TaskCleaner-macOS-${target_arch}.zip.sha256"
-        echo "       SHA256: $(cat "TaskCleaner-macOS-${target_arch}.zip.sha256")"
+        echo "      ZIP SHA256: $(cat "TaskCleaner-macOS-${target_arch}.zip.sha256")"
+    )
+}
+
+# 打包 DMG 可视化拖拽安装盘并计算 SHA256
+package_dmg() {
+    local target_arch="$1"
+    local source_app_dir="$2"
+    local dmg_file="$DIR/build/TaskCleaner-macOS-${target_arch}.dmg"
+    local source_parent_dir="$(dirname "$source_app_dir")"
+
+    echo "[DMG] 正在打包 $(basename "$dmg_file")..."
+    rm -f "$dmg_file" "${dmg_file}.sha256" "$DIR/build/rw.*.dmg" 2>/dev/null || true
+
+    local bg_img="$DIR/Resources/dmg_background.png"
+    local bg_opt=()
+    if [ -f "$bg_img" ]; then
+        bg_opt=(--background "$bg_img")
+    fi
+
+    local vol_icon="$DIR/Resources/AppIcon.icns"
+    local icon_opt=()
+    if [ -f "$vol_icon" ]; then
+        icon_opt=(--volicon "$vol_icon")
+    fi
+
+    local built_with_create_dmg=false
+
+    if command -v create-dmg >/dev/null 2>&1; then
+        echo "       调用 create-dmg 进行可视化排版 (App + Applications 拖拽关联)..."
+        local skip_opt=()
+        if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+            skip_opt=(--skip-jenkins)
+        fi
+
+        if create-dmg \
+            --volname "Task Cleaner" \
+            "${icon_opt[@]}" \
+            "${bg_opt[@]}" \
+            --window-pos 200 120 \
+            --window-size 600 380 \
+            --icon-size 110 \
+            --icon "TaskCleaner.app" 160 190 \
+            --hide-extension "TaskCleaner.app" \
+            --app-drop-link 440 190 \
+            "${skip_opt[@]}" \
+            --hdiutil-retries 10 \
+            --overwrite \
+            "$dmg_file" \
+            "$source_parent_dir" >/dev/null 2>&1; then
+            built_with_create_dmg=true
+        else
+            echo "       尝试使用 create-dmg 基础模式 (--skip-jenkins)..."
+            if create-dmg \
+                --volname "Task Cleaner" \
+                "${icon_opt[@]}" \
+                --icon-size 110 \
+                --icon "TaskCleaner.app" 160 190 \
+                --hide-extension "TaskCleaner.app" \
+                --app-drop-link 440 190 \
+                --skip-jenkins \
+                --hdiutil-retries 10 \
+                --overwrite \
+                "$dmg_file" \
+                "$source_parent_dir" >/dev/null 2>&1; then
+                built_with_create_dmg=true
+            fi
+        fi
+    fi
+
+    if [ "$built_with_create_dmg" = false ]; then
+        echo "       调用 macOS 原生 hdiutil 创建拖拽式安装镜像..."
+        local staging_dir="$DIR/build/dmg_staging_${target_arch}"
+        rm -rf "$staging_dir"
+        mkdir -p "$staging_dir"
+        cp -R "$source_app_dir" "$staging_dir/"
+        ln -s /Applications "$staging_dir/Applications"
+        hdiutil create \
+            -volname "Task Cleaner" \
+            -srcfolder "$staging_dir" \
+            -ov \
+            -format UDZO \
+            "$dmg_file" >/dev/null
+        rm -rf "$staging_dir"
+    fi
+
+    rm -f "$DIR/build/rw.*.dmg" 2>/dev/null || true
+
+    (
+        cd "$DIR/build"
+        shasum -a 256 "TaskCleaner-macOS-${target_arch}.dmg" > "TaskCleaner-macOS-${target_arch}.dmg.sha256"
+        echo "      DMG SHA256: $(cat "TaskCleaner-macOS-${target_arch}.dmg.sha256")"
     )
 }
 
 ensure_app_icon
+ensure_dmg_background
 mkdir -p "$DIR/build"
 
 build_arm64() {
@@ -224,6 +324,7 @@ build_arm64() {
     mkdir -p "$DIR/build/arm64"
     assemble_bundle "arm64" "$bin" "$DIR/build/arm64/TaskCleaner.app"
     package_zip "arm64" "$DIR/build/arm64/TaskCleaner.app"
+    package_dmg "arm64" "$DIR/build/arm64/TaskCleaner.app"
 }
 
 build_x86_64() {
@@ -238,6 +339,7 @@ build_x86_64() {
     mkdir -p "$DIR/build/x86_64"
     assemble_bundle "x86_64" "$bin" "$DIR/build/x86_64/TaskCleaner.app"
     package_zip "x86_64" "$DIR/build/x86_64/TaskCleaner.app"
+    package_dmg "x86_64" "$DIR/build/x86_64/TaskCleaner.app"
 }
 
 build_universal() {
@@ -266,10 +368,14 @@ build_universal() {
     mkdir -p "$DIR/build/universal"
     assemble_bundle "universal" "$DIR/.build/universal/TaskCleanerGUI" "$DIR/build/universal/TaskCleaner.app"
     package_zip "universal" "$DIR/build/universal/TaskCleaner.app"
+    package_dmg "universal" "$DIR/build/universal/TaskCleaner.app"
 
-    # 同步兼容旧名称 TaskCleaner-macOS.zip
+    # 同步兼容旧名称 TaskCleaner-macOS.zip 与 TaskCleaner-macOS.dmg
     cp "$DIR/build/TaskCleaner-macOS-universal.zip" "$DIR/build/TaskCleaner-macOS.zip"
     shasum -a 256 "$DIR/build/TaskCleaner-macOS.zip" > "$DIR/build/TaskCleaner-macOS.zip.sha256"
+
+    cp "$DIR/build/TaskCleaner-macOS-universal.dmg" "$DIR/build/TaskCleaner-macOS.dmg"
+    shasum -a 256 "$DIR/build/TaskCleaner-macOS.dmg" > "$DIR/build/TaskCleaner-macOS.dmg.sha256"
 }
 
 build_native() {
@@ -282,9 +388,13 @@ build_native() {
         exit 1
     fi
     assemble_bundle "native" "$bin" "$DIR/build/TaskCleaner.app"
-    echo "[完成] 原生应用组装完成: $DIR/build/TaskCleaner.app"
-    echo "[提示] 可将应用移动到 Applications 目录:"
-    echo "       cp -R \"$DIR/build/TaskCleaner.app\" /Applications/"
+    package_dmg "native" "$DIR/build/TaskCleaner.app"
+    mv "$DIR/build/TaskCleaner-macOS-native.dmg" "$DIR/build/TaskCleaner.dmg"
+    mv "$DIR/build/TaskCleaner-macOS-native.dmg.sha256" "$DIR/build/TaskCleaner.dmg.sha256"
+
+    echo "[完成] 原生应用及 DMG 安装盘组装完成:"
+    echo "       - App 应用目录: $DIR/build/TaskCleaner.app"
+    echo "       - DMG 安装磁盘: $DIR/build/TaskCleaner.dmg"
 }
 
 case "$TARGET" in

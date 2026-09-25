@@ -66,6 +66,10 @@ jobs:
           echo "[CLI 架构检验]"
           file dist/arm64/mtc dist/x86_64/mtc dist/universal/mtc
 
+      - name: Install create-dmg Packaging Utility
+        run: |
+          brew install create-dmg || true
+
       - name: Build and Package All Architectures
         working-directory: macos-task-cleaner-gui
         run: |
@@ -107,12 +111,22 @@ jobs:
           body: |
             ### 架构与下载说明 / Architecture & Downloads
 
-            | 架构 / Architecture | 适用设备 / Applicable Devices | 对应安装包 / Asset |
-            | :--- | :--- | :--- |
-            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | `TaskCleaner-macOS-arm64.zip` |
-            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | `TaskCleaner-macOS-x86_64.zip` |
-            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | `TaskCleaner-macOS-universal.zip` |
+            推荐下载 **DMG** 格式安装盘，双击打开后拖拽至 Applications 快捷安装。
+
+            | 架构 / Architecture | 适用设备 / Applicable Devices | 推荐拖拽安装包 (DMG) | 归档压缩包 (ZIP) |
+            | :--- | :--- | :--- | :--- |
+            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | `TaskCleaner-macOS-arm64.dmg` | `TaskCleaner-macOS-arm64.zip` |
+            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | `TaskCleaner-macOS-x86_64.dmg` | `TaskCleaner-macOS-x86_64.zip` |
+            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | `TaskCleaner-macOS-universal.dmg` | `TaskCleaner-macOS-universal.zip` |
           files: |
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg.sha256
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-x86_64.dmg
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-x86_64.dmg.sha256
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-universal.dmg
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-universal.dmg.sha256
+            macos-task-cleaner-gui/build/TaskCleaner-macOS.dmg
+            macos-task-cleaner-gui/build/TaskCleaner-macOS.dmg.sha256
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.zip
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.zip.sha256
             macos-task-cleaner-gui/build/TaskCleaner-macOS-x86_64.zip
