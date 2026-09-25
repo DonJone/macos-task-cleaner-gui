@@ -15,18 +15,19 @@ public struct TaskCleanerMenuView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 10) {
-                // 1. 顶栏 (Header Bar - 极简排版，参考 macOS 网络托盘，去除芯片图示)
+                // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
                 headerSection
 
                 // 2. 状态提示 (Status Toast - 液态玻璃浮层)
                 if let msg = viewModel.statusMessage {
                     statusToastView(message: msg)
+                        .transition(.opacity)
                 }
 
-                // 3. 核心操作面板 (Hero Action Card - 结束任务采用暖调琥珀橙，避免与蓝色选中冲突)
+                // 3. 核心操作面板 (Hero Action Card)
                 actionSection
 
-                // 4. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘活跃网络蓝色 Pill 呈现)
+                // 4. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘当前连接蓝色高亮)
                 segmentedSection
 
                 // 5. 应用列表区 (Inset Grouped App List)
@@ -40,11 +41,16 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 320)
-        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: viewModel.selectedTab)
-        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: viewModel.statusMessage)
+        // 关键：打开即刷新，并保持实时常驻前台进程感知
+        .onAppear {
+            viewModel.startLiveMonitoring()
+        }
+        .onDisappear {
+            viewModel.stopLiveMonitoring()
+        }
     }
 
-    // MARK: - Header (无多余廉价芯片图标，对齐网络托盘简洁标题栏)
+    // MARK: - Header (刚性固定尺寸与锚点，彻底解决图标跳动问题)
     private var headerSection: some View {
         HStack(spacing: 8) {
             Text("Task Cleaner")
@@ -57,24 +63,29 @@ public struct TaskCleanerMenuView: View {
 
             Spacer()
 
+            // 刚性 24x24 点击锚点，内部居中自旋，杜绝任何位移跳跃
             Button(action: {
                 viewModel.refresh()
             }) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .rotationEffect(.degrees(viewModel.isWorking ? 360 : 0))
-                    .animation(
-                        viewModel.isWorking
-                            ? .linear(duration: 0.8).repeatForever(autoreverses: false)
-                            : .default,
-                        value: viewModel.isWorking
-                    )
+                ZStack {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(viewModel.isWorking ? 360 : 0))
+                        .animation(
+                            viewModel.isWorking
+                                ? .linear(duration: 0.7).repeatForever(autoreverses: false)
+                                : .default,
+                            value: viewModel.isWorking
+                        )
+                }
+                .frame(width: 24, height: 24, alignment: .center)
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.isWorking)
             .help("重新扫描前台进程")
         }
+        .frame(height: 24)
     }
 
     // MARK: - Status Toast
@@ -102,7 +113,7 @@ public struct TaskCleanerMenuView: View {
         )
     }
 
-    // MARK: - Action Section (结束全部任务采用橙色/琥珀调，与蓝色选中状态清晰分离)
+    // MARK: - Action Section (原生中性 Bordered 按钮，标注 mtc -e 执行语义)
     private var actionSection: some View {
         SystemCard(cornerRadius: 10) {
             if let summary = viewModel.summary, summary.target_count > 0 {
@@ -163,7 +174,7 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Segmented Switcher (参考 macOS 网络托盘当前连接高亮样式：激活项采用 System Blue)
+    // MARK: - Segmented Switcher (对齐 macOS 网络托盘当前连接高亮：激活项采用 System Blue)
     private var segmentedSection: some View {
         HStack(spacing: 3) {
             segmentTabButton(
