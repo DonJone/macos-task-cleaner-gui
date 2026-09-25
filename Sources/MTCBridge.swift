@@ -104,6 +104,24 @@ public class MTCBridge {
         }
     }
 
+    public func removeFromWhitelist(identifier: String) -> Bool {
+        guard let mtc = findMTCBinary() else {
+            return false
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: mtc)
+        process.arguments = ["-r", identifier]
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
     public func openConfigFile() {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let mtcConfig = home.appendingPathComponent(".config/mtc/config.toml")

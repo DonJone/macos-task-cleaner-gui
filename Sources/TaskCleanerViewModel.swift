@@ -160,6 +160,25 @@ public class TaskCleanerViewModel: ObservableObject {
         }
     }
 
+    public func unprotectApp(_ app: ProtectedAppEntry) {
+        guard !isWorking else { return }
+        isWorking = true
+        statusMessage = "已将 \(app.name) 移出白名单"
+
+        Task {
+            let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
+            _ = await Task.detached {
+                MTCBridge.shared.removeFromWhitelist(identifier: identifier)
+            }.value
+
+            self.isWorking = false
+            self.refresh(silent: true)
+
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            self.statusMessage = nil
+        }
+    }
+
     public func openConfigFile() {
         MTCBridge.shared.openConfigFile()
     }

@@ -278,7 +278,9 @@ public struct TaskCleanerMenuView: View {
                     .padding(.vertical, 40)
             } else {
                 ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
-                    NativeProtectedRow(app: app)
+                    NativeProtectedRow(app: app, isWorking: viewModel.isWorking) {
+                        viewModel.unprotectApp(app)
+                    }
 
                     if index < protectedList.count - 1 {
                         Divider()
@@ -346,7 +348,9 @@ public struct TaskCleanerMenuView: View {
                     .padding(.bottom, 2)
 
                     ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
-                        NativeProtectedRow(app: app)
+                        NativeProtectedRow(app: app, isWorking: viewModel.isWorking) {
+                            viewModel.unprotectApp(app)
+                        }
 
                         if index < protectedList.count - 1 {
                             Divider()
@@ -443,6 +447,8 @@ struct NativeTargetRow: View {
 // MARK: - 原生受保护应用行组件
 struct NativeProtectedRow: View {
     let app: ProtectedAppEntry
+    let isWorking: Bool
+    let onRemove: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
@@ -468,9 +474,12 @@ struct NativeProtectedRow: View {
 
             Spacer()
 
-            Image(systemName: "checkmark.shield")
-                .font(.system(size: 11))
-                .foregroundStyle(Color(nsColor: .systemBlue).opacity(0.85))
+            Button(action: onRemove) {
+                Text("移除")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.mini)
+            .disabled(isWorking)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4.5)
