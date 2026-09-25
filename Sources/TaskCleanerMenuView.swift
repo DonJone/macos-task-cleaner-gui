@@ -3,6 +3,7 @@ import AppKit
 
 public struct TaskCleanerMenuView: View {
     @ObservedObject public var viewModel: TaskCleanerViewModel
+    @ObservedObject private var i18n = I18n.shared
 
     public init(viewModel: TaskCleanerViewModel) {
         self.viewModel = viewModel
@@ -52,7 +53,7 @@ public struct TaskCleanerMenuView: View {
                 .foregroundStyle(.primary)
 
             if let summary = viewModel.summary {
-                SystemBadge("\(summary.scanned_total) 运行中", color: .secondary)
+                SystemBadge(i18n.format(.header_running, summary.scanned_total), color: .secondary)
             }
 
             Spacer()
@@ -77,7 +78,7 @@ public struct TaskCleanerMenuView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help("重新扫描前台进程")
+            .help(i18n.t(.header_refresh_help))
         }
         .frame(height: 24)
     }
@@ -91,7 +92,7 @@ public struct TaskCleanerMenuView: View {
             VStack(alignment: .leading, spacing: 9) {
                 HStack {
                     VStack(alignment: .leading, spacing: 1.5) {
-                        Text(hasTargets ? "\(targetCount) 个待结束进程" : "前台应用均受保护")
+                        Text(hasTargets ? i18n.format(.targets_count, targetCount) : i18n.t(.all_protected_title))
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.primary)
 
@@ -101,7 +102,7 @@ public struct TaskCleanerMenuView: View {
                                 .font(.system(size: 10.5, weight: .medium))
                                 .foregroundStyle(Color(nsColor: .systemBlue))
                         } else {
-                            Text(hasTargets ? "结束未受保护的前台应用进程" : "当前活动应用均符合白名单规则")
+                            Text(hasTargets ? i18n.t(.targets_desc) : i18n.t(.all_protected_desc))
                                 .font(.system(size: 10.5))
                                 .foregroundStyle(.secondary)
                         }
@@ -110,7 +111,7 @@ public struct TaskCleanerMenuView: View {
                     Spacer()
 
                     SystemBadge(
-                        hasTargets ? "待处理" : "受保护",
+                        hasTargets ? i18n.t(.badge_pending) : i18n.t(.badge_protected),
                         color: hasTargets ? .secondary : Color(nsColor: .systemBlue)
                     )
                 }
@@ -122,7 +123,7 @@ public struct TaskCleanerMenuView: View {
                         Spacer()
                         Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
                             .font(.system(size: 11.5, weight: .medium))
-                        Text(hasTargets ? "结束" : "已就绪")
+                        Text(hasTargets ? i18n.t(.btn_terminate) : i18n.t(.btn_ready))
                             .font(.system(size: 12, weight: .semibold))
                         Spacer()
                     }
@@ -139,19 +140,19 @@ public struct TaskCleanerMenuView: View {
     private var segmentedSection: some View {
         HStack(spacing: 3) {
             segmentTabButton(
-                title: "待结束",
+                title: i18n.t(.tab_targets),
                 count: viewModel.summary?.target_count ?? 0,
                 tab: .targets
             )
 
             segmentTabButton(
-                title: "已保护",
+                title: i18n.t(.tab_protected),
                 count: viewModel.summary?.protected_count ?? 0,
                 tab: .protected
             )
 
             segmentTabButton(
-                title: "全部活动",
+                title: i18n.t(.tab_all),
                 count: viewModel.summary?.scanned_total ?? 0,
                 tab: .all
             )
@@ -231,11 +232,11 @@ public struct TaskCleanerMenuView: View {
                         .font(.system(size: 20))
                         .foregroundStyle(Color(nsColor: .systemBlue))
 
-                    Text("当前无待结束进程")
+                    Text(i18n.t(.empty_targets_title))
                         .font(.system(size: 11.5, weight: .semibold))
                         .foregroundStyle(.primary)
 
-                    Text("所有前台图形应用均受白名单保护")
+                    Text(i18n.t(.empty_targets_subtitle))
                         .font(.system(size: 10))
                         .foregroundStyle(.secondary)
 
@@ -244,7 +245,7 @@ public struct TaskCleanerMenuView: View {
                             viewModel.selectedTab = .all
                         }
                     }) {
-                        Text("查看全部 \(viewModel.summary?.scanned_total ?? 0) 个活动进程")
+                        Text(i18n.format(.btn_view_all, viewModel.summary?.scanned_total ?? 0))
                             .font(.system(size: 10, weight: .medium))
                     }
                     .buttonStyle(.bordered)
@@ -281,7 +282,7 @@ public struct TaskCleanerMenuView: View {
         let protectedList = viewModel.summary?.protected_apps ?? []
         return VStack(spacing: 0) {
             if protectedList.isEmpty {
-                Text("暂无匹配的白名单规则")
+                Text(i18n.t(.empty_protected))
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -310,7 +311,7 @@ public struct TaskCleanerMenuView: View {
 
         return VStack(spacing: 0) {
             if targets.isEmpty && protectedList.isEmpty {
-                Text("未检测到前台图形进程")
+                Text(i18n.t(.empty_all))
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -319,7 +320,7 @@ public struct TaskCleanerMenuView: View {
                 // 1. 待结束进程组 (若有)
                 if !targets.isEmpty {
                     HStack {
-                        Text("待结束进程")
+                        Text(i18n.t(.group_targets))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -355,7 +356,7 @@ public struct TaskCleanerMenuView: View {
                 // 2. 受保护进程组
                 if !protectedList.isEmpty {
                     HStack {
-                        Text("受保护进程")
+                        Text(i18n.t(.group_protected))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -394,7 +395,7 @@ public struct TaskCleanerMenuView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "gearshape")
                             .font(.system(size: 11))
-                        Text("配置文件")
+                        Text(i18n.t(.btn_config))
                             .font(.system(size: 11))
                     }
                     .foregroundStyle(.secondary)
@@ -403,10 +404,38 @@ public struct TaskCleanerMenuView: View {
 
                 Spacer()
 
+                Menu {
+                    ForEach(LanguagePreference.allCases) { pref in
+                        Button(action: {
+                            i18n.setLanguage(pref)
+                        }) {
+                            HStack {
+                                Text(pref.localizedTitle(in: i18n))
+                                if i18n.preference == pref {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 3) {
+                        Image(systemName: "globe")
+                            .font(.system(size: 10.5))
+                        Text(i18n.preference == .auto ? i18n.t(.lang_auto) : i18n.currentLanguage.displayName)
+                            .font(.system(size: 10))
+                    }
+                    .foregroundStyle(.secondary)
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .help(i18n.t(.btn_language))
+
+                Spacer()
+
                 Button(action: {
                     NSApplication.shared.terminate(nil)
                 }) {
-                    Text("退出")
+                    Text(i18n.t(.btn_quit))
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
                 }
@@ -482,13 +511,13 @@ struct NativeTargetRow: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help("结束任务")
+                .help(I18n.shared.t(.action_terminate_help))
                 .disabled(isWorking)
 
                 // 2. 拓展项 (竖三点)：加入白名单位于拓展菜单，严格右对齐
                 Menu {
                     Button(action: onWhitelist) {
-                        Label("加入白名单", systemImage: "checkmark.shield")
+                        Label(I18n.shared.t(.action_add_whitelist), systemImage: "checkmark.shield")
                     }
 
                     Divider()
@@ -500,7 +529,7 @@ struct NativeTargetRow: View {
                             forType: .string
                         )
                     }) {
-                        Label("复制标识符", systemImage: "doc.on.doc")
+                        Label(I18n.shared.t(.action_copy_id), systemImage: "doc.on.doc")
                     }
                 } label: {
                     Image(nsImage: makeVerticalEllipsisImage())
@@ -509,7 +538,7 @@ struct NativeTargetRow: View {
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
-                .help("拓展操作")
+                .help(I18n.shared.t(.action_more_help))
                 .frame(width: 18, height: 22)
                 .offset(x: 3)
                 .disabled(isWorking)
@@ -544,7 +573,7 @@ struct NativeProtectedRow: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                Text(app.tier)
+                Text(I18n.shared.localizeTier(app.tier))
                     .font(.system(size: 9.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -553,7 +582,7 @@ struct NativeProtectedRow: View {
             Spacer()
 
             Button(action: onRemove) {
-                Text("移除")
+                Text(I18n.shared.t(.btn_remove_protected))
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)

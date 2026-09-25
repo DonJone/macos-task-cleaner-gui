@@ -136,7 +136,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func cleanAll(force: Bool = false, purge: Bool = false) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "正在结束进程..."
+        statusMessage = I18n.shared.t(.status_terminating_all)
 
         Task {
             let success = await Task.detached {
@@ -144,9 +144,9 @@ public class TaskCleanerViewModel: ObservableObject {
             }.value
 
             if success {
-                self.statusMessage = "进程已结束"
+                self.statusMessage = I18n.shared.t(.status_all_terminated)
             } else {
-                self.statusMessage = "部分进程未响应"
+                self.statusMessage = I18n.shared.t(.status_some_unresponsive)
             }
 
             self.isWorking = false
@@ -160,7 +160,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func terminateTarget(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "正在结束 \(app.name)..."
+        statusMessage = I18n.shared.format(.status_terminating_app, app.name)
 
         Task {
             let success = await Task.detached {
@@ -168,9 +168,9 @@ public class TaskCleanerViewModel: ObservableObject {
             }.value
 
             if success {
-                self.statusMessage = "已结束 \(app.name)"
+                self.statusMessage = I18n.shared.format(.status_app_terminated, app.name)
             } else {
-                self.statusMessage = "无法结束 \(app.name)"
+                self.statusMessage = I18n.shared.format(.status_app_terminate_failed, app.name)
             }
 
             self.isWorking = false
@@ -184,7 +184,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func whitelistApp(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "已将 \(app.name) 加入白名单"
+        statusMessage = I18n.shared.format(.status_added_whitelist, app.name)
 
         Task {
             let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
@@ -203,7 +203,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func unprotectApp(_ app: ProtectedAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "已将 \(app.name) 移出白名单"
+        statusMessage = I18n.shared.format(.status_removed_whitelist, app.name)
 
         Task {
             let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name

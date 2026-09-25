@@ -1,0 +1,1317 @@
+import Foundation
+import SwiftUI
+import AppKit
+
+public enum AppLanguage: String, CaseIterable, Identifiable {
+    case en = "en"
+    case zhHans = "zh-Hans"
+    case zhHant = "zh-Hant"
+    case ja = "ja"
+    case ko = "ko"
+    case fr = "fr"
+    case de = "de"
+    case es = "es"
+    case pt = "pt"
+    case it = "it"
+    case ru = "ru"
+    case nl = "nl"
+    case pl = "pl"
+    case tr = "tr"
+    case ar = "ar"
+    case th = "th"
+    case vi = "vi"
+    case id = "id"
+    case sv = "sv"
+    case da = "da"
+    case nb = "nb"
+    case fi = "fi"
+    case cs = "cs"
+    case uk = "uk"
+
+    public var id: String { rawValue }
+
+    public var displayName: String {
+        switch self {
+        case .en: return "English"
+        case .zhHans: return "简体中文"
+        case .zhHant: return "繁體中文"
+        case .ja: return "日本語"
+        case .ko: return "한국어"
+        case .fr: return "Français"
+        case .de: return "Deutsch"
+        case .es: return "Español"
+        case .pt: return "Português"
+        case .it: return "Italiano"
+        case .ru: return "Русский"
+        case .nl: return "Nederlands"
+        case .pl: return "Polski"
+        case .tr: return "Türkçe"
+        case .ar: return "العربية"
+        case .th: return "ไทย"
+        case .vi: return "Tiếng Việt"
+        case .id: return "Bahasa Indonesia"
+        case .sv: return "Svenska"
+        case .da: return "Dansk"
+        case .nb: return "Norsk Bokmål"
+        case .fi: return "Suomi"
+        case .cs: return "Čeština"
+        case .uk: return "Українська"
+        }
+    }
+}
+
+public enum LanguagePreference: String, CaseIterable, Identifiable {
+    case auto = "auto"
+    case en = "en"
+    case zhHans = "zh-Hans"
+    case zhHant = "zh-Hant"
+    case ja = "ja"
+    case ko = "ko"
+    case fr = "fr"
+    case de = "de"
+    case es = "es"
+    case pt = "pt"
+    case it = "it"
+    case ru = "ru"
+    case nl = "nl"
+    case pl = "pl"
+    case tr = "tr"
+    case ar = "ar"
+    case th = "th"
+    case vi = "vi"
+    case id = "id"
+    case sv = "sv"
+    case da = "da"
+    case nb = "nb"
+    case fi = "fi"
+    case cs = "cs"
+    case uk = "uk"
+
+    public var id: String { rawValue }
+
+    @MainActor
+    public func localizedTitle(in i18n: I18n) -> String {
+        switch self {
+        case .auto:
+            return i18n.t(.lang_auto)
+        default:
+            return AppLanguage(rawValue: rawValue)?.displayName ?? rawValue
+        }
+    }
+}
+
+public enum I18nKey: String {
+    case header_running
+    case header_refresh_help
+    case targets_count
+    case all_protected_title
+    case targets_desc
+    case all_protected_desc
+    case badge_pending
+    case badge_protected
+    case btn_terminate
+    case btn_ready
+    case tab_targets
+    case tab_protected
+    case tab_all
+    case empty_targets_title
+    case empty_targets_subtitle
+    case btn_view_all
+    case empty_protected
+    case empty_all
+    case group_targets
+    case group_protected
+    case btn_config
+    case btn_language
+    case btn_quit
+    case lang_auto
+    case action_terminate_help
+    case action_add_whitelist
+    case action_copy_id
+    case action_more_help
+    case btn_remove_protected
+    case status_terminating_all
+    case status_all_terminated
+    case status_some_unresponsive
+    case status_terminating_app
+    case status_app_terminated
+    case status_app_terminate_failed
+    case status_added_whitelist
+    case status_removed_whitelist
+    case tier_l1
+    case tier_l2
+    case tier_l3
+    case tier_l4
+    case tier_cli
+}
+
+@MainActor
+public class I18n: ObservableObject {
+    public static let shared = I18n()
+
+    private let userDefaultsKey = "TaskCleaner_SelectedLanguage"
+
+    @Published public var preference: LanguagePreference {
+        didSet {
+            UserDefaults.standard.set(preference.rawValue, forKey: userDefaultsKey)
+            updateResolvedLanguage()
+        }
+    }
+
+    @Published public private(set) var currentLanguage: AppLanguage = .en
+
+    private init() {
+        let stored = UserDefaults.standard.string(forKey: userDefaultsKey) ?? "auto"
+        self.preference = LanguagePreference(rawValue: stored) ?? .auto
+        updateResolvedLanguage()
+
+        NotificationCenter.default.addObserver(
+            forName: NSLocale.currentLocaleDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.updateResolvedLanguage()
+            }
+        }
+    }
+
+    public func setLanguage(_ pref: LanguagePreference) {
+        self.preference = pref
+    }
+
+    private func updateResolvedLanguage() {
+        switch preference {
+        case .auto:
+            self.currentLanguage = Self.detectSystemLanguage()
+        default:
+            self.currentLanguage = AppLanguage(rawValue: preference.rawValue) ?? .en
+        }
+    }
+
+    public static func detectSystemLanguage() -> AppLanguage {
+        let preferred = Locale.preferredLanguages
+        for pref in preferred {
+            let lower = pref.lowercased()
+            if lower.starts(with: "zh-hant") || lower.starts(with: "zh-tw") || lower.starts(with: "zh-hk") || lower.starts(with: "zh-mo") {
+                return .zhHant
+            }
+            if lower.starts(with: "zh") {
+                return .zhHans
+            }
+            if lower.starts(with: "ja") { return .ja }
+            if lower.starts(with: "ko") { return .ko }
+            if lower.starts(with: "fr") { return .fr }
+            if lower.starts(with: "de") { return .de }
+            if lower.starts(with: "es") { return .es }
+            if lower.starts(with: "pt") { return .pt }
+            if lower.starts(with: "it") { return .it }
+            if lower.starts(with: "ru") { return .ru }
+            if lower.starts(with: "nl") { return .nl }
+            if lower.starts(with: "pl") { return .pl }
+            if lower.starts(with: "tr") { return .tr }
+            if lower.starts(with: "ar") { return .ar }
+            if lower.starts(with: "th") { return .th }
+            if lower.starts(with: "vi") { return .vi }
+            if lower.starts(with: "id") { return .id }
+            if lower.starts(with: "sv") { return .sv }
+            if lower.starts(with: "da") { return .da }
+            if lower.starts(with: "nb") || lower.starts(with: "no") || lower.starts(with: "nn") { return .nb }
+            if lower.starts(with: "fi") { return .fi }
+            if lower.starts(with: "cs") { return .cs }
+            if lower.starts(with: "uk") { return .uk }
+            if lower.starts(with: "en") { return .en }
+        }
+        return .en
+    }
+
+    public func t(_ key: I18nKey) -> String {
+        if let dict = translations[currentLanguage], let val = dict[key] {
+            return val
+        }
+        if let fallback = translations[.en]?[key] {
+            return fallback
+        }
+        return key.rawValue
+    }
+
+    public func format(_ key: I18nKey, _ args: CVarArg...) -> String {
+        let tmpl = t(key)
+        return String(format: tmpl, arguments: args)
+    }
+
+    public func localizeTier(_ rawTier: String) -> String {
+        if rawTier.contains("L1") || rawTier.contains("核心") {
+            return t(.tier_l1)
+        } else if rawTier.contains("L2") || rawTier.contains("终端") {
+            return t(.tier_l2)
+        } else if rawTier.contains("L3") || rawTier.contains("设施") {
+            return t(.tier_l3)
+        } else if rawTier.contains("CLI") {
+            return t(.tier_cli)
+        } else if rawTier.contains("L4") || rawTier.contains("配置") {
+            return t(.tier_l4)
+        }
+        return rawTier
+    }
+}
+
+// 24 种常用语言词典库 (严格遵循专业系统术语)
+private let translations: [AppLanguage: [I18nKey: String]] = [
+    .en: [
+        .header_running: "%d Running",
+        .header_refresh_help: "Rescan foreground processes",
+        .targets_count: "%d Processes to Terminate",
+        .all_protected_title: "All Applications Protected",
+        .targets_desc: "Terminate unexempted foreground applications",
+        .all_protected_desc: "All active applications match whitelist rules",
+        .badge_pending: "Pending",
+        .badge_protected: "Protected",
+        .btn_terminate: "Terminate",
+        .btn_ready: "Ready",
+        .tab_targets: "To Clean",
+        .tab_protected: "Protected",
+        .tab_all: "All Active",
+        .empty_targets_title: "No Pending Processes",
+        .empty_targets_subtitle: "All foreground GUI applications are protected",
+        .btn_view_all: "View all %d active processes",
+        .empty_protected: "No matching whitelist rules",
+        .empty_all: "No foreground GUI processes detected",
+        .group_targets: "Processes to Terminate",
+        .group_protected: "Protected Processes",
+        .btn_config: "Configuration",
+        .btn_language: "Language",
+        .btn_quit: "Quit",
+        .lang_auto: "Auto (System Default)",
+        .action_terminate_help: "Terminate Task",
+        .action_add_whitelist: "Add to Whitelist",
+        .action_copy_id: "Copy Identifier",
+        .action_more_help: "More Actions",
+        .btn_remove_protected: "Remove",
+        .status_terminating_all: "Terminating processes...",
+        .status_all_terminated: "Processes terminated",
+        .status_some_unresponsive: "Some processes unresponsive",
+        .status_terminating_app: "Terminating %@...",
+        .status_app_terminated: "Terminated %@",
+        .status_app_terminate_failed: "Failed to terminate %@",
+        .status_added_whitelist: "Added %@ to whitelist",
+        .status_removed_whitelist: "Removed %@ from whitelist",
+        .tier_l1: "L1: Core OS",
+        .tier_l2: "L2: Context Shell",
+        .tier_l3: "L3: Utilities",
+        .tier_l4: "L4: User Config",
+        .tier_cli: "L4: CLI Override"
+    ],
+    .zhHans: [
+        .header_running: "%d 运行中",
+        .header_refresh_help: "重新扫描前台进程",
+        .targets_count: "%d 个待结束进程",
+        .all_protected_title: "前台应用均受保护",
+        .targets_desc: "结束未受保护的前台应用进程",
+        .all_protected_desc: "当前活动应用均符合白名单规则",
+        .badge_pending: "待处理",
+        .badge_protected: "受保护",
+        .btn_terminate: "结束",
+        .btn_ready: "已就绪",
+        .tab_targets: "待结束",
+        .tab_protected: "已保护",
+        .tab_all: "全部活动",
+        .empty_targets_title: "当前无待结束进程",
+        .empty_targets_subtitle: "所有前台图形应用均受白名单保护",
+        .btn_view_all: "查看全部 %d 个活动进程",
+        .empty_protected: "暂无匹配的白名单规则",
+        .empty_all: "未检测到前台图形进程",
+        .group_targets: "待结束进程",
+        .group_protected: "受保护进程",
+        .btn_config: "配置文件",
+        .btn_language: "语言",
+        .btn_quit: "退出",
+        .lang_auto: "自动 (系统默认)",
+        .action_terminate_help: "结束任务",
+        .action_add_whitelist: "加入白名单",
+        .action_copy_id: "复制标识符",
+        .action_more_help: "拓展操作",
+        .btn_remove_protected: "移除",
+        .status_terminating_all: "正在结束进程...",
+        .status_all_terminated: "进程已结束",
+        .status_some_unresponsive: "部分进程未响应",
+        .status_terminating_app: "正在结束 %@...",
+        .status_app_terminated: "已结束 %@",
+        .status_app_terminate_failed: "无法结束 %@",
+        .status_added_whitelist: "已将 %@ 加入白名单",
+        .status_removed_whitelist: "已将 %@ 移出白名单",
+        .tier_l1: "L1: 系统核心",
+        .tier_l2: "L2: 会话终端",
+        .tier_l3: "L3: 常驻设施",
+        .tier_l4: "L4: 用户配置",
+        .tier_cli: "L4: CLI保留"
+    ],
+    .zhHant: [
+        .header_running: "%d 運行中",
+        .header_refresh_help: "重新掃描前景處理程序",
+        .targets_count: "%d 個待結束處理程序",
+        .all_protected_title: "前景應用程式均受保護",
+        .targets_desc: "結束未受保護的前景應用程式處理程序",
+        .all_protected_desc: "目前活躍應用程式均符合白名單規則",
+        .badge_pending: "待處理",
+        .badge_protected: "受保護",
+        .btn_terminate: "結束",
+        .btn_ready: "已就緒",
+        .tab_targets: "待結束",
+        .tab_protected: "已保護",
+        .tab_all: "全部活動",
+        .empty_targets_title: "目前無待結束處理程序",
+        .empty_targets_subtitle: "所有前景圖形應用程式均受白名單保護",
+        .btn_view_all: "檢視全部 %d 個活動處理程序",
+        .empty_protected: "暫無符合的白名單規則",
+        .empty_all: "未偵測到前景圖形處理程序",
+        .group_targets: "待結束處理程序",
+        .group_protected: "受保護處理程序",
+        .btn_config: "設定檔",
+        .btn_language: "語言",
+        .btn_quit: "結束",
+        .lang_auto: "自動 (系統預設)",
+        .action_terminate_help: "結束工作",
+        .action_add_whitelist: "加入白名單",
+        .action_copy_id: "複製識別碼",
+        .action_more_help: "擴充操作",
+        .btn_remove_protected: "移除",
+        .status_terminating_all: "正在結束處理程序...",
+        .status_all_terminated: "處理程序已結束",
+        .status_some_unresponsive: "部分處理程序未回應",
+        .status_terminating_app: "正在結束 %@...",
+        .status_app_terminated: "已結束 %@",
+        .status_app_terminate_failed: "無法結束 %@",
+        .status_added_whitelist: "已將 %@ 加入白名單",
+        .status_removed_whitelist: "已將 %@ 移出白名單",
+        .tier_l1: "L1: 系統核心",
+        .tier_l2: "L2: 工作階段終端機",
+        .tier_l3: "L3: 常駐設施",
+        .tier_l4: "L4: 使用者設定",
+        .tier_cli: "L4: CLI保留"
+    ],
+    .ja: [
+        .header_running: "%d 実行中",
+        .header_refresh_help: "フォアグラウンドプロセスを再スキャン",
+        .targets_count: "%d 件の終了対象プロセス",
+        .all_protected_title: "全アプリが保護されています",
+        .targets_desc: "保護されていないフォアグラウンドアプリを終了",
+        .all_protected_desc: "現在のアクティブアプリはすべてホワイトリスト対象です",
+        .badge_pending: "待機中",
+        .badge_protected: "保護中",
+        .btn_terminate: "終了",
+        .btn_ready: "準備完了",
+        .tab_targets: "終了対象",
+        .tab_protected: "保護済み",
+        .tab_all: "全アクティブ",
+        .empty_targets_title: "終了対象のプロセスはありません",
+        .empty_targets_subtitle: "すべてのフォアグラウンドアプリが保護されています",
+        .btn_view_all: "全 %d 件のアクティブプロセスを表示",
+        .empty_protected: "一致するホワイトリストルールがありません",
+        .empty_all: "フォアグラウンドプロセスが検出されませんでした",
+        .group_targets: "終了対象プロセス",
+        .group_protected: "保護されたプロセス",
+        .btn_config: "設定ファイル",
+        .btn_language: "言語",
+        .btn_quit: "終了",
+        .lang_auto: "自動 (システムデフォルト)",
+        .action_terminate_help: "タスクを終了",
+        .action_add_whitelist: "ホワイトリストに追加",
+        .action_copy_id: "識別子をコピー",
+        .action_more_help: "その他の操作",
+        .btn_remove_protected: "削除",
+        .status_terminating_all: "プロセスを終了中...",
+        .status_all_terminated: "プロセスを終了しました",
+        .status_some_unresponsive: "一部のプロセスが応答しません",
+        .status_terminating_app: "%@ を終了中...",
+        .status_app_terminated: "%@ を終了しました",
+        .status_app_terminate_failed: "%@ を終了できませんでした",
+        .status_added_whitelist: "%@ をホワイトリストに追加しました",
+        .status_removed_whitelist: "%@ をホワイトリストから削除しました",
+        .tier_l1: "L1: システム中核",
+        .tier_l2: "L2: 端末シェル",
+        .tier_l3: "L3: 常駐ツール",
+        .tier_l4: "L4: ユーザー設定",
+        .tier_cli: "L4: CLI指定"
+    ],
+    .ko: [
+        .header_running: "%d 실행 중",
+        .header_refresh_help: "포그라운드 프로세스 다시 스캔",
+        .targets_count: "%d개의 종료 대기 프로세스",
+        .all_protected_title: "모든 앱이 보호 상태입니다",
+        .targets_desc: "보호되지 않은 포그라운드 프로세스 종료",
+        .all_protected_desc: "현재 활성 앱이 모두 화이트리스트 규칙과 일치합니다",
+        .badge_pending: "대기 중",
+        .badge_protected: "보호됨",
+        .btn_terminate: "종료",
+        .btn_ready: "준비 완료",
+        .tab_targets: "종료 대상",
+        .tab_protected: "보호됨",
+        .tab_all: "전체 활성",
+        .empty_targets_title: "종료 대기 프로세스가 없습니다",
+        .empty_targets_subtitle: "모든 포그라운드 GUI 앱이 화이트리스트로 보호됩니다",
+        .btn_view_all: "전체 %d개 활성 프로세스 보기",
+        .empty_protected: "일치하는 화이트리스트 규칙이 없습니다",
+        .empty_all: "포그라운드 GUI 프로세스가 감지되지 않았습니다",
+        .group_targets: "종료 대상 프로세스",
+        .group_protected: "보호된 프로세스",
+        .btn_config: "설정 파일",
+        .btn_language: "언어",
+        .btn_quit: "종료",
+        .lang_auto: "자동 (시스템 기본값)",
+        .action_terminate_help: "작업 종료",
+        .action_add_whitelist: "화이트리스트에 추가",
+        .action_copy_id: "식별자 복사",
+        .action_more_help: "추가 작업",
+        .btn_remove_protected: "제거",
+        .status_terminating_all: "프로세스를 종료하는 중...",
+        .status_all_terminated: "프로세스가 종료되었습니다",
+        .status_some_unresponsive: "일부 프로세스가 응답하지 않습니다",
+        .status_terminating_app: "%@ 종료 중...",
+        .status_app_terminated: "%@ 종료됨",
+        .status_app_terminate_failed: "%@을(를) 종료하지 못했습니다",
+        .status_added_whitelist: "%@을(를) 화이트리스트에 추가했습니다",
+        .status_removed_whitelist: "%@을(를) 화이트리스트에서 제거했습니다",
+        .tier_l1: "L1: 시스템 핵심",
+        .tier_l2: "L2: 세션 셸",
+        .tier_l3: "L3: 상주 유틸리티",
+        .tier_l4: "L4: 사용자 설정",
+        .tier_cli: "L4: CLI 예약"
+    ],
+    .fr: [
+        .header_running: "%d en cours",
+        .header_refresh_help: "Analyser à nouveau les processus de premier plan",
+        .targets_count: "%d processus à terminer",
+        .all_protected_title: "Toutes les apps sont protégées",
+        .targets_desc: "Terminer les applications non exemptées",
+        .all_protected_desc: "Toutes les applications actives respectent la liste blanche",
+        .badge_pending: "En attente",
+        .badge_protected: "Protégé",
+        .btn_terminate: "Terminer",
+        .btn_ready: "Prêt",
+        .tab_targets: "À nettoyer",
+        .tab_protected: "Protégé",
+        .tab_all: "Tout actif",
+        .empty_targets_title: "Aucun processus en attente",
+        .empty_targets_subtitle: "Toutes les applications d'interface graphique sont protégées",
+        .btn_view_all: "Afficher les %d processus actifs",
+        .empty_protected: "Aucune règle de liste blanche correspondante",
+        .empty_all: "Aucun processus graphique détecté",
+        .group_targets: "Processus à terminer",
+        .group_protected: "Processus protégés",
+        .btn_config: "Configuration",
+        .btn_language: "Langue",
+        .btn_quit: "Quitter",
+        .lang_auto: "Automatique (par défaut)",
+        .action_terminate_help: "Terminer la tâche",
+        .action_add_whitelist: "Ajouter à la liste blanche",
+        .action_copy_id: "Copier l'identifiant",
+        .action_more_help: "Plus d'actions",
+        .btn_remove_protected: "Supprimer",
+        .status_terminating_all: "Arrêt des processus...",
+        .status_all_terminated: "Processus terminés",
+        .status_some_unresponsive: "Certains processus ne répondent pas",
+        .status_terminating_app: "Arrêt de %@...",
+        .status_app_terminated: "%@ terminé",
+        .status_app_terminate_failed: "Impossible de terminer %@",
+        .status_added_whitelist: "%@ ajouté à la liste blanche",
+        .status_removed_whitelist: "%@ retiré de la liste blanche",
+        .tier_l1: "L1: Système de base",
+        .tier_l2: "L2: Shell contextuel",
+        .tier_l3: "L3: Utilitaires permanents",
+        .tier_l4: "L4: Config utilisateur",
+        .tier_cli: "L4: Remplacement CLI"
+    ],
+    .de: [
+        .header_running: "%d aktiv",
+        .header_refresh_help: "Vordergrundprozesse neu scannen",
+        .targets_count: "%d Prozesse zu beenden",
+        .all_protected_title: "Alle Apps sind geschützt",
+        .targets_desc: "Nicht ausgenommene Vordergrundanwendungen beenden",
+        .all_protected_desc: "Alle aktiven Apps entsprechen den Whitelist-Regeln",
+        .badge_pending: "Ausstehend",
+        .badge_protected: "Geschützt",
+        .btn_terminate: "Beenden",
+        .btn_ready: "Bereit",
+        .tab_targets: "Zu bereinigen",
+        .tab_protected: "Geschützt",
+        .tab_all: "Alle aktiven",
+        .empty_targets_title: "Keine ausstehenden Prozesse",
+        .empty_targets_subtitle: "Alle GUI-Vordergrundanwendungen sind geschützt",
+        .btn_view_all: "Alle %d aktiven Prozesse anzeigen",
+        .empty_protected: "Keine passenden Whitelist-Regeln",
+        .empty_all: "Keine Vordergrund-GUI-Prozesse erkannt",
+        .group_targets: "Zu beendende Prozesse",
+        .group_protected: "Geschützte Prozesse",
+        .btn_config: "Konfiguration",
+        .btn_language: "Sprache",
+        .btn_quit: "Beenden",
+        .lang_auto: "Automatisch (Systemstandard)",
+        .action_terminate_help: "Task beenden",
+        .action_add_whitelist: "Zur Whitelist hinzufügen",
+        .action_copy_id: "Kennung kopieren",
+        .action_more_help: "Weitere Aktionen",
+        .btn_remove_protected: "Entfernen",
+        .status_terminating_all: "Prozesse werden beendet...",
+        .status_all_terminated: "Prozesse beendet",
+        .status_some_unresponsive: "Einige Prozesse reagieren nicht",
+        .status_terminating_app: "%@ wird beendet...",
+        .status_app_terminated: "%@ beendet",
+        .status_app_terminate_failed: "Konnte %@ nicht beenden",
+        .status_added_whitelist: "%@ zur Whitelist hinzugefügt",
+        .status_removed_whitelist: "%@ aus der Whitelist entfernt",
+        .tier_l1: "L1: Systemkern",
+        .tier_l2: "L2: Kontext-Shell",
+        .tier_l3: "L3: Dauerhafte Dienste",
+        .tier_l4: "L4: Benutzerkonfig",
+        .tier_cli: "L4: CLI-Überschreibung"
+    ],
+    .es: [
+        .header_running: "%d en ejecución",
+        .header_refresh_help: "Volver a escanear procesos de primer plano",
+        .targets_count: "%d procesos por terminar",
+        .all_protected_title: "Todas las aplicaciones protegidas",
+        .targets_desc: "Terminar aplicaciones no exentas de primer plano",
+        .all_protected_desc: "Todas las apps activas coinciden con la lista blanca",
+        .badge_pending: "Pendiente",
+        .badge_protected: "Protegido",
+        .btn_terminate: "Terminar",
+        .btn_ready: "Listo",
+        .tab_targets: "Por limpiar",
+        .tab_protected: "Protegido",
+        .tab_all: "Todo activo",
+        .empty_targets_title: "No hay procesos pendientes",
+        .empty_targets_subtitle: "Todas las aplicaciones GUI están protegidas",
+        .btn_view_all: "Ver los %d procesos activos",
+        .empty_protected: "No hay reglas de lista blanca coincidentes",
+        .empty_all: "No se detectaron procesos GUI de primer plano",
+        .group_targets: "Procesos por terminar",
+        .group_protected: "Procesos protegidos",
+        .btn_config: "Configuración",
+        .btn_language: "Idioma",
+        .btn_quit: "Salir",
+        .lang_auto: "Automático (predeterminado)",
+        .action_terminate_help: "Terminar tarea",
+        .action_add_whitelist: "Añadir a la lista blanca",
+        .action_copy_id: "Copiar identificador",
+        .action_more_help: "Más acciones",
+        .btn_remove_protected: "Eliminar",
+        .status_terminating_all: "Terminando procesos...",
+        .status_all_terminated: "Procesos terminados",
+        .status_some_unresponsive: "Algunos procesos no responden",
+        .status_terminating_app: "Terminando %@...",
+        .status_app_terminated: "%@ terminado",
+        .status_app_terminate_failed: "No se pudo terminar %@",
+        .status_added_whitelist: "%@ añadido a la lista blanca",
+        .status_removed_whitelist: "%@ eliminado de la lista blanca",
+        .tier_l1: "L1: Núcleo del sistema",
+        .tier_l2: "L2: Terminal de sesión",
+        .tier_l3: "L3: Utilidades residentes",
+        .tier_l4: "L4: Config de usuario",
+        .tier_cli: "L4: Reserva CLI"
+    ],
+    .pt: [
+        .header_running: "%d em execução",
+        .header_refresh_help: "Verificar processos em primeiro plano novamente",
+        .targets_count: "%d processos para encerrar",
+        .all_protected_title: "Todos os aplicativos protegidos",
+        .targets_desc: "Encerrar aplicativos em primeiro plano não isentos",
+        .all_protected_desc: "Todos os aplicativos ativos correspondem à lista branca",
+        .badge_pending: "Pendente",
+        .badge_protected: "Protegido",
+        .btn_terminate: "Encerrar",
+        .btn_ready: "Pronto",
+        .tab_targets: "A limpar",
+        .tab_protected: "Protegido",
+        .tab_all: "Todos ativos",
+        .empty_targets_title: "Nenhum processo pendente",
+        .empty_targets_subtitle: "Todos os aplicativos GUI estão protegidos pela lista branca",
+        .btn_view_all: "Ver todos os %d processos ativos",
+        .empty_protected: "Nenhuma regra de lista branca correspondente",
+        .empty_all: "Nenhum processo GUI em primeiro plano detectado",
+        .group_targets: "Processos para encerrar",
+        .group_protected: "Processos protegidos",
+        .btn_config: "Configurações",
+        .btn_language: "Idioma",
+        .btn_quit: "Sair",
+        .lang_auto: "Automático (padrão do sistema)",
+        .action_terminate_help: "Encerrar tarefa",
+        .action_add_whitelist: "Adicionar à lista branca",
+        .action_copy_id: "Copiar identificador",
+        .action_more_help: "Mais ações",
+        .btn_remove_protected: "Remover",
+        .status_terminating_all: "Encerrando processos...",
+        .status_all_terminated: "Processos encerrados",
+        .status_some_unresponsive: "Alguns processos não respondem",
+        .status_terminating_app: "Encerrando %@...",
+        .status_app_terminated: "%@ encerrado",
+        .status_app_terminate_failed: "Falha ao encerrar %@",
+        .status_added_whitelist: "%@ adicionado à lista branca",
+        .status_removed_whitelist: "%@ removido da lista branca",
+        .tier_l1: "L1: Núcleo do sistema",
+        .tier_l2: "L2: Shell de contexto",
+        .tier_l3: "L3: Utilitários residentes",
+        .tier_l4: "L4: Config do usuário",
+        .tier_cli: "L4: Substituição CLI"
+    ],
+    .it: [
+        .header_running: "%d in esecuzione",
+        .header_refresh_help: "Riscansiona processi in primo piano",
+        .targets_count: "%d processi da terminare",
+        .all_protected_title: "Tutte le app sono protette",
+        .targets_desc: "Termina le applicazioni non esenti in primo piano",
+        .all_protected_desc: "Tutte le app attive corrispondono alla whitelist",
+        .badge_pending: "In attesa",
+        .badge_protected: "Protetto",
+        .btn_terminate: "Termina",
+        .btn_ready: "Pronto",
+        .tab_targets: "Da pulire",
+        .tab_protected: "Protetto",
+        .tab_all: "Tutti attivi",
+        .empty_targets_title: "Nessun processo in sospeso",
+        .empty_targets_subtitle: "Tutte le applicazioni GUI sono protette",
+        .btn_view_all: "Visualizza tutti i %d processi attivi",
+        .empty_protected: "Nessuna regola whitelist corrispondente",
+        .empty_all: "Nessun processo GUI in primo piano rilevato",
+        .group_targets: "Processi da terminare",
+        .group_protected: "Processi protetti",
+        .btn_config: "Configurazione",
+        .btn_language: "Lingua",
+        .btn_quit: "Esci",
+        .lang_auto: "Automatico (predefinito)",
+        .action_terminate_help: "Termina attività",
+        .action_add_whitelist: "Aggiungi alla whitelist",
+        .action_copy_id: "Copia identificatore",
+        .action_more_help: "Altre azioni",
+        .btn_remove_protected: "Rimuovi",
+        .status_terminating_all: "Terminazione processi...",
+        .status_all_terminated: "Processi terminati",
+        .status_some_unresponsive: "Alcuni processi non rispondono",
+        .status_terminating_app: "Terminazione di %@...",
+        .status_app_terminated: "%@ terminato",
+        .status_app_terminate_failed: "Impossibile terminare %@",
+        .status_added_whitelist: "%@ aggiunto alla whitelist",
+        .status_removed_whitelist: "%@ rimosso dalla whitelist",
+        .tier_l1: "L1: Base di sistema",
+        .tier_l2: "L2: Shell di contesto",
+        .tier_l3: "L3: Utilità residenti",
+        .tier_l4: "L4: Config utente",
+        .tier_cli: "L4: Sovrascrittura CLI"
+    ],
+    .ru: [
+        .header_running: "%d запущено",
+        .header_refresh_help: "Повторно сканировать активные процессы",
+        .targets_count: "%d процессов к завершению",
+        .all_protected_title: "Все приложения защищены",
+        .targets_desc: "Завершить незащищенные активные приложения",
+        .all_protected_desc: "Все активные приложения в белом списке",
+        .badge_pending: "В очереди",
+        .badge_protected: "Защищено",
+        .btn_terminate: "Завершить",
+        .btn_ready: "Готово",
+        .tab_targets: "К очистке",
+        .tab_protected: "Защищено",
+        .tab_all: "Все активные",
+        .empty_targets_title: "Нет процессов к завершению",
+        .empty_targets_subtitle: "Все графические приложения защищены белым списком",
+        .btn_view_all: "Просмотреть все %d активных процессов",
+        .empty_protected: "Нет подходящих правил белого списка",
+        .empty_all: "Графические процессы не обнаружены",
+        .group_targets: "Процессы к завершению",
+        .group_protected: "Защищенные процессы",
+        .btn_config: "Конфигурация",
+        .btn_language: "Язык",
+        .btn_quit: "Выход",
+        .lang_auto: "Авто (по умолчанию)",
+        .action_terminate_help: "Завершить задачу",
+        .action_add_whitelist: "Добавить в белый список",
+        .action_copy_id: "Скопировать идентификатор",
+        .action_more_help: "Дополнительные действия",
+        .btn_remove_protected: "Удалить",
+        .status_terminating_all: "Завершение процессов...",
+        .status_all_terminated: "Процессы завершены",
+        .status_some_unresponsive: "Некоторые процессы не отвечают",
+        .status_terminating_app: "Завершение %@...",
+        .status_app_terminated: "%@ завершено",
+        .status_app_terminate_failed: "Не удалось завершить %@",
+        .status_added_whitelist: "%@ добавлен в белый список",
+        .status_removed_whitelist: "%@ удален из белого списка",
+        .tier_l1: "L1: Ядро системы",
+        .tier_l2: "L2: Терминал сессии",
+        .tier_l3: "L3: Системные утилиты",
+        .tier_l4: "L4: Пользовательская",
+        .tier_cli: "L4: Параметр CLI"
+    ],
+    .nl: [
+        .header_running: "%d actief",
+        .header_refresh_help: "Voorgrondprocessen opnieuw scannen",
+        .targets_count: "%d processen te beëindigen",
+        .all_protected_title: "Alle apps zijn beveiligd",
+        .targets_desc: "Sluit niet-uitgezonderde voorgrondapps",
+        .all_protected_desc: "Alle actieve apps voldoen aan de whitelist",
+        .badge_pending: "In afwachting",
+        .badge_protected: "Beveiligd",
+        .btn_terminate: "Beëindigen",
+        .btn_ready: "Gereed",
+        .tab_targets: "Te wissen",
+        .tab_protected: "Beveiligd",
+        .tab_all: "Alles actief",
+        .empty_targets_title: "Geen processen in afwachting",
+        .empty_targets_subtitle: "Alle voorgrond-GUI-apps worden beschermd",
+        .btn_view_all: "Bekijk alle %d actieve processen",
+        .empty_protected: "Geen overeenkomende whitelist-regels",
+        .empty_all: "Geen voorgrond-GUI-processen gedetecteerd",
+        .group_targets: "Te beëindigen processen",
+        .group_protected: "Beveiligde processen",
+        .btn_config: "Configuratie",
+        .btn_language: "Taal",
+        .btn_quit: "Afsluiten",
+        .lang_auto: "Automatisch (standaard)",
+        .action_terminate_help: "Taak beëindigen",
+        .action_add_whitelist: "Toevoegen aan whitelist",
+        .action_copy_id: "Kopieer identificatie",
+        .action_more_help: "Meer acties",
+        .btn_remove_protected: "Verwijderen",
+        .status_terminating_all: "Processen beëindigen...",
+        .status_all_terminated: "Processen beëindigd",
+        .status_some_unresponsive: "Sommige processen reageren niet",
+        .status_terminating_app: "%@ beëindigen...",
+        .status_app_terminated: "%@ beëindigd",
+        .status_app_terminate_failed: "Kan %@ niet beëindigen",
+        .status_added_whitelist: "%@ toegevoegd aan whitelist",
+        .status_removed_whitelist: "%@ verwijderd van whitelist",
+        .tier_l1: "L1: Systeemkern",
+        .tier_l2: "L2: Context-shell",
+        .tier_l3: "L3: Permanente tools",
+        .tier_l4: "L4: Gebruikersconfig",
+        .tier_cli: "L4: CLI-overschrijving"
+    ],
+    .pl: [
+        .header_running: "%d aktywnych",
+        .header_refresh_help: "Ponownie skanuj procesy pierwszoplanowe",
+        .targets_count: "%d procesów do zakończenia",
+        .all_protected_title: "Wszystkie aplikacje chronione",
+        .targets_desc: "Zakończ nieobjęte ochroną aplikacje pierwszoplanowe",
+        .all_protected_desc: "Wszystkie aktywne aplikacje są na białej liście",
+        .badge_pending: "Oczekujące",
+        .badge_protected: "Chronione",
+        .btn_terminate: "Zakończ",
+        .btn_ready: "Gotowe",
+        .tab_targets: "Do czyszczenia",
+        .tab_protected: "Chronione",
+        .tab_all: "Wszystkie aktywne",
+        .empty_targets_title: "Brak oczekujących procesów",
+        .empty_targets_subtitle: "Wszystkie aplikacje pierwszoplanowe są chronione",
+        .btn_view_all: "Zobacz wszystkie %d aktywne procesy",
+        .empty_protected: "Brak pasujących reguł białej listy",
+        .empty_all: "Nie wykryto procesów GUI pierwszego planu",
+        .group_targets: "Procesy do zakończenia",
+        .group_protected: "Chronione procesy",
+        .btn_config: "Konfiguracja",
+        .btn_language: "Język",
+        .btn_quit: "Zakończ",
+        .lang_auto: "Automatycznie (domyślny)",
+        .action_terminate_help: "Zakończ zadanie",
+        .action_add_whitelist: "Dodaj do białej listy",
+        .action_copy_id: "Kopiuj identyfikator",
+        .action_more_help: "Więcej akcji",
+        .btn_remove_protected: "Usuń",
+        .status_terminating_all: "Kończenie procesów...",
+        .status_all_terminated: "Procesy zakończone",
+        .status_some_unresponsive: "Niektóre procesy nie odpowiadają",
+        .status_terminating_app: "Kończenie %@...",
+        .status_app_terminated: "%@ zakończono",
+        .status_app_terminate_failed: "Nie udało się zakończyć %@",
+        .status_added_whitelist: "Dodano %@ do białej listy",
+        .status_removed_whitelist: "Usunięto %@ z białej listy",
+        .tier_l1: "L1: Rdzeń systemu",
+        .tier_l2: "L2: Powłoka sesji",
+        .tier_l3: "L3: Narzędzia rezydentne",
+        .tier_l4: "L4: Konfiguracja użytkownika",
+        .tier_cli: "L4: Nadpisanie CLI"
+    ],
+    .tr: [
+        .header_running: "%d çalışıyor",
+        .header_refresh_help: "Ön plan işlemlerini yeniden tara",
+        .targets_count: "%d sonlandırılacak işlem",
+        .all_protected_title: "Tüm uygulamalar korunuyor",
+        .targets_desc: "Muaf olmayan ön plan uygulamalarını sonlandır",
+        .all_protected_desc: "Tüm etkin uygulamalar beyaz liste kurallarına uyuyor",
+        .badge_pending: "Bekliyor",
+        .badge_protected: "Korumalı",
+        .btn_terminate: "Sonlandır",
+        .btn_ready: "Hazır",
+        .tab_targets: "Temizlenecek",
+        .tab_protected: "Korumalı",
+        .tab_all: "Tümü etkin",
+        .empty_targets_title: "Bekleyen işlem yok",
+        .empty_targets_subtitle: "Tüm ön plan grafik uygulamaları beyaz liste ile korunuyor",
+        .btn_view_all: "Tüm %d etkin işlemi görüntüle",
+        .empty_protected: "Eşleşen beyaz liste kuralı yok",
+        .empty_all: "Ön plan grafik işlemi algılanmadı",
+        .group_targets: "Sonlandırılacak işlemler",
+        .group_protected: "Korunan işlemler",
+        .btn_config: "Yapılandırma",
+        .btn_language: "Dil",
+        .btn_quit: "Çıkış",
+        .lang_auto: "Otomatik (Sistem Varsayılanı)",
+        .action_terminate_help: "Görevi sonlandır",
+        .action_add_whitelist: "Beyaz listeye ekle",
+        .action_copy_id: "Tanımlayıcıyı kopyala",
+        .action_more_help: "Daha fazla işlem",
+        .btn_remove_protected: "Kaldır",
+        .status_terminating_all: "İşlemler sonlandırılıyor...",
+        .status_all_terminated: "İşlemler sonlandırıldı",
+        .status_some_unresponsive: "Bazı işlemler yanıt vermiyor",
+        .status_terminating_app: "%@ sonlandırılıyor...",
+        .status_app_terminated: "%@ sonlandırıldı",
+        .status_app_terminate_failed: "%@ sonlandırılamadı",
+        .status_added_whitelist: "%@ beyaz listeye eklendi",
+        .status_removed_whitelist: "%@ beyaz listeden kaldırıldı",
+        .tier_l1: "L1: Sistem Çekirdeği",
+        .tier_l2: "L2: Oturum Kabuğu",
+        .tier_l3: "L3: Yerleşik Araçlar",
+        .tier_l4: "L4: Kullanıcı Yapılandırması",
+        .tier_cli: "L4: CLI Geçersiz Kılma"
+    ],
+    .ar: [
+        .header_running: "%d قيد التشغيل",
+        .header_refresh_help: "إعادة فحص العمليات الأمامية",
+        .targets_count: "%d عمليات للإنهاء",
+        .all_protected_title: "جميع التطبيقات محمية",
+        .targets_desc: "إنهاء التطبيقات الأمامية غير المستثناة",
+        .all_protected_desc: "جميع التطبيقات النشطة تطابق قواعد القائمة البيضاء",
+        .badge_pending: "معلق",
+        .badge_protected: "محمي",
+        .btn_terminate: "إنهاء",
+        .btn_ready: "جاهز",
+        .tab_targets: "للتنظيف",
+        .tab_protected: "محمي",
+        .tab_all: "الكل نشط",
+        .empty_targets_title: "لا توجد عمليات معلقة",
+        .empty_targets_subtitle: "جميع تطبيقات الواجهة الأمامية محمية",
+        .btn_view_all: "عرض جميع العمليات النشطة البالغ عددها %d",
+        .empty_protected: "لا توجد قواعد مطابقة في القائمة البيضاء",
+        .empty_all: "لم يتم اكتشاف أي عمليات رسومية أمامية",
+        .group_targets: "العمليات المراد إنهاؤها",
+        .group_protected: "العمليات المحمية",
+        .btn_config: "ملف التكوين",
+        .btn_language: "اللغة",
+        .btn_quit: "إنهاء",
+        .lang_auto: "تلقائي (افتراضي النظام)",
+        .action_terminate_help: "إنهاء المهمة",
+        .action_add_whitelist: "إضافة إلى القائمة البيضاء",
+        .action_copy_id: "نسخ المعرّف",
+        .action_more_help: "مزيد من الإجراءات",
+        .btn_remove_protected: "إزالة",
+        .status_terminating_all: "جارٍ إنهاء العمليات...",
+        .status_all_terminated: "تم إنهاء العمليات",
+        .status_some_unresponsive: "بعض العمليات لا تستجيب",
+        .status_terminating_app: "جارٍ إنهاء %@...",
+        .status_app_terminated: "تم إنهاء %@",
+        .status_app_terminate_failed: "فشل إنهاء %@",
+        .status_added_whitelist: "تمت إضافة %@ إلى القائمة البيضاء",
+        .status_removed_whitelist: "تمت إزالة %@ من القائمة البيضاء",
+        .tier_l1: "L1: نواة النظام",
+        .tier_l2: "L2: صدفة الجلسة",
+        .tier_l3: "L3: الأدوات الدائمة",
+        .tier_l4: "L4: تكوين المستخدم",
+        .tier_cli: "L4: تجاوز CLI"
+    ],
+    .th: [
+        .header_running: "%d กำลังทำงาน",
+        .header_refresh_help: "สแกนกระบวนการเบื้องหน้าอีกครั้ง",
+        .targets_count: "%d กระบวนการที่รอสิ้นสุด",
+        .all_protected_title: "แอปพลิเคชันทั้งหมดได้รับการปกป้อง",
+        .targets_desc: "สิ้นสุดแอปพลิเคชันเบื้องหน้าที่ไม่ได้รับการยกเว้น",
+        .all_protected_desc: "แอปพลิเคชันที่ใช้งานอยู่ทั้งหมดตรงตามกฎรายการที่อนุญาต",
+        .badge_pending: "รอดำเนินการ",
+        .badge_protected: "ได้รับการปกป้อง",
+        .btn_terminate: "สิ้นสุด",
+        .btn_ready: "พร้อม",
+        .tab_targets: "ที่จะทำความสะอาด",
+        .tab_protected: "ได้รับการปกป้อง",
+        .tab_all: "ทั้งหมดที่ใช้งาน",
+        .empty_targets_title: "ไม่มีกระบวนการที่รอดำเนินการ",
+        .empty_targets_subtitle: "แอปพลิเคชัน GUI เบื้องหน้าทั้งหมดได้รับการปกป้อง",
+        .btn_view_all: "ดูกระบวนการที่ใช้งานอยู่ทั้งหมด %d รายการ",
+        .empty_protected: "ไม่มีกฎรายการที่อนุญาตที่ตรงกัน",
+        .empty_all: "ตรวจไม่พบกระบวนการ GUI เบื้องหน้า",
+        .group_targets: "กระบวนการที่จะสิ้นสุด",
+        .group_protected: "กระบวนการที่ได้รับการปกป้อง",
+        .btn_config: "ไฟล์การกำหนดค่า",
+        .btn_language: "ภาษา",
+        .btn_quit: "ออก",
+        .lang_auto: "อัตโนมัติ (ค่าเริ่มต้นระบบ)",
+        .action_terminate_help: "สิ้นสุดงาน",
+        .action_add_whitelist: "เพิ่มลงในรายการที่อนุญาต",
+        .action_copy_id: "คัดลอกตัวระบุ",
+        .action_more_help: "การดำเนินการเพิ่มเติม",
+        .btn_remove_protected: "ลบ",
+        .status_terminating_all: "กำลังสิ้นสุดกระบวนการ...",
+        .status_all_terminated: "กระบวนการสิ้นสุดแล้ว",
+        .status_some_unresponsive: "บางกระบวนการไม่ตอบสนอง",
+        .status_terminating_app: "กำลังสิ้นสุด %@...",
+        .status_app_terminated: "%@ สิ้นสุดแล้ว",
+        .status_app_terminate_failed: "ไม่สามารถสิ้นสุด %@",
+        .status_added_whitelist: "เพิ่ม %@ ในรายการที่อนุญาตแล้ว",
+        .status_removed_whitelist: "ลบ %@ ออกจากรายการที่อนุญาตแล้ว",
+        .tier_l1: "L1: แกนระบบ",
+        .tier_l2: "L2: เชลล์เซสชัน",
+        .tier_l3: "L3: ยูทิลิตี้ประจำ",
+        .tier_l4: "L4: การกำหนดค่าผู้ใช้",
+        .tier_cli: "L4: การแทนที่ CLI"
+    ],
+    .vi: [
+        .header_running: "%d đang chạy",
+        .header_refresh_help: "Quét lại các tiến trình phía trước",
+        .targets_count: "%d tiến trình cần kết thúc",
+        .all_protected_title: "Tất cả ứng dụng đều được bảo vệ",
+        .targets_desc: "Kết thúc các ứng dụng không được miễn trừ",
+        .all_protected_desc: "Mọi ứng dụng hoạt động đều khớp với danh sách trắng",
+        .badge_pending: "Đang chờ",
+        .badge_protected: "Được bảo vệ",
+        .btn_terminate: "Kết thúc",
+        .btn_ready: "Sẵn sàng",
+        .tab_targets: "Cần dọn dẹp",
+        .tab_protected: "Được bảo vệ",
+        .tab_all: "Tất cả hoạt động",
+        .empty_targets_title: "Không có tiến trình đang chờ",
+        .empty_targets_subtitle: "Tất cả ứng dụng GUI phía trước đều được bảo vệ",
+        .btn_view_all: "Xem tất cả %d tiến trình đang hoạt động",
+        .empty_protected: "Không có quy tắc danh sách trắng phù hợp",
+        .empty_all: "Không phát hiện tiến trình GUI phía trước",
+        .group_targets: "Tiến trình cần kết thúc",
+        .group_protected: "Tiến trình được bảo vệ",
+        .btn_config: "Tệp cấu hình",
+        .btn_language: "Ngôn ngữ",
+        .btn_quit: "Thoát",
+        .lang_auto: "Tự động (Mặc định hệ thống)",
+        .action_terminate_help: "Kết thúc tác vụ",
+        .action_add_whitelist: "Thêm vào danh sách trắng",
+        .action_copy_id: "Sao chép mã định danh",
+        .action_more_help: "Thao tác khác",
+        .btn_remove_protected: "Xóa",
+        .status_terminating_all: "Đang kết thúc tiến trình...",
+        .status_all_terminated: "Đã kết thúc tiến trình",
+        .status_some_unresponsive: "Một số tiến trình không phản hồi",
+        .status_terminating_app: "Đang kết thúc %@...",
+        .status_app_terminated: "Đã kết thúc %@",
+        .status_app_terminate_failed: "Không thể kết thúc %@",
+        .status_added_whitelist: "Đã thêm %@ vào danh sách trắng",
+        .status_removed_whitelist: "Đã xóa %@ khỏi danh sách trắng",
+        .tier_l1: "L1: Cốt lõi hệ thống",
+        .tier_l2: "L2: Phiên làm việc",
+        .tier_l3: "L3: Tiện ích thường trú",
+        .tier_l4: "L4: Cấu hình người dùng",
+        .tier_cli: "L4: Ghi đè CLI"
+    ],
+    .id: [
+        .header_running: "%d berjalan",
+        .header_refresh_help: "Pindai ulang proses latar depan",
+        .targets_count: "%d proses untuk dihentikan",
+        .all_protected_title: "Semua aplikasi dilindungi",
+        .targets_desc: "Hentikan aplikasi latar depan yang tidak dikecualikan",
+        .all_protected_desc: "Semua aplikasi aktif cocok dengan aturan whitelist",
+        .badge_pending: "Tertunda",
+        .badge_protected: "Dilindungi",
+        .btn_terminate: "Hentikan",
+        .btn_ready: "Siap",
+        .tab_targets: "Untuk Dibersihkan",
+        .tab_protected: "Dilindungi",
+        .tab_all: "Semua Aktif",
+        .empty_targets_title: "Tidak ada proses tertunda",
+        .empty_targets_subtitle: "Semua aplikasi GUI latar depan dilindungi",
+        .btn_view_all: "Lihat semua %d proses aktif",
+        .empty_protected: "Tidak ada aturan whitelist yang cocok",
+        .empty_all: "Tidak ada proses GUI latar depan terdeteksi",
+        .group_targets: "Proses untuk Dihentikan",
+        .group_protected: "Proses yang Dilindungi",
+        .btn_config: "Konfigurasi",
+        .btn_language: "Bahasa",
+        .btn_quit: "Keluar",
+        .lang_auto: "Otomatis (Default Sistem)",
+        .action_terminate_help: "Hentikan tugas",
+        .action_add_whitelist: "Tambahkan ke Whitelist",
+        .action_copy_id: "Salin Pengidentifikasi",
+        .action_more_help: "Tindakan Lainnya",
+        .btn_remove_protected: "Hapus",
+        .status_terminating_all: "Menghentikan proses...",
+        .status_all_terminated: "Proses dihentikan",
+        .status_some_unresponsive: "Beberapa proses tidak merespons",
+        .status_terminating_app: "Menghentikan %@...",
+        .status_app_terminated: "%@ dihentikan",
+        .status_app_terminate_failed: "Gagal menghentikan %@",
+        .status_added_whitelist: "Menambahkan %@ ke whitelist",
+        .status_removed_whitelist: "Menghapus %@ dari whitelist",
+        .tier_l1: "L1: Inti Sistem",
+        .tier_l2: "L2: Shell Konteks",
+        .tier_l3: "L3: Utilitas Residen",
+        .tier_l4: "L4: Konfigurasi Pengguna",
+        .tier_cli: "L4: Penggantian CLI"
+    ],
+    .sv: [
+        .header_running: "%d körs",
+        .header_refresh_help: "Skanna förgrundsprocesser igen",
+        .targets_count: "%d processer att avsluta",
+        .all_protected_title: "Alla appar är skyddade",
+        .targets_desc: "Avsluta oskyddade förgrundsappar",
+        .all_protected_desc: "Alla aktiva appar matchar vitlistan",
+        .badge_pending: "Väntar",
+        .badge_protected: "Skyddad",
+        .btn_terminate: "Avsluta",
+        .btn_ready: "Redo",
+        .tab_targets: "Att rensa",
+        .tab_protected: "Skyddade",
+        .tab_all: "Alla aktiva",
+        .empty_targets_title: "Inga väntande processer",
+        .empty_targets_subtitle: "Alla förgrunds GUI-appar är skyddade",
+        .btn_view_all: "Visa alla %d aktiva processer",
+        .empty_protected: "Inga matchande vitlisteregler",
+        .empty_all: "Inga förgrunds GUI-processer upptäcktes",
+        .group_targets: "Processer att avsluta",
+        .group_protected: "Skyddade processer",
+        .btn_config: "Konfiguration",
+        .btn_language: "Språk",
+        .btn_quit: "Avsluta",
+        .lang_auto: "Automatiskt (systemstandard)",
+        .action_terminate_help: "Avsluta uppgift",
+        .action_add_whitelist: "Lägg till i vitlistan",
+        .action_copy_id: "Kopiera identifierare",
+        .action_more_help: "Fler åtgärder",
+        .btn_remove_protected: "Ta bort",
+        .status_terminating_all: "Avslutar processer...",
+        .status_all_terminated: "Processer avslutade",
+        .status_some_unresponsive: "Vissa processer svarar inte",
+        .status_terminating_app: "Avslutar %@...",
+        .status_app_terminated: "%@ avslutad",
+        .status_app_terminate_failed: "Kunde inte avsluta %@",
+        .status_added_whitelist: "Lade till %@ i vitlistan",
+        .status_removed_whitelist: "Tog bort %@ från vitlistan",
+        .tier_l1: "L1: Systemkärna",
+        .tier_l2: "L2: Kontextskal",
+        .tier_l3: "L3: Residenta verktyg",
+        .tier_l4: "L4: Användarkonfig",
+        .tier_cli: "L4: CLI-undantag"
+    ],
+    .da: [
+        .header_running: "%d kører",
+        .header_refresh_help: "Genskan forgrundsprocesser",
+        .targets_count: "%d processer der skal afsluttes",
+        .all_protected_title: "Alle apps er beskyttet",
+        .targets_desc: "Afslut ubeskyttede forgrundsapps",
+        .all_protected_desc: "Alle aktive apps matcher hvidlisten",
+        .badge_pending: "Afventer",
+        .badge_protected: "Beskyttet",
+        .btn_terminate: "Afslut",
+        .btn_ready: "Klar",
+        .tab_targets: "Til rensning",
+        .tab_protected: "Beskyttet",
+        .tab_all: "Alle aktive",
+        .empty_targets_title: "Ingen afventende processer",
+        .empty_targets_subtitle: "Alle forgrunds GUI-apps er beskyttet",
+        .btn_view_all: "Vis alle %d aktive processer",
+        .empty_protected: "Ingen matchende hvidlisteregler",
+        .empty_all: "Ingen forgrunds GUI-processer registreret",
+        .group_targets: "Processer der skal afsluttes",
+        .group_protected: "Beskyttede processer",
+        .btn_config: "Konfiguration",
+        .btn_language: "Sprog",
+        .btn_quit: "Slut",
+        .lang_auto: "Automatisk (systemstandard)",
+        .action_terminate_help: "Afslut opgave",
+        .action_add_whitelist: "Føj til hvidliste",
+        .action_copy_id: "Kopier identifikator",
+        .action_more_help: "Flere handlinger",
+        .btn_remove_protected: "Fjern",
+        .status_terminating_all: "Afslutter processer...",
+        .status_all_terminated: "Processer afsluttet",
+        .status_some_unresponsive: "Nogle processer svarer ikke",
+        .status_terminating_app: "Afslutter %@...",
+        .status_app_terminated: "%@ afsluttet",
+        .status_app_terminate_failed: "Kunne ikke afslutte %@",
+        .status_added_whitelist: "Føjede %@ til hvidliste",
+        .status_removed_whitelist: "Fjernede %@ fra hvidliste",
+        .tier_l1: "L1: Systemkerne",
+        .tier_l2: "L2: Kontext-shell",
+        .tier_l3: "L3: Permanente hjælpeprogrammer",
+        .tier_l4: "L4: Brugerkonfiguration",
+        .tier_cli: "L4: CLI-tilsidesættelse"
+    ],
+    .nb: [
+        .header_running: "%d kjører",
+        .header_refresh_help: "Skann forgrunnsprosesser på nytt",
+        .targets_count: "%d prosesser som skal avsluttes",
+        .all_protected_title: "Alle apper er beskyttet",
+        .targets_desc: "Avslutt ubeskyttede forgrunnsapper",
+        .all_protected_desc: "Alle aktive apper matcher hvitelisten",
+        .badge_pending: "Venter",
+        .badge_protected: "Beskyttet",
+        .btn_terminate: "Avslutt",
+        .btn_ready: "Klar",
+        .tab_targets: "Skal renses",
+        .tab_protected: "Beskyttet",
+        .tab_all: "Alle aktive",
+        .empty_targets_title: "Ingen ventende prosesser",
+        .empty_targets_subtitle: "Alle GUI-forgrunnsapper er beskyttet",
+        .btn_view_all: "Vis alle %d aktive prosesser",
+        .empty_protected: "Ingen matchende hvitelisteregler",
+        .empty_all: "Ingen GUI-forgrunnsprosesser oppdaget",
+        .group_targets: "Prosesser som skal avsluttes",
+        .group_protected: "Beskyttede prosesser",
+        .btn_config: "Konfigurasjon",
+        .btn_language: "Språk",
+        .btn_quit: "Avslutt",
+        .lang_auto: "Automatisk (systemstandard)",
+        .action_terminate_help: "Avslutt oppgave",
+        .action_add_whitelist: "Legg til i hviteliste",
+        .action_copy_id: "Kopier identifikator",
+        .action_more_help: "Flere handlinger",
+        .btn_remove_protected: "Fjern",
+        .status_terminating_all: "Avslutter prosesser...",
+        .status_all_terminated: "Prosesser avsluttet",
+        .status_some_unresponsive: "Noen prosesser svarer ikke",
+        .status_terminating_app: "Avslutter %@...",
+        .status_app_terminated: "%@ avsluttet",
+        .status_app_terminate_failed: "Kunne ikke avslutte %@",
+        .status_added_whitelist: "La til %@ i hviteliste",
+        .status_removed_whitelist: "Fjernet %@ fra hviteliste",
+        .tier_l1: "L1: Systemkjerne",
+        .tier_l2: "L2: Kontekst-skall",
+        .tier_l3: "L3: Faste verktøy",
+        .tier_l4: "L4: Brukerkonfig",
+        .tier_cli: "L4: CLI-overstyring"
+    ],
+    .fi: [
+        .header_running: "%d käynnissä",
+        .header_refresh_help: "Skannaa edustaprosessit uudelleen",
+        .targets_count: "%d päätettävää prosessia",
+        .all_protected_title: "Kaikki sovellukset suojattu",
+        .targets_desc: "Päätä suojaamattomat edustasovellukset",
+        .all_protected_desc: "Kaikki aktiiviset sovellukset vastaavat sallittujen luetteloa",
+        .badge_pending: "Odottaa",
+        .badge_protected: "Suojattu",
+        .btn_terminate: "Päätä",
+        .btn_ready: "Valmis",
+        .tab_targets: "Puhdistettavat",
+        .tab_protected: "Suojatut",
+        .tab_all: "Kaikki aktiiviset",
+        .empty_targets_title: "Ei odottavia prosesseja",
+        .empty_targets_subtitle: "Kaikki edustan graafiset sovellukset on suojattu",
+        .btn_view_all: "Näytä kaikki %d aktiivista prosessia",
+        .empty_protected: "Ei vastaavia sallittujen luettelon sääntöjä",
+        .empty_all: "Edustan graafisia prosesseja ei havaittu",
+        .group_targets: "Päätettävät prosessit",
+        .group_protected: "Suojatut prosessit",
+        .btn_config: "Asetukset",
+        .btn_language: "Kieli",
+        .btn_quit: "Lopeta",
+        .lang_auto: "Automaattinen (oletus)",
+        .action_terminate_help: "Päätä tehtävä",
+        .action_add_whitelist: "Lisää sallittujen luetteloon",
+        .action_copy_id: "Kopioi tunniste",
+        .action_more_help: "Lisää toimintoja",
+        .btn_remove_protected: "Poista",
+        .status_terminating_all: "Päätetään prosesseja...",
+        .status_all_terminated: "Prosessit päätetty",
+        .status_some_unresponsive: "Jotkin prosessit eivät vastaa",
+        .status_terminating_app: "Päätetään %@...",
+        .status_app_terminated: "%@ päätetty",
+        .status_app_terminate_failed: "Ei voitu päättää kohdetta %@",
+        .status_added_whitelist: "Lisätty %@ sallittujen luetteloon",
+        .status_removed_whitelist: "Poistettu %@ sallittujen luettelosta",
+        .tier_l1: "L1: Järjestelmäydin",
+        .tier_l2: "L2: Kontekstikuori",
+        .tier_l3: "L3: Pysyvät apuohjelmat",
+        .tier_l4: "L4: Käyttäjäasetukset",
+        .tier_cli: "L4: CLI-ohitus"
+    ],
+    .cs: [
+        .header_running: "%d běží",
+        .header_refresh_help: "Znovu skenovat procesy v popředí",
+        .targets_count: "%d procesů k ukončení",
+        .all_protected_title: "Všechny aplikace jsou chráněny",
+        .targets_desc: "Ukončit nechráněné aplikace v popředí",
+        .all_protected_desc: "Všechny aktivní aplikace odpovídají seznamu povolených",
+        .badge_pending: "Čeká",
+        .badge_protected: "Chráněno",
+        .btn_terminate: "Ukončit",
+        .btn_ready: "Připraveno",
+        .tab_targets: "K vyčištění",
+        .tab_protected: "Chráněné",
+        .tab_all: "Všechny aktivní",
+        .empty_targets_title: "Žádné čekající procesy",
+        .empty_targets_subtitle: "Všechny grafické aplikace v popředí jsou chráněny",
+        .btn_view_all: "Zobrazit všech %d aktivních procesů",
+        .empty_protected: "Žádná odpovídající pravidla povolených",
+        .empty_all: "Nebyly zjištěny žádné grafické procesy v popředí",
+        .group_targets: "Procesy k ukončení",
+        .group_protected: "Chráněné procesy",
+        .btn_config: "Konfigurace",
+        .btn_language: "Jazyk",
+        .btn_quit: "Konec",
+        .lang_auto: "Automaticky (výchozí)",
+        .action_terminate_help: "Ukončit úlohu",
+        .action_add_whitelist: "Přidat na seznam povolených",
+        .action_copy_id: "Zkopírovat identifikátor",
+        .action_more_help: "Další akce",
+        .btn_remove_protected: "Odebrat",
+        .status_terminating_all: "Ukončování procesů...",
+        .status_all_terminated: "Procesy ukončeny",
+        .status_some_unresponsive: "Některé procesy neodpovídají",
+        .status_terminating_app: "Ukončování %@...",
+        .status_app_terminated: "%@ ukončeno",
+        .status_app_terminate_failed: "Nepodařilo se ukončit %@",
+        .status_added_whitelist: "%@ přidáno na seznam povolených",
+        .status_removed_whitelist: "%@ odebráno ze seznamu povolených",
+        .tier_l1: "L1: Jádro systému",
+        .tier_l2: "L2: Kontextový shell",
+        .tier_l3: "L3: Rezidentní nástroje",
+        .tier_l4: "L4: Uživatelská konfigurace",
+        .tier_cli: "L4: Přepsání CLI"
+    ],
+    .uk: [
+        .header_running: "%d запущено",
+        .header_refresh_help: "Повторно сканувати процеси переднього плану",
+        .targets_count: "%d процесів для завершення",
+        .all_protected_title: "Усі програми захищено",
+        .targets_desc: "Завершити незахищені програми переднього плану",
+        .all_protected_desc: "Усі активні програми відповідають правилам білого списку",
+        .badge_pending: "Очікує",
+        .badge_protected: "Захищено",
+        .btn_terminate: "Завершити",
+        .btn_ready: "Готово",
+        .tab_targets: "До очищення",
+        .tab_protected: "Захищено",
+        .tab_all: "Усі активні",
+        .empty_targets_title: "Немає процесів в очікуванні",
+        .empty_targets_subtitle: "Усі графічні програми переднього плану захищені",
+        .btn_view_all: "Переглянути всі %d активних процесів",
+        .empty_protected: "Немає відповідних правил білого списку",
+        .empty_all: "Не виявлено графічних процесів переднього плану",
+        .group_targets: "Процеси для завершення",
+        .group_protected: "Захищені процеси",
+        .btn_config: "Конфігурація",
+        .btn_language: "Мова",
+        .btn_quit: "Вийти",
+        .lang_auto: "Авто (за замовчуванням)",
+        .action_terminate_help: "Завершити завдання",
+        .action_add_whitelist: "Додати до білого списку",
+        .action_copy_id: "Скопіювати ідентифікатор",
+        .action_more_help: "Більше дій",
+        .btn_remove_protected: "Видалити",
+        .status_terminating_all: "Завершення процесів...",
+        .status_all_terminated: "Процеси завершено",
+        .status_some_unresponsive: "Деякі процеси не відповідають",
+        .status_terminating_app: "Завершення %@...",
+        .status_app_terminated: "%@ завершено",
+        .status_app_terminate_failed: "Не вдалося завершити %@",
+        .status_added_whitelist: "%@ додано до білого списку",
+        .status_removed_whitelist: "%@ видалено з білого списку",
+        .tier_l1: "L1: Ядро системи",
+        .tier_l2: "L2: Термінал сесії",
+        .tier_l3: "L3: Системні утиліти",
+        .tier_l4: "L4: Конфігурація користувача",
+        .tier_cli: "L4: Перевизначення CLI"
+    ]
+]

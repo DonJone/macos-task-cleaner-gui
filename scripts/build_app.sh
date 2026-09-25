@@ -47,6 +47,35 @@ cat << 'EOF' > "$CONTENTS_DIR/Info.plist"
     <string>0.1.0</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>zh-Hans</string>
+        <string>zh-Hant</string>
+        <string>ja</string>
+        <string>ko</string>
+        <string>fr</string>
+        <string>de</string>
+        <string>es</string>
+        <string>pt</string>
+        <string>it</string>
+        <string>ru</string>
+        <string>nl</string>
+        <string>pl</string>
+        <string>tr</string>
+        <string>ar</string>
+        <string>th</string>
+        <string>vi</string>
+        <string>id</string>
+        <string>sv</string>
+        <string>da</string>
+        <string>nb</string>
+        <string>fi</string>
+        <string>cs</string>
+        <string>uk</string>
+    </array>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>LSUIElement</key>
@@ -56,6 +85,16 @@ cat << 'EOF' > "$CONTENTS_DIR/Info.plist"
 </dict>
 </plist>
 EOF
+
+echo "       生成 24 种语言本地化资源包 (.lproj)..."
+LANGS=("en" "zh-Hans" "zh-Hant" "ja" "ko" "fr" "de" "es" "pt" "it" "ru" "nl" "pl" "tr" "ar" "th" "vi" "id" "sv" "da" "nb" "fi" "cs" "uk")
+for lang in "${LANGS[@]}"; do
+    mkdir -p "$RESOURCES_DIR/$lang.lproj"
+    cat << EOF > "$RESOURCES_DIR/$lang.lproj/InfoPlist.strings"
+"CFBundleDisplayName" = "Task Cleaner";
+"CFBundleName" = "Task Cleaner";
+EOF
+done
 
 echo "[4/4] 打包完成: $APP_DIR"
 echo "[提示] 可将应用移动到 Applications 目录:"
