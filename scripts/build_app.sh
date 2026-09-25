@@ -18,9 +18,17 @@ echo "[2/4] 正在生成 $APP_NAME 目录结构..."
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR"
 
-echo "[3/4] 拷贝可执行文件并写入 Info.plist..."
+echo "[3/4] 拷贝可执行文件、图标并写入 Info.plist..."
 cp "$DIR/.build/release/TaskCleanerGUI" "$MACOS_DIR/TaskCleanerGUI"
 chmod +x "$MACOS_DIR/TaskCleanerGUI"
+
+if [ ! -f "$DIR/Resources/AppIcon.icns" ]; then
+    echo "       正在生成 AppIcon.icns..."
+    swift "$DIR/scripts/generate_app_icon.swift"
+    iconutil -c icns /tmp/AppIcon.iconset -o "$DIR/Resources/AppIcon.icns"
+fi
+
+cp "$DIR/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
 
 cat << 'EOF' > "$CONTENTS_DIR/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -37,6 +45,8 @@ cat << 'EOF' > "$CONTENTS_DIR/Info.plist"
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
     <string>0.1.0</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>LSUIElement</key>

@@ -56,13 +56,7 @@ struct TaskCleanerApp: App {
         MenuBarExtra {
             TaskCleanerMenuView(viewModel: viewModel)
         } label: {
-            HStack(spacing: 3.5) {
-                Image(nsImage: TrayIconHelper.pillXIcon)
-                if let count = viewModel.summary?.target_count, count > 0 {
-                    Text("\(count)")
-                        .font(.system(size: 10.5, weight: .bold, design: .rounded))
-                }
-            }
+            Image(nsImage: TrayIconHelper.pillXIcon)
         }
         .menuBarExtraStyle(.window)
     }
