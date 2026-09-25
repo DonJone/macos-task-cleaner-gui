@@ -1,0 +1,128 @@
+import Foundation
+import AppKit
+
+public class MTCBridge {
+    public static let shared = MTCBridge()
+
+    public func findMTCBinary() -> String? {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let possiblePaths = [
+            "\(home)/.local/bin/mtc",
+            "\(home)/.local/bin/taskcleaner",
+            "/usr/local/bin/mtc",
+            "/opt/homebrew/bin/mtc",
+            "/usr/local/bin/taskcleaner"
+        ]
+
+        for path in possiblePaths {
+            if FileManager.default.isExecutableFile(atPath: path) {
+                return path
+            }
+        }
+
+        // Try `which mtc`
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/which")
+        process.arguments = ["mtc"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        if let _ = try? process.run() {
+            process.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !output.isEmpty && FileManager.default.isExecutableFile(atPath: output) {
+                return output
+            }
+        }
+
+        return nil
+    }
+
+    public func fetchSummary() -> DryRunSummary? {
+        guard let mtc = findMTCBinary() else {
+            return nil
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: mtc)
+        process.arguments = ["--json", "--dry-run"]
+        let pipe = Pipe()
+        process.standardOutput = pipe
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            let decoder = JSONDecoder()
+            return try decoder.decode(DryRunSummary.self, from: data)
+        } catch {
+            return nil
+        }
+    }
+
+    public func executeClean(force: Bool = false, purge: Bool = false) -> Bool {
+        guard let mtc = findMTCBinary() else {
+            return false
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: mtc)
+        var args = ["--execute"]
+        if force {
+            args.append("--force")
+        }
+        if purge {
+            args.append("--purge")
+        }
+        process.arguments = args
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
+    public func addToWhitelist(identifier: String) -> Bool {
+        guard let mtc = findMTCBinary() else {
+            return false
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: mtc)
+        process.arguments = ["-a", identifier]
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
+    public func openConfigFile() {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let mtcConfig = home.appendingPathComponent(".config/mtc/config.toml")
+        let legacyConfig = home.appendingPathComponent(".config/taskcleaner/config.toml")
+
+        let target = FileManager.default.fileExists(atPath: mtcConfig.path) ? mtcConfig : legacyConfig
+
+        if FileManager.default.fileExists(atPath: target.path) {
+            NSWorkspace.shared.open(target)
+        } else {
+            // Run `mtc --init-config` to generate it
+            if let mtc = findMTCBinary() {
+                let process = Process()
+                process.executableURL = URL(fileURLWithPath: mtc)
+                process.arguments = ["--init-config"]
+                try? process.run()
+                process.waitUntilExit()
+            }
+            NSWorkspace.shared.open(mtcConfig)
+        }
+    }
+}
