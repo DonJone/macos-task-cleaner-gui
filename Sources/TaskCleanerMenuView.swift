@@ -415,7 +415,29 @@ public struct TaskCleanerMenuView: View {
     }
 }
 
-// MARK: - 原生待清场应用行组件 (支持单独结束任务与拓展选项)
+// MARK: - 辅助绘制原生矢量纵向三点图标 (避免 AppKit 丢弃旋转 modifier)
+private func makeVerticalEllipsisImage() -> NSImage {
+    let img = NSImage(size: NSSize(width: 14, height: 16), flipped: false) { rect in
+        let dotRadius: CGFloat = 1.35
+        let centerX = rect.midX
+        let centerY = rect.midY
+        let spacing: CGFloat = 4.2
+
+        let dotsY = [centerY + spacing, centerY, centerY - spacing]
+        NSColor.secondaryLabelColor.setFill()
+
+        for y in dotsY {
+            let dotRect = NSRect(x: centerX - dotRadius, y: y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
+            let path = NSBezierPath(ovalIn: dotRect)
+            path.fill()
+        }
+        return true
+    }
+    img.isTemplate = true
+    return img
+}
+
+// MARK: - 原生待清场应用行组件 (支持单独结束任务与拓展选项，统一右对齐)
 struct NativeTargetRow: View {
     let app: TargetAppEntry
     let isWorking: Bool
@@ -447,8 +469,8 @@ struct NativeTargetRow: View {
 
             Spacer()
 
-            HStack(spacing: 4) {
-                // 单独结束任务按钮 (小垃圾桶图标)
+            HStack(spacing: 0) {
+                // 1. 单独结束任务按钮 (小垃圾桶图标)
                 Button(action: onTerminate) {
                     Image(systemName: "trash")
                         .font(.system(size: 11))
@@ -460,7 +482,7 @@ struct NativeTargetRow: View {
                 .help("结束任务")
                 .disabled(isWorking)
 
-                // 拓展项 (竖三点)：加入白名单位于拓展菜单
+                // 2. 拓展项 (竖三点)：加入白名单位于拓展菜单，严格右对齐
                 Menu {
                     Button(action: onWhitelist) {
                         Label("加入白名单", systemImage: "checkmark.shield")
@@ -478,25 +500,25 @@ struct NativeTargetRow: View {
                         Label("复制标识符", systemImage: "doc.on.doc")
                     }
                 } label: {
-                    Image(systemName: "ellipsis")
-                        .font(.system(size: 11, weight: .medium))
-                        .rotationEffect(.degrees(90))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 20, height: 22)
+                    Image(nsImage: makeVerticalEllipsisImage())
+                        .frame(width: 14, height: 22)
                         .contentShape(Rectangle())
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
                 .help("拓展操作")
+                .frame(width: 18, height: 22)
+                .offset(x: 3)
                 .disabled(isWorking)
             }
+            .frame(width: 44, alignment: .trailing)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
     }
 }
 
-// MARK: - 原生受保护应用行组件
+// MARK: - 原生受保护应用行组件 (统一右对齐基线)
 struct NativeProtectedRow: View {
     let app: ProtectedAppEntry
     let isWorking: Bool
@@ -506,22 +528,23 @@ struct NativeProtectedRow: View {
         HStack(spacing: 8) {
             Image(nsImage: app.appIcon)
                 .resizable()
-                .frame(width: 20, height: 20)
-                .clipShape(RoundedRectangle(cornerRadius: 4.5, style: .continuous))
+                .frame(width: 22, height: 22)
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 4.5, style: .continuous)
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
                         .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
                 )
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(app.name)
-                    .font(.system(size: 11.5, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
                 Text(app.tier)
                     .font(.system(size: 9.5))
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
 
             Spacer()
@@ -531,9 +554,10 @@ struct NativeProtectedRow: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)
+            .frame(width: 44, alignment: .trailing)
             .disabled(isWorking)
         }
         .padding(.horizontal, 10)
-        .padding(.vertical, 4.5)
+        .padding(.vertical, 5)
     }
 }
