@@ -5,8 +5,10 @@ public class MTCBridge {
     public static let shared = MTCBridge()
 
     public func findMTCBinary() -> String? {
+        let bundleInternal = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/mtc").path
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         let possiblePaths = [
+            bundleInternal,
             "\(home)/.local/bin/mtc",
             "\(home)/.local/bin/taskcleaner",
             "/usr/local/bin/mtc",
