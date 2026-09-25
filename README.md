@@ -28,6 +28,7 @@ A lightweight, native macOS menu bar application designed for non-intrusive fore
 * **Non-Intrusive POSIX Escalation**: Triggers `SIGTERM -> grace polling -> SIGKILL` via the underlying `mtc` bridge, bypassing modal save/confirm dialogs.
 * **Authentic macOS System Utility Styling**: Employs dark monitor screen squircle aesthetics matching macOS Terminal and Activity Monitor.
 * **24 Global Languages & Automatic Locale Detection**: Automatically detects macOS system language across 24 common languages (English, 简体中文, 繁體中文, 日本語, 한국어, Français, Deutsch, Español, Português, Italiano, Русский, Nederlands, Polski, Türkçe, العربية, ไทย, Tiếng Việt, Bahasa Indonesia, Svenska, Dansk, Norsk Bokmål, Suomi, Čeština, Українська) with seamless manual switching via the bottom toolbar.
+* **First-Launch Onboarding & Launch at Login**: Features a native onboarding card on first run, powered by modern macOS 13+ `SMAppService` with zero daemon overhead and instant toggling in settings.
 
 ---
 

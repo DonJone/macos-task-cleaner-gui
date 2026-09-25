@@ -4,6 +4,7 @@ import AppKit
 public struct TaskCleanerMenuView: View {
     @ObservedObject public var viewModel: TaskCleanerViewModel
     @ObservedObject private var i18n = I18n.shared
+    @ObservedObject private var launchManager = LaunchAtLoginManager.shared
 
     public init(viewModel: TaskCleanerViewModel) {
         self.viewModel = viewModel
@@ -18,6 +19,11 @@ public struct TaskCleanerMenuView: View {
             VStack(spacing: 10) {
                 // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
                 headerSection
+
+                // 首次开机自启动引导卡片 (仅首次打开且未开启时展示)
+                if launchManager.shouldShowPrompt {
+                    launchAtLoginPromptCard
+                }
 
                 // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
                 actionSection
@@ -81,6 +87,71 @@ public struct TaskCleanerMenuView: View {
             .help(i18n.t(.header_refresh_help))
         }
         .frame(height: 24)
+    }
+
+    // MARK: - 首次开机自启动引导卡片 (Apple 原生质感，支持立即启用与稍后忽略)
+    private var launchAtLoginPromptCard: some View {
+        SystemCard(cornerRadius: 10) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Image(systemName: "macwindow.and.cursor")
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundStyle(Color(nsColor: .systemBlue))
+
+                    Text(i18n.t(.launch_at_login_title))
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundStyle(.primary)
+
+                    Spacer()
+
+                    Button(action: {
+                        launchManager.dismissPrompt()
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 16, height: 16)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Text(i18n.t(.launch_at_login_desc))
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: 8) {
+                    Spacer()
+
+                    Button(action: {
+                        launchManager.dismissPrompt()
+                    }) {
+                        Text(i18n.t(.btn_later))
+                            .font(.system(size: 10.5))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+
+                    Button(action: {
+                        launchManager.enableFromPrompt()
+                        viewModel.statusMessage = i18n.t(.status_launch_enabled)
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000)
+                            viewModel.statusMessage = nil
+                        }
+                    }) {
+                        Text(i18n.t(.btn_enable))
+                            .font(.system(size: 10.5, weight: .semibold))
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.mini)
+                }
+            }
+            .padding(9)
+        }
+        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     // MARK: - Action Section (结构恒定，去除底层命令字样与注释，自然优雅)
@@ -389,9 +460,31 @@ public struct TaskCleanerMenuView: View {
                 .opacity(0.4)
 
             HStack {
-                Button(action: {
-                    viewModel.openConfigFile()
-                }) {
+                Menu {
+                    Button(action: {
+                        launchManager.toggle()
+                        viewModel.statusMessage = launchManager.isEnabled ? i18n.t(.status_launch_enabled) : i18n.t(.status_launch_disabled)
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000)
+                            viewModel.statusMessage = nil
+                        }
+                    }) {
+                        HStack {
+                            Text(i18n.t(.launch_at_login_menu))
+                            if launchManager.isEnabled {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+
+                    Divider()
+
+                    Button(action: {
+                        viewModel.openConfigFile()
+                    }) {
+                        Text(i18n.t(.btn_config))
+                    }
+                } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "gearshape")
                             .font(.system(size: 11))
@@ -400,7 +493,8 @@ public struct TaskCleanerMenuView: View {
                     }
                     .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.plain)
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
 
                 Spacer()
 

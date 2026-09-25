@@ -143,6 +143,13 @@ public enum I18nKey: String {
     case tier_l3
     case tier_l4
     case tier_cli
+    case launch_at_login_title
+    case launch_at_login_desc
+    case btn_enable
+    case btn_later
+    case launch_at_login_menu
+    case status_launch_enabled
+    case status_launch_disabled
 }
 
 @MainActor
@@ -300,7 +307,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Context Shell",
         .tier_l3: "L3: Utilities",
         .tier_l4: "L4: User Config",
-        .tier_cli: "L4: CLI Override"
+        .tier_cli: "L4: CLI Override",
+        .launch_at_login_title: "Launch at Login",
+        .launch_at_login_desc: "Run quietly in menu bar on system startup",
+        .btn_enable: "Enable",
+        .btn_later: "Later",
+        .launch_at_login_menu: "Launch at Login",
+        .status_launch_enabled: "Launch at login enabled",
+        .status_launch_disabled: "Launch at login disabled"
     ],
     .zhHans: [
         .header_running: "%d 运行中",
@@ -344,7 +358,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: 会话终端",
         .tier_l3: "L3: 常驻设施",
         .tier_l4: "L4: 用户配置",
-        .tier_cli: "L4: CLI保留"
+        .tier_cli: "L4: CLI保留",
+        .launch_at_login_title: "开机自启动",
+        .launch_at_login_desc: "登录系统时常驻菜单栏，随时快速清场",
+        .btn_enable: "启用",
+        .btn_later: "稍后",
+        .launch_at_login_menu: "开机自动启动",
+        .status_launch_enabled: "已启用开机自启动",
+        .status_launch_disabled: "已停用开机自启动"
     ],
     .zhHant: [
         .header_running: "%d 運行中",
@@ -388,7 +409,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: 工作階段終端機",
         .tier_l3: "L3: 常駐設施",
         .tier_l4: "L4: 使用者設定",
-        .tier_cli: "L4: CLI保留"
+        .tier_cli: "L4: CLI保留",
+        .launch_at_login_title: "開機自動啟動",
+        .launch_at_login_desc: "登入系統時常駐選單列，隨時快速清場",
+        .btn_enable: "啟用",
+        .btn_later: "稍後",
+        .launch_at_login_menu: "開機自動啟動",
+        .status_launch_enabled: "已啟用開機自動啟動",
+        .status_launch_disabled: "已停用開機自動啟動"
     ],
     .ja: [
         .header_running: "%d 実行中",
@@ -432,7 +460,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: 端末シェル",
         .tier_l3: "L3: 常駐ツール",
         .tier_l4: "L4: ユーザー設定",
-        .tier_cli: "L4: CLI指定"
+        .tier_cli: "L4: CLI指定",
+        .launch_at_login_title: "ログイン時に起動",
+        .launch_at_login_desc: "システム起動時にメニューバーに常駐します",
+        .btn_enable: "有効にする",
+        .btn_later: "後で",
+        .launch_at_login_menu: "ログイン時に自動起動",
+        .status_launch_enabled: "ログイン時起動を有効化しました",
+        .status_launch_disabled: "ログイン時起動を無効化しました"
     ],
     .ko: [
         .header_running: "%d 실행 중",
@@ -476,7 +511,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: 세션 셸",
         .tier_l3: "L3: 상주 유틸리티",
         .tier_l4: "L4: 사용자 설정",
-        .tier_cli: "L4: CLI 예약"
+        .tier_cli: "L4: CLI 예약",
+        .launch_at_login_title: "로그인 시 자동 실행",
+        .launch_at_login_desc: "시스템 시작 시 메뉴 막대에 상주하여 즉시 정리",
+        .btn_enable: "활성화",
+        .btn_later: "나중에",
+        .launch_at_login_menu: "로그인 시 자동 실행",
+        .status_launch_enabled: "로그인 시 자동 실행 켜짐",
+        .status_launch_disabled: "로그인 시 자동 실행 꺼짐"
     ],
     .fr: [
         .header_running: "%d en cours",
@@ -520,7 +562,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Shell contextuel",
         .tier_l3: "L3: Utilitaires permanents",
         .tier_l4: "L4: Config utilisateur",
-        .tier_cli: "L4: Remplacement CLI"
+        .tier_cli: "L4: Remplacement CLI",
+        .launch_at_login_title: "Lancer à la connexion",
+        .launch_at_login_desc: "Réside dans la barre des menus au démarrage du système",
+        .btn_enable: "Activer",
+        .btn_later: "Plus tard",
+        .launch_at_login_menu: "Lancer à la connexion",
+        .status_launch_enabled: "Lancement à la connexion activé",
+        .status_launch_disabled: "Lancement à la connexion désactivé"
     ],
     .de: [
         .header_running: "%d aktiv",
@@ -564,7 +613,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontext-Shell",
         .tier_l3: "L3: Dauerhafte Dienste",
         .tier_l4: "L4: Benutzerkonfig",
-        .tier_cli: "L4: CLI-Überschreibung"
+        .tier_cli: "L4: CLI-Überschreibung",
+        .launch_at_login_title: "Beim Login starten",
+        .launch_at_login_desc: "Bleibt beim Systemstart in der Menüleiste aktiv",
+        .btn_enable: "Aktivieren",
+        .btn_later: "Später",
+        .launch_at_login_menu: "Beim Login automatisch starten",
+        .status_launch_enabled: "Beim Login starten aktiviert",
+        .status_launch_disabled: "Beim Login starten deaktiviert"
     ],
     .es: [
         .header_running: "%d en ejecución",
@@ -608,7 +664,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Terminal de sesión",
         .tier_l3: "L3: Utilidades residentes",
         .tier_l4: "L4: Config de usuario",
-        .tier_cli: "L4: Reserva CLI"
+        .tier_cli: "L4: Reserva CLI",
+        .launch_at_login_title: "Iniciar al iniciar sesión",
+        .launch_at_login_desc: "Permanecer en la barra de menús al iniciar el sistema",
+        .btn_enable: "Activar",
+        .btn_later: "Más tarde",
+        .launch_at_login_menu: "Iniciar al iniciar sesión",
+        .status_launch_enabled: "Inicio de sesión activado",
+        .status_launch_disabled: "Inicio de sesión desactivado"
     ],
     .pt: [
         .header_running: "%d em execução",
@@ -652,7 +715,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Shell de contexto",
         .tier_l3: "L3: Utilitários residentes",
         .tier_l4: "L4: Config do usuário",
-        .tier_cli: "L4: Substituição CLI"
+        .tier_cli: "L4: Substituição CLI",
+        .launch_at_login_title: "Iniciar na inicialização",
+        .launch_at_login_desc: "Permanece na barra de menus ao iniciar o sistema",
+        .btn_enable: "Ativar",
+        .btn_later: "Mais tarde",
+        .launch_at_login_menu: "Iniciar ao fazer login",
+        .status_launch_enabled: "Inicialização ativada",
+        .status_launch_disabled: "Inicialização desativada"
     ],
     .it: [
         .header_running: "%d in esecuzione",
@@ -696,7 +766,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Shell di contesto",
         .tier_l3: "L3: Utilità residenti",
         .tier_l4: "L4: Config utente",
-        .tier_cli: "L4: Sovrascrittura CLI"
+        .tier_cli: "L4: Sovrascrittura CLI",
+        .launch_at_login_title: "Avvia al login",
+        .launch_at_login_desc: "Rimani nella barra dei menu all'avvio del sistema",
+        .btn_enable: "Abilita",
+        .btn_later: "Più tardi",
+        .launch_at_login_menu: "Avvia al login",
+        .status_launch_enabled: "Avvio al login attivato",
+        .status_launch_disabled: "Avvio al login disattivato"
     ],
     .ru: [
         .header_running: "%d запущено",
@@ -740,7 +817,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Терминал сессии",
         .tier_l3: "L3: Системные утилиты",
         .tier_l4: "L4: Пользовательская",
-        .tier_cli: "L4: Параметр CLI"
+        .tier_cli: "L4: Параметр CLI",
+        .launch_at_login_title: "Запуск при входе",
+        .launch_at_login_desc: "Работать в строке меню при запуске системы",
+        .btn_enable: "Включить",
+        .btn_later: "Позже",
+        .launch_at_login_menu: "Автозапуск при входе",
+        .status_launch_enabled: "Автозапуск включен",
+        .status_launch_disabled: "Автозапуск отключен"
     ],
     .nl: [
         .header_running: "%d actief",
@@ -784,7 +868,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Context-shell",
         .tier_l3: "L3: Permanente tools",
         .tier_l4: "L4: Gebruikersconfig",
-        .tier_cli: "L4: CLI-overschrijving"
+        .tier_cli: "L4: CLI-overschrijving",
+        .launch_at_login_title: "Starten bij inloggen",
+        .launch_at_login_desc: "Blijf in de menubalk actief bij het opstarten",
+        .btn_enable: "Inschakelen",
+        .btn_later: "Later",
+        .launch_at_login_menu: "Starten bij inloggen",
+        .status_launch_enabled: "Starten bij inloggen ingeschakeld",
+        .status_launch_disabled: "Starten bij inloggen uitgeschakeld"
     ],
     .pl: [
         .header_running: "%d aktywnych",
@@ -828,7 +919,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Powłoka sesji",
         .tier_l3: "L3: Narzędzia rezydentne",
         .tier_l4: "L4: Konfiguracja użytkownika",
-        .tier_cli: "L4: Nadpisanie CLI"
+        .tier_cli: "L4: Nadpisanie CLI",
+        .launch_at_login_title: "Uruchom przy logowaniu",
+        .launch_at_login_desc: "Działaj w pasku menu przy starcie systemu",
+        .btn_enable: "Włącz",
+        .btn_later: "Później",
+        .launch_at_login_menu: "Uruchamiaj przy logowaniu",
+        .status_launch_enabled: "Uruchamianie włączone",
+        .status_launch_disabled: "Uruchamianie wyłączone"
     ],
     .tr: [
         .header_running: "%d çalışıyor",
@@ -872,7 +970,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Oturum Kabuğu",
         .tier_l3: "L3: Yerleşik Araçlar",
         .tier_l4: "L4: Kullanıcı Yapılandırması",
-        .tier_cli: "L4: CLI Geçersiz Kılma"
+        .tier_cli: "L4: CLI Geçersiz Kılma",
+        .launch_at_login_title: "Girişte başlat",
+        .launch_at_login_desc: "Sistem başladığında menü çubuğunda sessizce çalışsın",
+        .btn_enable: "Etkinleştir",
+        .btn_later: "Daha sonra",
+        .launch_at_login_menu: "Girişte otomatik başlat",
+        .status_launch_enabled: "Girişte başlatma etkinleştirildi",
+        .status_launch_disabled: "Girişte başlatma devre dışı"
     ],
     .ar: [
         .header_running: "%d قيد التشغيل",
@@ -916,7 +1021,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: صدفة الجلسة",
         .tier_l3: "L3: الأدوات الدائمة",
         .tier_l4: "L4: تكوين المستخدم",
-        .tier_cli: "L4: تجاوز CLI"
+        .tier_cli: "L4: تجاوز CLI",
+        .launch_at_login_title: "التشغيل عند تسجيل الدخول",
+        .launch_at_login_desc: "البقاء في شريط القوائم عند بدء تشغيل النظام",
+        .btn_enable: "تفعيل",
+        .btn_later: "لاحقاً",
+        .launch_at_login_menu: "التشغيل التلقائي عند الدخول",
+        .status_launch_enabled: "تم تفعيل التشغيل عند الدخول",
+        .status_launch_disabled: "تم تعطيل التشغيل عند الدخول"
     ],
     .th: [
         .header_running: "%d กำลังทำงาน",
@@ -960,7 +1072,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: เชลล์เซสชัน",
         .tier_l3: "L3: ยูทิลิตี้ประจำ",
         .tier_l4: "L4: การกำหนดค่าผู้ใช้",
-        .tier_cli: "L4: การแทนที่ CLI"
+        .tier_cli: "L4: การแทนที่ CLI",
+        .launch_at_login_title: "เปิดใช้งานเมื่อเข้าสู่ระบบ",
+        .launch_at_login_desc: "ทำงานในแถบเมนูเมื่อเริ่มต้นระบบ",
+        .btn_enable: "เปิดใช้งาน",
+        .btn_later: "ไว้ทีหลัง",
+        .launch_at_login_menu: "เริ่มทำงานเมื่อเข้าสู่ระบบอัตโนมัติ",
+        .status_launch_enabled: "เปิดใช้งานการเริ่มอัตโนมัติแล้ว",
+        .status_launch_disabled: "ปิดการเริ่มอัตโนมัติแล้ว"
     ],
     .vi: [
         .header_running: "%d đang chạy",
@@ -1004,7 +1123,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Phiên làm việc",
         .tier_l3: "L3: Tiện ích thường trú",
         .tier_l4: "L4: Cấu hình người dùng",
-        .tier_cli: "L4: Ghi đè CLI"
+        .tier_cli: "L4: Ghi đè CLI",
+        .launch_at_login_title: "Khởi chạy khi đăng nhập",
+        .launch_at_login_desc: "Thường trú trên thanh menu khi khởi động hệ thống",
+        .btn_enable: "Bật",
+        .btn_later: "Để sau",
+        .launch_at_login_menu: "Tự động khởi chạy khi đăng nhập",
+        .status_launch_enabled: "Đã bật khởi chạy cùng hệ thống",
+        .status_launch_disabled: "Đã tắt khởi chạy cùng hệ thống"
     ],
     .id: [
         .header_running: "%d berjalan",
@@ -1048,7 +1174,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Shell Konteks",
         .tier_l3: "L3: Utilitas Residen",
         .tier_l4: "L4: Konfigurasi Pengguna",
-        .tier_cli: "L4: Penggantian CLI"
+        .tier_cli: "L4: Penggantian CLI",
+        .launch_at_login_title: "Buka saat login",
+        .launch_at_login_desc: "Tetap di bilah menu saat sistem dimulai",
+        .btn_enable: "Aktifkan",
+        .btn_later: "Nanti",
+        .launch_at_login_menu: "Buka otomatis saat login",
+        .status_launch_enabled: "Mulai saat login diaktifkan",
+        .status_launch_disabled: "Mulai saat login dinonaktifkan"
     ],
     .sv: [
         .header_running: "%d körs",
@@ -1092,7 +1225,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontextskal",
         .tier_l3: "L3: Residenta verktyg",
         .tier_l4: "L4: Användarkonfig",
-        .tier_cli: "L4: CLI-undantag"
+        .tier_cli: "L4: CLI-undantag",
+        .launch_at_login_title: "Starta vid inloggning",
+        .launch_at_login_desc: "Körs tyst i menyraden vid systemstart",
+        .btn_enable: "Aktivera",
+        .btn_later: "Senare",
+        .launch_at_login_menu: "Starta automatiskt vid inloggning",
+        .status_launch_enabled: "Autostart aktiverad",
+        .status_launch_disabled: "Autostart inaktiverad"
     ],
     .da: [
         .header_running: "%d kører",
@@ -1136,7 +1276,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontext-shell",
         .tier_l3: "L3: Permanente hjælpeprogrammer",
         .tier_l4: "L4: Brugerkonfiguration",
-        .tier_cli: "L4: CLI-tilsidesættelse"
+        .tier_cli: "L4: CLI-tilsidesættelse",
+        .launch_at_login_title: "Start ved login",
+        .launch_at_login_desc: "Kører i menulinjen ved systemstart",
+        .btn_enable: "Aktiver",
+        .btn_later: "Senere",
+        .launch_at_login_menu: "Start automatisk ved login",
+        .status_launch_enabled: "Start ved login aktiveret",
+        .status_launch_disabled: "Start ved login deaktiveret"
     ],
     .nb: [
         .header_running: "%d kjører",
@@ -1180,7 +1327,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontekst-skall",
         .tier_l3: "L3: Faste verktøy",
         .tier_l4: "L4: Brukerkonfig",
-        .tier_cli: "L4: CLI-overstyring"
+        .tier_cli: "L4: CLI-overstyring",
+        .launch_at_login_title: "Start ved pålogging",
+        .launch_at_login_desc: "Kjører i menylinjen ved oppstart av systemet",
+        .btn_enable: "Aktiver",
+        .btn_later: "Senere",
+        .launch_at_login_menu: "Start automatisk ved pålogging",
+        .status_launch_enabled: "Start ved pålogging aktivert",
+        .status_launch_disabled: "Start ved pålogging deaktivert"
     ],
     .fi: [
         .header_running: "%d käynnissä",
@@ -1224,7 +1378,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontekstikuori",
         .tier_l3: "L3: Pysyvät apuohjelmat",
         .tier_l4: "L4: Käyttäjäasetukset",
-        .tier_cli: "L4: CLI-ohitus"
+        .tier_cli: "L4: CLI-ohitus",
+        .launch_at_login_title: "Käynnistä sisäänkirjautuessa",
+        .launch_at_login_desc: "Pysyy valikkorivillä järjestelmän käynnistyessä",
+        .btn_enable: "Ota käyttöön",
+        .btn_later: "Myöhemmin",
+        .launch_at_login_menu: "Käynnistä automaattisesti",
+        .status_launch_enabled: "Automaattikäynnistys käytössä",
+        .status_launch_disabled: "Automaattikäynnistys poistettu käytöstä"
     ],
     .cs: [
         .header_running: "%d běží",
@@ -1268,7 +1429,14 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Kontextový shell",
         .tier_l3: "L3: Rezidentní nástroje",
         .tier_l4: "L4: Uživatelská konfigurace",
-        .tier_cli: "L4: Přepsání CLI"
+        .tier_cli: "L4: Přepsání CLI",
+        .launch_at_login_title: "Spustit při přihlášení",
+        .launch_at_login_desc: "Zůstat v řádku nabídek při spuštění systému",
+        .btn_enable: "Povolit",
+        .btn_later: "Později",
+        .launch_at_login_menu: "Spustit při přihlášení",
+        .status_launch_enabled: "Spouštění při přihlášení povoleno",
+        .status_launch_disabled: "Spouštění při přihlášení zakázáno"
     ],
     .uk: [
         .header_running: "%d запущено",
@@ -1312,6 +1480,13 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l2: "L2: Термінал сесії",
         .tier_l3: "L3: Системні утиліти",
         .tier_l4: "L4: Конфігурація користувача",
-        .tier_cli: "L4: Перевизначення CLI"
+        .tier_cli: "L4: Перевизначення CLI",
+        .launch_at_login_title: "Запуск під час входу",
+        .launch_at_login_desc: "Працювати в смузі меню під час запуску системи",
+        .btn_enable: "Увімкнути",
+        .btn_later: "Пізніше",
+        .launch_at_login_menu: "Автозапуск під час входу",
+        .status_launch_enabled: "Автозапуск увімкнено",
+        .status_launch_disabled: "Автозапуск вимкнено"
     ]
 ]
