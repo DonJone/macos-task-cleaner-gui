@@ -1,18 +1,67 @@
-# macOS Task Cleaner GUI (`TaskCleaner.app`)
+<p align="center">
+  <img src="docs/images/app-icon-128.png" width="128" height="128" alt="Task Cleaner 应用图标" />
+</p>
 
-<p align="left">
+<h1 align="center">Task Cleaner</h1>
+
+<p align="center">
+  <strong>面向 macOS 的轻量、工程级状态栏任务清场与白名单管理客户端</strong>
+</p>
+
+<p align="center">
   <a href="README.md">English</a> | <a href="README_ZH.md">简体中文</a>
 </p>
 
-面向 macOS 的状态栏常驻任务清场图形界面客户端。采用原生 Swift 与 SwiftUI 架构结合 AppKit 深度集成开发，提供轻量、现代、零弹窗打扰的前台任务清理与白名单管理体验。
+<p align="center">
+  <a href="https://apple.com/macos"><img src="https://img.shields.io/badge/平台-macOS%2013%2B-000000?logo=apple&logoColor=white" alt="平台: macOS 13+" /></a>
+  <img src="https://img.shields.io/badge/架构-Apple%20Silicon%20%7C%20AMD64-blue" alt="架构: Apple Silicon | AMD64" />
+  <a href="https://swift.org/"><img src="https://img.shields.io/badge/编程语言-Swift%205.9%2B-F05138?logo=swift&logoColor=white" alt="Swift: 5.9+" /></a>
+  <img src="https://img.shields.io/badge/界面库-SwiftUI-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI" />
+  <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/核心引擎-Rust-dea584?logo=rust&logoColor=white" alt="核心引擎: Rust" /></a>
+  <img src="https://img.shields.io/badge/国际化-24%20种常用语言-teal" alt="语言: 24 种语言" />
+  <a href="https://github.com/DonJone/macos-task-cleaner-gui/releases"><img src="https://img.shields.io/badge/分发包-DMG%20拖拽安装-blueviolet" alt="分发格式: DMG" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/协议-MIT-green" alt="开源协议: MIT" /></a>
+</p>
 
 ---
 
 ## 界面效果展示
 
-| 状态栏常驻浮层客户端 (`TaskCleaner.app`) | 配套命令行向导 (`mtc -i`) |
-| :---: | :---: |
-| <img src="docs/images/gui-menubar.png" width="340" alt="macOS Task Cleaner 菜单栏界面" /> | <img src="docs/images/cli-interactive.png" width="480" alt="macOS Task Cleaner 交互式终端向导" /> |
+<p align="center">
+  <img src="docs/images/gui-menubar.png" width="400" alt="macOS Task Cleaner 菜单栏常驻浮层" />
+</p>
+
+---
+
+## 下载与快速安装
+
+### 1. 推荐：DMG 拖拽式安装镜像
+
+前往 [GitHub Releases](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest) 直接下载适用于您 Mac 架构的安装镜像：
+
+| 硬件架构 | 适用设备 | 安装包直链下载 |
+| :--- | :--- | :--- |
+| **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-arm64.dmg) |
+| **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-x86_64.dmg) |
+| **Universal** (`universal`) | 兼容全部 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-universal.dmg) |
+
+双击打开下载的 `.dmg` 文件后，直接将 `Task Cleaner.app` 拖入 `Applications` 文件夹即可完成安装。
+
+### 2. 源码本地编译
+
+要求 macOS 13.0+ 及 Swift 5.9+ / Xcode 环境：
+
+```bash
+git clone https://github.com/DonJone/macos-task-cleaner-gui.git
+cd macos-task-cleaner-gui
+
+# 使用内置脚本一键编译并组装（支持参数: arm64 | x86_64 | universal | all | native）
+./scripts/build_app.sh
+
+# 移动至应用程序目录并启动
+cp -R build/TaskCleaner.app /Applications/
+open /Applications/TaskCleaner.app
+```
 
 ---
 
@@ -32,33 +81,18 @@
 
 ---
 
-## 编译与打包
-
-要求 macOS 13.0+ 及 Swift 5.9+ / Xcode 环境：
-
-```bash
-git clone https://github.com/DonJone/macos-task-cleaner-gui.git
-cd macos-task-cleaner-gui
-
-# 使用内置脚本一键编译并组装 TaskCleaner.app
-./scripts/build_app.sh
-
-# 移动至应用程序目录
-cp -R build/TaskCleaner.app /Applications/
-open /Applications/TaskCleaner.app
-```
-
----
-
 ## 项目代码结构
 
 * `Sources/TaskCleanerApp.swift`：应用程序入口与 `MenuBarExtra` 声明、托盘原生矢量绘制
 * `Sources/TaskCleanerMenuView.swift`：SwiftUI 交互浮层面板、动态高度协调器、应用行视图与操作菜单
 * `Sources/TaskCleanerViewModel.swift`：状态机管理、异步扫描与清场调度
 * `Sources/MTCBridge.swift`：与底层 `mtc` 引擎及 TOML 配置的通信桥接层
+* `Sources/LaunchAtLoginManager.swift`：原生 `SMAppService` 开机自启动集成与首次引导协调器
+* `Sources/I18n.swift`：24 种常用语言国际化注册表与运行时多语言切换器
 * `Sources/Models.swift`：数据模型定义与应用图标动态提取
-* `scripts/build_app.sh`：自动编译与 `TaskCleaner.app` 打包脚本
+* `scripts/build_app.sh`：自动编译、`TaskCleaner.app` 组装及 DMG 可视化拖拽安装盘生成脚本
 * `scripts/generate_app_icon.swift`：应用官方 AppIcon 矢量生成器
+* `scripts/generate_dmg_background.swift`：2x Retina 分辨率 DMG 拖拽安装背景图生成器
 
 ---
 
