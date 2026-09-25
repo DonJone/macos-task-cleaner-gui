@@ -113,14 +113,14 @@ public struct TaskCleanerMenuView: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(.primary)
 
-                            Text("终止未列入受信任白名单的前台应用进程")
+                            Text("执行 mtc -e 标准三段式优雅终止")
                                 .font(.system(size: 10.5))
                                 .foregroundStyle(.secondary)
                         }
 
                         Spacer()
 
-                        SystemBadge("待执行", color: .secondary)
+                        SystemBadge("mtc -e", color: .secondary)
                     }
 
                     Button(action: {
@@ -135,8 +135,7 @@ public struct TaskCleanerMenuView: View {
                             Spacer()
                         }
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.orange)
+                    .buttonStyle(.bordered)
                     .controlSize(.regular)
                     .disabled(viewModel.isWorking)
                 }
