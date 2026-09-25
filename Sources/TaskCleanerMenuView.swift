@@ -10,7 +10,7 @@ public struct TaskCleanerMenuView: View {
 
     public var body: some View {
         ZStack {
-            // macOS 27 原生系统级全尺寸毛玻璃背板 (支持底层折射与动态虚化)
+            // macOS 27 原生系统级毛玻璃背板 (支持底层折射与动态虚化)
             VisualEffectBackground(material: .popover, blendingMode: .behindWindow)
                 .ignoresSafeArea()
 
@@ -26,7 +26,7 @@ public struct TaskCleanerMenuView: View {
                 // 3. 核心操作面板 (Hero Action Card - macOS 27 收敛圆角与薄材质)
                 actionSection
 
-                // 4. 分段选择器 (Segmented Switcher - 系统原生控件)
+                // 4. 分段选择器 (Segmented Switcher - 目标进程 vs 受保护进程)
                 segmentedSection
 
                 // 5. 应用列表区 (Inset Grouped App List)
@@ -47,7 +47,7 @@ public struct TaskCleanerMenuView: View {
     // MARK: - Header
     private var headerSection: some View {
         HStack(spacing: 8) {
-            Image(systemName: "broom.fill")
+            Image(systemName: "cpu")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Color.accentColor)
 
@@ -56,7 +56,7 @@ public struct TaskCleanerMenuView: View {
                 .foregroundStyle(.primary)
 
             if let summary = viewModel.summary {
-                SystemBadge("\(summary.scanned_total) 运行中", color: .secondary)
+                SystemBadge("\(summary.scanned_total) 活跃进程", color: .secondary)
             }
 
             Spacer()
@@ -77,7 +77,7 @@ public struct TaskCleanerMenuView: View {
             }
             .buttonStyle(.plain)
             .disabled(viewModel.isWorking)
-            .help("刷新扫描前台应用")
+            .help("重新扫描前台进程")
         }
     }
 
@@ -113,34 +113,33 @@ public struct TaskCleanerMenuView: View {
                 VStack(alignment: .leading, spacing: 9) {
                     HStack {
                         VStack(alignment: .leading, spacing: 1.5) {
-                            Text("\(summary.target_count) 个应用待清场")
+                            Text("\(summary.target_count) 个进程待终止")
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(.primary)
 
-                            Text("关闭所有未加白名单的活动应用")
+                            Text("终止未列入受信任白名单的前台应用进程")
                                 .font(.system(size: 10.5))
                                 .foregroundStyle(.secondary)
                         }
 
                         Spacer()
 
-                        SystemBadge("就绪", color: .orange)
+                        SystemBadge("待执行", color: .secondary)
                     }
 
                     Button(action: {
                         viewModel.cleanAll()
                     }) {
-                        HStack(spacing: 5) {
+                        HStack(spacing: 6) {
                             Spacer()
-                            Image(systemName: "bolt.fill")
-                                .font(.system(size: 11, weight: .bold))
-                            Text("一键清场退出")
+                            Image(systemName: "xmark.circle")
+                                .font(.system(size: 12, weight: .medium))
+                            Text("结束全部目标任务")
                                 .font(.system(size: 12, weight: .semibold))
                             Spacer()
                         }
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.red)
                     .controlSize(.regular)
                     .disabled(viewModel.isWorking)
                 }
@@ -149,14 +148,14 @@ public struct TaskCleanerMenuView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.accentColor)
 
                     VStack(alignment: .leading, spacing: 1.5) {
-                        Text("当前工作区已完全清场")
+                        Text("无待终止的前台进程")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.primary)
 
-                        Text("所有前台图形应用均在受保护白名单中")
+                        Text("所有当前活动应用均匹配白名单豁免规则")
                             .font(.system(size: 10))
                             .foregroundStyle(.secondary)
                     }
@@ -171,10 +170,10 @@ public struct TaskCleanerMenuView: View {
     // MARK: - Segmented Switcher
     private var segmentedSection: some View {
         Picker("", selection: $viewModel.selectedTab) {
-            Text("待清场 (\(viewModel.summary?.target_count ?? 0))")
+            Text("目标进程 (\(viewModel.summary?.target_count ?? 0))")
                 .tag(CleanerTab.targets)
 
-            Text("受保护 (\(viewModel.summary?.protected_count ?? 0))")
+            Text("受保护进程 (\(viewModel.summary?.protected_count ?? 0))")
                 .tag(CleanerTab.protected)
         }
         .pickerStyle(.segmented)
@@ -201,7 +200,7 @@ public struct TaskCleanerMenuView: View {
         return VStack(spacing: 0) {
             if targets.isEmpty {
                 VStack(spacing: 4) {
-                    Text("暂无待清场前台应用")
+                    Text("当前无待终止进程")
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
@@ -228,7 +227,7 @@ public struct TaskCleanerMenuView: View {
         let protectedList = viewModel.summary?.protected_apps ?? []
         return VStack(spacing: 0) {
             if protectedList.isEmpty {
-                Text("暂无白名单匹配记录")
+                Text("暂无匹配的白名单规则")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
@@ -317,7 +316,7 @@ struct NativeTargetRow: View {
             Spacer()
 
             Button(action: onWhitelist) {
-                Text("+ 白名单")
+                Text("加入白名单")
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)
@@ -356,7 +355,7 @@ struct NativeProtectedRow: View {
 
             Spacer()
 
-            Image(systemName: "checkmark.shield.fill")
+            Image(systemName: "checkmark.shield")
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary.opacity(0.75))
         }
