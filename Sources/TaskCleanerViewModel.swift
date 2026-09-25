@@ -132,8 +132,7 @@ public class TaskCleanerViewModel: ObservableObject {
                 self.statusMessage = "部分进程受系统保护或未正常响应"
             }
 
-            // Refresh state after cleaning
-            try? await Task.sleep(nanoseconds: 300_000_000)
+            self.isWorking = false
             self.refresh(silent: true)
 
             try? await Task.sleep(nanoseconds: 2_000_000_000)
@@ -152,6 +151,7 @@ public class TaskCleanerViewModel: ObservableObject {
                 MTCBridge.shared.addToWhitelist(identifier: identifier)
             }.value
 
+            self.isWorking = false
             self.refresh(silent: true)
 
             try? await Task.sleep(nanoseconds: 2_000_000_000)

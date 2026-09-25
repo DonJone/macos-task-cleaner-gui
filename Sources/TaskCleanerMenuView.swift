@@ -18,22 +18,16 @@ public struct TaskCleanerMenuView: View {
                 // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
                 headerSection
 
-                // 2. 状态提示 (Status Toast - 液态玻璃浮层)
-                if let msg = viewModel.statusMessage {
-                    statusToastView(message: msg)
-                        .transition(.opacity)
-                }
-
-                // 3. 核心操作面板 (Hero Action Card)
+                // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
                 actionSection
 
-                // 4. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘当前连接蓝色高亮)
+                // 3. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘当前连接蓝色高亮)
                 segmentedSection
 
-                // 5. 应用列表区 (Inset Grouped App List)
+                // 4. 应用列表区 (Inset Grouped App List)
                 appListView
 
-                // 6. 底栏工具 (Footer Toolbar)
+                // 5. 底栏工具 (Footer Toolbar)
                 footerSection
             }
             .padding(.horizontal, 12)
@@ -88,89 +82,56 @@ public struct TaskCleanerMenuView: View {
         .frame(height: 24)
     }
 
-    // MARK: - Status Toast
-    private func statusToastView(message: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "info.circle.fill")
-                .font(.system(size: 11))
-                .foregroundStyle(Color.accentColor)
-
-            Text(message)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.primary)
-
-            Spacer()
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(.ultraThinMaterial)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
-        )
-    }
-
-    // MARK: - Action Section (原生中性 Bordered 按钮，标注 mtc -e 执行语义)
+    // MARK: - Action Section (结构恒定，彻底杜绝点击时的高度形变与整屏跳跃)
     private var actionSection: some View {
-        SystemCard(cornerRadius: 10) {
-            if let summary = viewModel.summary, summary.target_count > 0 {
-                VStack(alignment: .leading, spacing: 9) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 1.5) {
-                            Text("\(summary.target_count) 个进程待终止")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.primary)
+        let hasTargets = (viewModel.summary?.target_count ?? 0) > 0
+        let targetCount = viewModel.summary?.target_count ?? 0
 
-                            Text("执行 mtc -e 标准三段式优雅终止")
-                                .font(.system(size: 10.5))
-                                .foregroundStyle(.secondary)
-                        }
-
-                        Spacer()
-
-                        SystemBadge("mtc -e", color: .secondary)
-                    }
-
-                    Button(action: {
-                        viewModel.cleanAll()
-                    }) {
-                        HStack(spacing: 6) {
-                            Spacer()
-                            Image(systemName: "xmark.circle")
-                                .font(.system(size: 11.5, weight: .medium))
-                            Text("结束全部目标任务")
-                                .font(.system(size: 12, weight: .semibold))
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.regular)
-                    .disabled(viewModel.isWorking)
-                }
-                .padding(11)
-            } else {
-                HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color(nsColor: .systemBlue))
-
+        return SystemCard(cornerRadius: 10) {
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
                     VStack(alignment: .leading, spacing: 1.5) {
-                        Text("无待终止的前台进程")
+                        Text(hasTargets ? "\(targetCount) 个进程待终止" : "所有前台应用均受保护")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.primary)
 
-                        Text("所有当前活动应用均匹配白名单豁免规则")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
+                        // 状态反馈直接就地显示于副标题槽位，不产生额外高度插入
+                        if let msg = viewModel.statusMessage {
+                            Text(msg)
+                                .font(.system(size: 10.5, weight: .medium))
+                                .foregroundStyle(Color(nsColor: .systemBlue))
+                        } else {
+                            Text(hasTargets ? "执行 mtc -e 标准三段式优雅终止" : "已匹配白名单豁免规则")
+                                .font(.system(size: 10.5))
+                                .foregroundStyle(.secondary)
+                        }
                     }
 
                     Spacer()
+
+                    SystemBadge(
+                        hasTargets ? "mtc -e" : "已清场",
+                        color: hasTargets ? .secondary : Color(nsColor: .systemBlue)
+                    )
                 }
-                .padding(11)
+
+                Button(action: {
+                    viewModel.cleanAll()
+                }) {
+                    HStack(spacing: 6) {
+                        Spacer()
+                        Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
+                            .font(.system(size: 11.5, weight: .medium))
+                        Text(hasTargets ? "结束全部目标任务" : "无待终止任务")
+                            .font(.system(size: 12, weight: .semibold))
+                        Spacer()
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.regular)
+                .disabled(!hasTargets || viewModel.isWorking)
             }
+            .padding(11)
         }
     }
 
