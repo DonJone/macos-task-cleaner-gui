@@ -49,33 +49,28 @@ jobs:
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
 
-      - name: Compile Universal mtc Engine
+      - name: Compile Multi-Architecture mtc Engine
         working-directory: macos-task-cleaner-cli
         run: |
           cargo build --release --target aarch64-apple-darwin
           cargo build --release --target x86_64-apple-darwin
-          mkdir -p target/release
+          mkdir -p dist/arm64 dist/x86_64 dist/universal target/release
+          cp target/aarch64-apple-darwin/release/mtc dist/arm64/mtc
+          cp target/x86_64-apple-darwin/release/mtc dist/x86_64/mtc
           lipo -create \
             target/aarch64-apple-darwin/release/mtc \
             target/x86_64-apple-darwin/release/mtc \
-            -output target/release/mtc
-          chmod +x target/release/mtc
-          file target/release/mtc
+            -output dist/universal/mtc
+          cp dist/universal/mtc target/release/mtc
+          chmod +x dist/arm64/mtc dist/x86_64/mtc dist/universal/mtc target/release/mtc
+          echo "[CLI 架构检验]"
+          file dist/arm64/mtc dist/x86_64/mtc dist/universal/mtc
 
-      - name: Build and Assemble TaskCleaner.app
+      - name: Build and Package All Architectures
         working-directory: macos-task-cleaner-gui
         run: |
           chmod +x scripts/build_app.sh
-          ./scripts/build_app.sh
-
-      - name: Package Distribution Archive
-        working-directory: macos-task-cleaner-gui
-        run: |
-          cd build
-          zip -r -y TaskCleaner-macOS.zip TaskCleaner.app
-          shasum -a 256 TaskCleaner-macOS.zip > TaskCleaner-macOS.zip.sha256
-          echo "SHA256 Checksum:"
-          cat TaskCleaner-macOS.zip.sha256
+          ./scripts/build_app.sh all
 
       - name: Compute Release Metadata
         id: meta
@@ -109,7 +104,21 @@ jobs:
           draft: false
           prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
           generate_release_notes: true
+          body: |
+            ### 架构与下载说明 / Architecture & Downloads
+
+            | 架构 / Architecture | 适用设备 / Applicable Devices | 对应安装包 / Asset |
+            | :--- | :--- | :--- |
+            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | `TaskCleaner-macOS-arm64.zip` |
+            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | `TaskCleaner-macOS-x86_64.zip` |
+            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | `TaskCleaner-macOS-universal.zip` |
           files: |
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.zip
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.zip.sha256
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-x86_64.zip
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-x86_64.zip.sha256
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-universal.zip
+            macos-task-cleaner-gui/build/TaskCleaner-macOS-universal.zip.sha256
             macos-task-cleaner-gui/build/TaskCleaner-macOS.zip
             macos-task-cleaner-gui/build/TaskCleaner-macOS.zip.sha256
         env:
