@@ -2,12 +2,19 @@ import Foundation
 import SwiftUI
 import Combine
 
+public enum CleanerTab: Int, CaseIterable, Identifiable {
+    case targets = 0
+    case protected = 1
+
+    public var id: Int { rawValue }
+}
+
 @MainActor
 public class TaskCleanerViewModel: ObservableObject {
     @Published public var summary: DryRunSummary?
     @Published public var isWorking: Bool = false
     @Published public var statusMessage: String?
-    @Published public var showProtectedList: Bool = false
+    @Published public var selectedTab: CleanerTab = .targets
 
     public init() {
         refresh()
