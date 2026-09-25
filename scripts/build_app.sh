@@ -20,6 +20,41 @@ ensure_app_icon() {
     fi
 }
 
+# 动态定位 TaskCleanerGUI 编译输出二进制
+locate_gui_binary() {
+    local scratch_dir="$1"
+    local triple="$2"
+    local candidate=""
+
+    # 方式 1: 通过 swift build --show-bin-path 获取
+    if [ -n "$triple" ]; then
+        local bin_dir
+        bin_dir="$(swift build -c release --triple "$triple" --scratch-path "$scratch_dir" --show-bin-path 2>/dev/null || true)"
+        if [ -n "$bin_dir" ] && [ -f "$bin_dir/TaskCleanerGUI" ]; then
+            echo "$bin_dir/TaskCleanerGUI"
+            return 0
+        fi
+    else
+        local bin_dir
+        bin_dir="$(swift build -c release --show-bin-path 2>/dev/null || true)"
+        if [ -n "$bin_dir" ] && [ -f "$bin_dir/TaskCleanerGUI" ]; then
+            echo "$bin_dir/TaskCleanerGUI"
+            return 0
+        fi
+    fi
+
+    # 方式 2: 在 scratch 目录或 .build 目录中检索可执行文件
+    if [ -d "$scratch_dir" ]; then
+        candidate="$(find "$scratch_dir" -type f -name "TaskCleanerGUI" ! -path "*.dSYM*" ! -path "*/intermediates/*" | head -n 1)"
+        if [ -n "$candidate" ] && [ -f "$candidate" ]; then
+            echo "$candidate"
+            return 0
+        fi
+    fi
+
+    echo ""
+}
+
 # 查找对应架构的 mtc 引擎
 find_mtc_binary() {
     local target_arch="$1"
@@ -180,32 +215,51 @@ mkdir -p "$DIR/build"
 build_arm64() {
     echo "[编译] 正在准备 Apple Silicon (arm64) Release 二进制..."
     swift build -c release --triple arm64-apple-macosx13.0 --scratch-path "$DIR/.build/arm64"
+    local bin
+    bin="$(locate_gui_binary "$DIR/.build/arm64" "arm64-apple-macosx13.0")"
+    if [ -z "$bin" ] || [ ! -f "$bin" ]; then
+        echo "[错误] 未找到编译完成的 arm64 TaskCleanerGUI 二进制文件"
+        exit 1
+    fi
     mkdir -p "$DIR/build/arm64"
-    assemble_bundle "arm64" "$DIR/.build/arm64/out/Products/Release/TaskCleanerGUI" "$DIR/build/arm64/TaskCleaner.app"
+    assemble_bundle "arm64" "$bin" "$DIR/build/arm64/TaskCleaner.app"
     package_zip "arm64" "$DIR/build/arm64/TaskCleaner.app"
 }
 
 build_x86_64() {
     echo "[编译] 正在准备 AMD64 / Intel (x86_64) Release 二进制..."
     swift build -c release --triple x86_64-apple-macosx13.0 --scratch-path "$DIR/.build/x86_64"
+    local bin
+    bin="$(locate_gui_binary "$DIR/.build/x86_64" "x86_64-apple-macosx13.0")"
+    if [ -z "$bin" ] || [ ! -f "$bin" ]; then
+        echo "[错误] 未找到编译完成的 x86_64 TaskCleanerGUI 二进制文件"
+        exit 1
+    fi
     mkdir -p "$DIR/build/x86_64"
-    assemble_bundle "x86_64" "$DIR/.build/x86_64/out/Products/Release/TaskCleanerGUI" "$DIR/build/x86_64/TaskCleaner.app"
+    assemble_bundle "x86_64" "$bin" "$DIR/build/x86_64/TaskCleaner.app"
     package_zip "x86_64" "$DIR/build/x86_64/TaskCleaner.app"
 }
 
 build_universal() {
     echo "[编译] 准备构建 Universal 通用架构版本..."
-    if [ ! -f "$DIR/.build/arm64/out/Products/Release/TaskCleanerGUI" ]; then
+    local arm64_bin
+    arm64_bin="$(locate_gui_binary "$DIR/.build/arm64" "arm64-apple-macosx13.0")"
+    if [ -z "$arm64_bin" ] || [ ! -f "$arm64_bin" ]; then
         build_arm64
+        arm64_bin="$(locate_gui_binary "$DIR/.build/arm64" "arm64-apple-macosx13.0")"
     fi
-    if [ ! -f "$DIR/.build/x86_64/out/Products/Release/TaskCleanerGUI" ]; then
+
+    local x86_64_bin
+    x86_64_bin="$(locate_gui_binary "$DIR/.build/x86_64" "x86_64-apple-macosx13.0")"
+    if [ -z "$x86_64_bin" ] || [ ! -f "$x86_64_bin" ]; then
         build_x86_64
+        x86_64_bin="$(locate_gui_binary "$DIR/.build/x86_64" "x86_64-apple-macosx13.0")"
     fi
 
     mkdir -p "$DIR/.build/universal"
     lipo -create \
-        "$DIR/.build/arm64/out/Products/Release/TaskCleanerGUI" \
-        "$DIR/.build/x86_64/out/Products/Release/TaskCleanerGUI" \
+        "$arm64_bin" \
+        "$x86_64_bin" \
         -output "$DIR/.build/universal/TaskCleanerGUI"
     chmod +x "$DIR/.build/universal/TaskCleanerGUI"
 
@@ -221,7 +275,13 @@ build_universal() {
 build_native() {
     echo "[编译] 开始编译本机原生架构 Release 二进制..."
     swift build -c release
-    assemble_bundle "native" "$DIR/.build/release/TaskCleanerGUI" "$DIR/build/TaskCleaner.app"
+    local bin
+    bin="$(locate_gui_binary "$DIR/.build" "")"
+    if [ -z "$bin" ] || [ ! -f "$bin" ]; then
+        echo "[错误] 未找到编译完成的 TaskCleanerGUI 二进制文件"
+        exit 1
+    fi
+    assemble_bundle "native" "$bin" "$DIR/build/TaskCleaner.app"
     echo "[完成] 原生应用组装完成: $DIR/build/TaskCleaner.app"
     echo "[提示] 可将应用移动到 Applications 目录:"
     echo "       cp -R \"$DIR/build/TaskCleaner.app\" /Applications/"
