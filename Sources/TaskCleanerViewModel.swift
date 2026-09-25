@@ -141,6 +141,30 @@ public class TaskCleanerViewModel: ObservableObject {
         }
     }
 
+    public func terminateTarget(_ app: TargetAppEntry) {
+        guard !isWorking else { return }
+        isWorking = true
+        statusMessage = "正在结束 \(app.name)..."
+
+        Task {
+            let success = await Task.detached {
+                MTCBridge.shared.terminateProcess(pid: app.pid)
+            }.value
+
+            if success {
+                self.statusMessage = "已结束 \(app.name)"
+            } else {
+                self.statusMessage = "无法结束 \(app.name)"
+            }
+
+            self.isWorking = false
+            self.refresh(silent: true)
+
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            self.statusMessage = nil
+        }
+    }
+
     public func whitelistApp(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true

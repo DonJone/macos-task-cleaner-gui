@@ -252,9 +252,16 @@ public struct TaskCleanerMenuView: View {
                 .padding(.vertical, 40)
             } else {
                 ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
-                    NativeTargetRow(app: app, isWorking: viewModel.isWorking) {
-                        viewModel.whitelistApp(app)
-                    }
+                    NativeTargetRow(
+                        app: app,
+                        isWorking: viewModel.isWorking,
+                        onTerminate: {
+                            viewModel.terminateTarget(app)
+                        },
+                        onWhitelist: {
+                            viewModel.whitelistApp(app)
+                        }
+                    )
 
                     if index < targets.count - 1 {
                         Divider()
@@ -319,9 +326,16 @@ public struct TaskCleanerMenuView: View {
                     .padding(.bottom, 2)
 
                     ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
-                        NativeTargetRow(app: app, isWorking: viewModel.isWorking) {
-                            viewModel.whitelistApp(app)
-                        }
+                        NativeTargetRow(
+                            app: app,
+                            isWorking: viewModel.isWorking,
+                            onTerminate: {
+                                viewModel.terminateTarget(app)
+                            },
+                            onWhitelist: {
+                                viewModel.whitelistApp(app)
+                            }
+                        )
 
                         if index < targets.count - 1 {
                             Divider()
@@ -401,10 +415,11 @@ public struct TaskCleanerMenuView: View {
     }
 }
 
-// MARK: - 原生待清场应用行组件 (支持 Default / Hover / Active / Disabled 状态)
+// MARK: - 原生待清场应用行组件 (支持单独结束任务与拓展选项)
 struct NativeTargetRow: View {
     let app: TargetAppEntry
     let isWorking: Bool
+    let onTerminate: () -> Void
     let onWhitelist: () -> Void
 
     var body: some View {
@@ -432,12 +447,49 @@ struct NativeTargetRow: View {
 
             Spacer()
 
-            Button(action: onWhitelist) {
-                Text("加入白名单")
+            HStack(spacing: 4) {
+                // 单独结束任务按钮 (小垃圾桶图标)
+                Button(action: onTerminate) {
+                    Image(systemName: "trash")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("结束任务")
+                .disabled(isWorking)
+
+                // 拓展项 (竖三点)：加入白名单位于拓展菜单
+                Menu {
+                    Button(action: onWhitelist) {
+                        Label("加入白名单", systemImage: "checkmark.shield")
+                    }
+
+                    Divider()
+
+                    Button(action: {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(
+                            !app.bundle_id.isEmpty ? app.bundle_id : app.name,
+                            forType: .string
+                        )
+                    }) {
+                        Label("复制标识符", systemImage: "doc.on.doc")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 11, weight: .medium))
+                        .rotationEffect(.degrees(90))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 20, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .help("拓展操作")
+                .disabled(isWorking)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.mini)
-            .disabled(isWorking)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)

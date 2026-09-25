@@ -122,6 +122,36 @@ public class MTCBridge {
         }
     }
 
+    public func terminateProcess(pid: Int, force: Bool = false) -> Bool {
+        guard let mtc = findMTCBinary() else {
+            if let app = NSRunningApplication(processIdentifier: pid_t(pid)) {
+                _ = app.terminate()
+                usleep(400_000)
+                if !app.isTerminated {
+                    _ = app.forceTerminate()
+                }
+                return true
+            }
+            return kill(pid_t(pid), SIGKILL) == 0
+        }
+
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: mtc)
+        var args = ["-t", String(pid)]
+        if force {
+            args.append("--force")
+        }
+        process.arguments = args
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            return process.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
     public func openConfigFile() {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let mtcConfig = home.appendingPathComponent(".config/mtc/config.toml")
