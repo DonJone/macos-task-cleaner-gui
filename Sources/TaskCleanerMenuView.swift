@@ -484,6 +484,14 @@ public struct TaskCleanerMenuView: View {
                     }) {
                         Text(i18n.t(.btn_config))
                     }
+
+                    Divider()
+
+                    Button(action: {
+                        viewModel.showAboutDialog()
+                    }) {
+                        Text(i18n.t(.btn_about))
+                    }
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "gearshape")

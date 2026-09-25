@@ -150,6 +150,7 @@ public enum I18nKey: String {
     case launch_at_login_menu
     case status_launch_enabled
     case status_launch_disabled
+    case btn_about
 }
 
 @MainActor
@@ -314,7 +315,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Later",
         .launch_at_login_menu: "Launch at Login",
         .status_launch_enabled: "Launch at login enabled",
-        .status_launch_disabled: "Launch at login disabled"
+        .status_launch_disabled: "Launch at login disabled",
+        .btn_about: "About Task Cleaner"
     ],
     .zhHans: [
         .header_running: "%d 运行中",
@@ -365,7 +367,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "稍后",
         .launch_at_login_menu: "开机自动启动",
         .status_launch_enabled: "已启用开机自启动",
-        .status_launch_disabled: "已停用开机自启动"
+        .status_launch_disabled: "已停用开机自启动",
+        .btn_about: "关于 Task Cleaner"
     ],
     .zhHant: [
         .header_running: "%d 運行中",
@@ -416,7 +419,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "稍後",
         .launch_at_login_menu: "開機自動啟動",
         .status_launch_enabled: "已啟用開機自動啟動",
-        .status_launch_disabled: "已停用開機自動啟動"
+        .status_launch_disabled: "已停用開機自動啟動",
+        .btn_about: "關於 Task Cleaner"
     ],
     .ja: [
         .header_running: "%d 実行中",

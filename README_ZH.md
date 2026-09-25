@@ -19,8 +19,8 @@
   <img src="https://img.shields.io/badge/界面库-SwiftUI-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI" />
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/核心引擎-Rust-dea584?logo=rust&logoColor=white" alt="核心引擎: Rust" /></a>
   <img src="https://img.shields.io/badge/国际化-24%20种常用语言-teal" alt="语言: 24 种语言" />
-  <a href="https://github.com/DonJone/macos-task-cleaner-gui/releases"><img src="https://img.shields.io/badge/分发包-DMG%20拖拽安装-blueviolet" alt="分发格式: DMG" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/协议-MIT-green" alt="开源协议: MIT" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/开源协议-GNU%20AGPLv3-blue" alt="开源协议: GNU AGPLv3" /></a>
+  <a href="COMMERCIAL.md"><img src="https://img.shields.io/badge/商业许可-可授权-orange" alt="商业许可: 可授权" /></a>
 </p>
 
 ---
@@ -103,6 +103,12 @@ open /Applications/TaskCleaner.app
 
 ---
 
-## 许可协议
+## 许可协议与商业授权
 
-MIT License. Copyright (c) 2026 DonJone.
+本项目采用双重授权模式（Dual-Licensing Model）：
+
+1. **开源许可证**：遵循 **GNU Affero General Public License v3.0 (AGPLv3)** 协议。个人学习、学术研究与非商业开源项目可免费使用与修改；凡修改或基于本项目构建衍生作品（包括通过网络提供交互服务的 SaaS / 云端调用形态），均须向公众无偿开源全部衍生代码。详见 [LICENSE](LICENSE)。
+2. **商业许可协议 (Commercial License)**：面向企业客户、闭源专有产品集成、白标重命名销售或无法遵守 AGPLv3 传染性条款的商业场景，必须事先取得商业授权许可证。详见 [COMMERCIAL.md](COMMERCIAL.md)。
+3. **商标与品牌保护**：项目名称、标识图形与应用图标均受版权及商标保护。任何二次分发或分叉 (Fork) 版本必须彻底去除官方品牌元素。详见 [TRADEMARK.md](TRADEMARK.md)。
+
+Copyright (c) 2026 DonJone. 保留所有权利。

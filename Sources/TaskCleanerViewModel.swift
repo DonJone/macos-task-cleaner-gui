@@ -222,4 +222,33 @@ public class TaskCleanerViewModel: ObservableObject {
     public func openConfigFile() {
         MTCBridge.shared.openConfigFile()
     }
+
+    public func showAboutDialog() {
+        let alert = NSAlert()
+        alert.messageText = "Task Cleaner 0.1.0"
+        alert.informativeText = """
+        Copyright (c) 2026 DonJone. All rights reserved.
+
+        Dual-Licensed: GNU AGPLv3 / Commercial License
+
+        Free and open source for personal and community use under GNU AGPLv3.
+        Commercial bundling, proprietary closed-source integration, SaaS operation, or white-labeling requires a commercial license.
+        """
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: "Commercial Policy")
+        alert.addButton(withTitle: "GitHub")
+
+        NSApp.activate(ignoringOtherApps: true)
+        let response = alert.runModal()
+        if response == .alertSecondButtonReturn {
+            if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner/blob/main/COMMERCIAL.md") {
+                NSWorkspace.shared.open(url)
+            }
+        } else if response == .alertThirdButtonReturn {
+            if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner") {
+                NSWorkspace.shared.open(url)
+            }
+        }
+    }
 }
