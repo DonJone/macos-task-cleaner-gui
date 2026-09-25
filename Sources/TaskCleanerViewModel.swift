@@ -120,7 +120,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func cleanAll(force: Bool = false, purge: Bool = false) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "正在终止目标进程..."
+        statusMessage = "正在结束进程..."
 
         Task {
             let success = await Task.detached {
@@ -128,9 +128,9 @@ public class TaskCleanerViewModel: ObservableObject {
             }.value
 
             if success {
-                self.statusMessage = "目标进程已全部终止"
+                self.statusMessage = "进程已结束"
             } else {
-                self.statusMessage = "部分进程受系统保护或未正常响应"
+                self.statusMessage = "部分进程未响应"
             }
 
             self.isWorking = false
@@ -144,7 +144,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func whitelistApp(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = "已将 \(app.name) 添加至受信任白名单"
+        statusMessage = "已将 \(app.name) 加入白名单"
 
         Task {
             let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name

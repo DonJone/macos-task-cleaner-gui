@@ -91,7 +91,7 @@ public struct TaskCleanerMenuView: View {
             VStack(alignment: .leading, spacing: 9) {
                 HStack {
                     VStack(alignment: .leading, spacing: 1.5) {
-                        Text(hasTargets ? "\(targetCount) 个进程待终止" : "所有前台应用均受保护")
+                        Text(hasTargets ? "\(targetCount) 个待结束进程" : "前台应用均受保护")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.primary)
 
@@ -101,7 +101,7 @@ public struct TaskCleanerMenuView: View {
                                 .font(.system(size: 10.5, weight: .medium))
                                 .foregroundStyle(Color(nsColor: .systemBlue))
                         } else {
-                            Text(hasTargets ? "一键结束未列入受信任白名单的活动应用" : "所有当前活动应用均匹配白名单豁免规则")
+                            Text(hasTargets ? "结束未受保护的前台应用进程" : "当前活动应用均符合白名单规则")
                                 .font(.system(size: 10.5))
                                 .foregroundStyle(.secondary)
                         }
@@ -110,7 +110,7 @@ public struct TaskCleanerMenuView: View {
                     Spacer()
 
                     SystemBadge(
-                        hasTargets ? "待处理" : "已清场",
+                        hasTargets ? "待处理" : "受保护",
                         color: hasTargets ? .secondary : Color(nsColor: .systemBlue)
                     )
                 }
@@ -122,7 +122,7 @@ public struct TaskCleanerMenuView: View {
                         Spacer()
                         Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
                             .font(.system(size: 11.5, weight: .medium))
-                        Text(hasTargets ? "结束全部目标任务" : "无待终止任务")
+                        Text(hasTargets ? "结束" : "已就绪")
                             .font(.system(size: 12, weight: .semibold))
                         Spacer()
                     }
