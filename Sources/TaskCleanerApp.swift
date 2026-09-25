@@ -4,8 +4,8 @@ import AppKit
 public enum TrayIconHelper {
     /// 绘制 macOS 系统级原生托盘图标：白色药丸形状，正中央镂空透明 X 符号
     public static let pillXIcon: NSImage = {
-        let width: CGFloat = 20.0
-        let height: CGFloat = 12.0
+        let width: CGFloat = 23.0
+        let height: CGFloat = 13.5
         let canvasHeight: CGFloat = 18.0
 
         let img = NSImage(size: NSSize(width: width, height: canvasHeight), flipped: false) { rect in
@@ -24,8 +24,8 @@ public enum TrayIconHelper {
             ctx.setBlendMode(.clear)
             let centerX = pillRect.midX
             let centerY = pillRect.midY
-            let half: CGFloat = 3.0
-            let stroke: CGFloat = 1.85
+            let half: CGFloat = 3.5
+            let stroke: CGFloat = 2.0
 
             let xPath = NSBezierPath()
             xPath.lineWidth = stroke

@@ -22,7 +22,7 @@ echo "[3/4] 拷贝可执行文件、图标并写入 Info.plist..."
 cp "$DIR/.build/release/TaskCleanerGUI" "$MACOS_DIR/TaskCleanerGUI"
 chmod +x "$MACOS_DIR/TaskCleanerGUI"
 
-if [ ! -f "$DIR/Resources/AppIcon.icns" ]; then
+if [ ! -f "$DIR/Resources/AppIcon.icns" ] || [ "$DIR/scripts/generate_app_icon.swift" -nt "$DIR/Resources/AppIcon.icns" ]; then
     echo "       正在生成 AppIcon.icns..."
     swift "$DIR/scripts/generate_app_icon.swift"
     iconutil -c icns /tmp/AppIcon.iconset -o "$DIR/Resources/AppIcon.icns"

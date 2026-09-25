@@ -31,10 +31,11 @@ func renderAppIcon(size: CGFloat) -> NSImage {
 
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let gradColors = [
-            NSColor(red: 0.18, green: 0.20, blue: 0.24, alpha: 1.0).cgColor,
-            NSColor(red: 0.11, green: 0.12, blue: 0.15, alpha: 1.0).cgColor
+            NSColor(red: 0.22, green: 0.24, blue: 0.28, alpha: 1.0).cgColor,
+            NSColor(red: 0.14, green: 0.15, blue: 0.18, alpha: 1.0).cgColor,
+            NSColor(red: 0.08, green: 0.09, blue: 0.11, alpha: 1.0).cgColor
         ] as CFArray
-        let locations: [CGFloat] = [0.0, 1.0]
+        let locations: [CGFloat] = [0.0, 0.5, 1.0]
         if let grad = CGGradient(colorsSpace: colorSpace, colors: gradColors, locations: locations) {
             ctx.drawLinearGradient(
                 grad,
@@ -46,80 +47,88 @@ func renderAppIcon(size: CGFloat) -> NSImage {
 
         // Inner rim highlight border
         let innerBorder = NSBezierPath(roundedRect: baseRect.insetBy(dx: 1.5 * s, dy: 1.5 * s), xRadius: baseRadius - 1.5 * s, yRadius: baseRadius - 1.5 * s)
-        NSColor.white.withAlphaComponent(0.12).setStroke()
+        NSColor.white.withAlphaComponent(0.15).setStroke()
         innerBorder.lineWidth = 2.0 * s
         innerBorder.stroke()
         ctx.restoreGState()
 
-        // 2. White Pill Shape in the Center
-        let pillW: CGFloat = 520.0 * s
-        let pillH: CGFloat = 310.0 * s
-        let pillX = (size - pillW) / 2.0
-        let pillY = (size - pillH) / 2.0 - 10 * s
-        let pillRect = NSRect(x: pillX, y: pillY, width: pillW, height: pillH)
-        let pillRadius = pillH / 2.0
+        // 2. Bold, Pristine White 'X' Symbol directly on the squircle (no capsule badge)
+        let xSpan: CGFloat = 390.0 * s
+        let xHalf = xSpan / 2.0
+        let xCenterX = baseRect.midX
+        let xCenterY = baseRect.midY
+        let strokeW: CGFloat = 90.0 * s
 
-        // Pill Drop Shadow
+        let cgPath = CGMutablePath()
+        let p1 = CGPoint(x: xCenterX - xHalf, y: xCenterY - xHalf)
+        let p2 = CGPoint(x: xCenterX + xHalf, y: xCenterY + xHalf)
+        let p3 = CGPoint(x: xCenterX - xHalf, y: xCenterY + xHalf)
+        let p4 = CGPoint(x: xCenterX + xHalf, y: xCenterY - xHalf)
+
+        cgPath.move(to: p1)
+        cgPath.addLine(to: p2)
+        cgPath.move(to: p3)
+        cgPath.addLine(to: p4)
+
+        let strokedCGPath = cgPath.copy(strokingWithWidth: strokeW, lineCap: .round, lineJoin: .round, miterLimit: 10.0)
+
+        // Layer 1: Ambient Contact Shadow (tight & deep)
         ctx.saveGState()
-        let pillShadow = NSShadow()
-        pillShadow.shadowColor = NSColor.black.withAlphaComponent(0.28)
-        pillShadow.shadowOffset = NSSize(width: 0, height: -12 * s)
-        pillShadow.shadowBlurRadius = 18 * s
-        pillShadow.set()
-
-        let pillPath = NSBezierPath(roundedRect: pillRect, xRadius: pillRadius, yRadius: pillRadius)
-        NSColor.white.setFill()
-        pillPath.fill()
+        let contactShadow = NSShadow()
+        contactShadow.shadowColor = NSColor.black.withAlphaComponent(0.40)
+        contactShadow.shadowOffset = NSSize(width: 0, height: -4 * s)
+        contactShadow.shadowBlurRadius = 8 * s
+        contactShadow.set()
+        ctx.addPath(strokedCGPath)
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.4).cgColor)
+        ctx.fillPath()
         ctx.restoreGState()
 
-        // Pill Surface Gradient (Pure Crisp White to Very Subtle Ice White)
+        // Layer 2: Soft Diffuse Elevation Shadow
         ctx.saveGState()
-        pillPath.addClip()
+        let diffuseShadow = NSShadow()
+        diffuseShadow.shadowColor = NSColor.black.withAlphaComponent(0.35)
+        diffuseShadow.shadowOffset = NSSize(width: 0, height: -18 * s)
+        diffuseShadow.shadowBlurRadius = 28 * s
+        diffuseShadow.set()
+        ctx.addPath(strokedCGPath)
+        ctx.setFillColor(NSColor.black.withAlphaComponent(0.3).cgColor)
+        ctx.fillPath()
+        ctx.restoreGState()
 
-        let pillGradColors = [
+        // Layer 3: Solid White Body with Subtle Top-to-Bottom Lighting
+        ctx.saveGState()
+        ctx.addPath(strokedCGPath)
+        ctx.clip()
+
+        let xGradColors = [
             NSColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0).cgColor,
-            NSColor(red: 0.94, green: 0.95, blue: 0.97, alpha: 1.0).cgColor
+            NSColor(red: 0.95, green: 0.96, blue: 0.98, alpha: 1.0).cgColor,
+            NSColor(red: 0.88, green: 0.90, blue: 0.93, alpha: 1.0).cgColor
         ] as CFArray
-        if let pillGrad = CGGradient(colorsSpace: colorSpace, colors: pillGradColors, locations: locations) {
+        let xLocations: [CGFloat] = [0.0, 0.45, 1.0]
+        if let xGrad = CGGradient(colorsSpace: colorSpace, colors: xGradColors, locations: xLocations) {
             ctx.drawLinearGradient(
-                pillGrad,
-                start: CGPoint(x: pillRect.midX, y: pillRect.maxY),
-                end: CGPoint(x: pillRect.midX, y: pillRect.minY),
+                xGrad,
+                start: CGPoint(x: xCenterX, y: xCenterY + xHalf + strokeW/2),
+                end: CGPoint(x: xCenterX, y: xCenterY - xHalf - strokeW/2),
                 options: []
             )
         }
 
-        // 3. Cutout / Recessed Transparent 'X' in the Center of the Pill
-        let xSpan: CGFloat = 138.0 * s
-        let xHalf = xSpan / 2.0
-        let xCenterX = pillRect.midX
-        let xCenterY = pillRect.midY
-        let strokeW: CGFloat = 46.0 * s
-
-        let xPath = NSBezierPath()
-        xPath.lineWidth = strokeW
-        xPath.lineCapStyle = .round
-
-        xPath.move(to: NSPoint(x: xCenterX - xHalf, y: xCenterY - xHalf))
-        xPath.line(to: NSPoint(x: xCenterX + xHalf, y: xCenterY + xHalf))
-
-        xPath.move(to: NSPoint(x: xCenterX - xHalf, y: xCenterY + xHalf))
-        xPath.line(to: NSPoint(x: xCenterX + xHalf, y: xCenterY - xHalf))
-
-        NSColor(red: 0.12, green: 0.13, blue: 0.16, alpha: 1.0).setStroke()
-        xPath.stroke()
-
-        let xInnerShadowPath = NSBezierPath()
-        xInnerShadowPath.lineWidth = strokeW
-        xInnerShadowPath.lineCapStyle = .round
-        xInnerShadowPath.move(to: NSPoint(x: xCenterX - xHalf, y: xCenterY + xHalf))
-        xInnerShadowPath.line(to: NSPoint(x: xCenterX + xHalf, y: xCenterY - xHalf))
-        xInnerShadowPath.move(to: NSPoint(x: xCenterX - xHalf, y: xCenterY - xHalf))
-        xInnerShadowPath.line(to: NSPoint(x: xCenterX + xHalf, y: xCenterY + xHalf))
-
-        NSColor.black.withAlphaComponent(0.25).setStroke()
-        xInnerShadowPath.lineWidth = 10.0 * s
-        xInnerShadowPath.stroke()
+        // Layer 4: Subtle Top Specular Rim on the X
+        let highlightGradColors = [
+            NSColor.white.withAlphaComponent(0.6).cgColor,
+            NSColor.white.withAlphaComponent(0.0).cgColor
+        ] as CFArray
+        if let hGrad = CGGradient(colorsSpace: colorSpace, colors: highlightGradColors, locations: [0.0, 1.0]) {
+            ctx.drawLinearGradient(
+                hGrad,
+                start: CGPoint(x: xCenterX, y: xCenterY + xHalf + strokeW/2),
+                end: CGPoint(x: xCenterX, y: xCenterY),
+                options: []
+            )
+        }
 
         ctx.restoreGState()
 
