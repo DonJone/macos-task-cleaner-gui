@@ -6,6 +6,7 @@ import Combine
 public enum CleanerTab: Int, CaseIterable, Identifiable {
     case targets = 0
     case protected = 1
+    case all = 2
 
     public var id: Int { rawValue }
 }

@@ -21,10 +21,10 @@ public struct TaskCleanerMenuView: View {
                 // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
                 actionSection
 
-                // 3. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘当前连接蓝色高亮)
+                // 3. 分段选择器 (对齐 macOS 网络托盘当前连接蓝色高亮，支持待结束/已保护/全部活动进程)
                 segmentedSection
 
-                // 4. 应用列表区 (Inset Grouped App List)
+                // 4. 加长型应用列表区 (支持流畅滚动浏览全部活动进程)
                 appListView
 
                 // 5. 底栏工具 (Footer Toolbar)
@@ -34,8 +34,8 @@ public struct TaskCleanerMenuView: View {
             .padding(.top, 12)
             .padding(.bottom, 8)
         }
-        .frame(width: 320)
-        // 关键：打开即刷新，并保持实时常驻前台进程感知
+        .frame(width: 340)
+        // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
             viewModel.startLiveMonitoring()
         }
@@ -52,7 +52,7 @@ public struct TaskCleanerMenuView: View {
                 .foregroundStyle(.primary)
 
             if let summary = viewModel.summary {
-                SystemBadge("\(summary.scanned_total) 活跃进程", color: .secondary)
+                SystemBadge("\(summary.scanned_total) 运行中", color: .secondary)
             }
 
             Spacer()
@@ -82,7 +82,7 @@ public struct TaskCleanerMenuView: View {
         .frame(height: 24)
     }
 
-    // MARK: - Action Section (结构恒定，彻底杜绝点击时的高度形变与整屏跳跃)
+    // MARK: - Action Section (结构恒定，去除底层命令字样与注释，自然优雅)
     private var actionSection: some View {
         let hasTargets = (viewModel.summary?.target_count ?? 0) > 0
         let targetCount = viewModel.summary?.target_count ?? 0
@@ -95,13 +95,13 @@ public struct TaskCleanerMenuView: View {
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.primary)
 
-                        // 状态反馈直接就地显示于副标题槽位，不产生额外高度插入
+                        // 状态反馈直接就地显示于副标题槽位
                         if let msg = viewModel.statusMessage {
                             Text(msg)
                                 .font(.system(size: 10.5, weight: .medium))
                                 .foregroundStyle(Color(nsColor: .systemBlue))
                         } else {
-                            Text(hasTargets ? "执行 mtc -e 标准三段式优雅终止" : "已匹配白名单豁免规则")
+                            Text(hasTargets ? "一键结束未列入受信任白名单的活动应用" : "所有当前活动应用均匹配白名单豁免规则")
                                 .font(.system(size: 10.5))
                                 .foregroundStyle(.secondary)
                         }
@@ -110,7 +110,7 @@ public struct TaskCleanerMenuView: View {
                     Spacer()
 
                     SystemBadge(
-                        hasTargets ? "mtc -e" : "已清场",
+                        hasTargets ? "待处理" : "已清场",
                         color: hasTargets ? .secondary : Color(nsColor: .systemBlue)
                     )
                 }
@@ -135,19 +135,25 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Segmented Switcher (对齐 macOS 网络托盘当前连接高亮：激活项采用 System Blue)
+    // MARK: - Segmented Switcher (对齐 macOS 网络托盘当前连接高亮：支持 待结束 / 已保护 / 全部活动)
     private var segmentedSection: some View {
         HStack(spacing: 3) {
             segmentTabButton(
-                title: "目标进程",
+                title: "待结束",
                 count: viewModel.summary?.target_count ?? 0,
                 tab: .targets
             )
 
             segmentTabButton(
-                title: "受保护进程",
+                title: "已保护",
                 count: viewModel.summary?.protected_count ?? 0,
                 tab: .protected
+            )
+
+            segmentTabButton(
+                title: "全部活动",
+                count: viewModel.summary?.scanned_total ?? 0,
+                tab: .all
             )
         }
         .padding(2.5)
@@ -165,13 +171,13 @@ public struct TaskCleanerMenuView: View {
                 viewModel.selectedTab = tab
             }
         }) {
-            HStack(spacing: 5) {
+            HStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 11.5, weight: isSelected ? .semibold : .regular))
+                    .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
 
                 Text("\(count)")
                     .font(.system(size: 9.5, weight: .medium, design: .monospaced))
-                    .padding(.horizontal, 5)
+                    .padding(.horizontal, 4.5)
                     .padding(.vertical, 1)
                     .background(
                         Capsule()
@@ -196,17 +202,20 @@ public struct TaskCleanerMenuView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - App List View
+    // MARK: - 加长型应用列表区 (放宽至 380pt 最大高度，确保充足的滚动阅览空间)
     private var appListView: some View {
         SystemCard(cornerRadius: 10) {
             ScrollView(.vertical, showsIndicators: true) {
-                if viewModel.selectedTab == .targets {
+                switch viewModel.selectedTab {
+                case .targets:
                     targetAppsList
-                } else {
+                case .protected:
                     protectedAppsList
+                case .all:
+                    allAppsList
                 }
             }
-            .frame(maxHeight: 230)
+            .frame(minHeight: 260, maxHeight: 380)
         }
     }
 
@@ -214,13 +223,33 @@ public struct TaskCleanerMenuView: View {
         let targets = viewModel.summary?.targets ?? []
         return VStack(spacing: 0) {
             if targets.isEmpty {
-                VStack(spacing: 4) {
-                    Text("当前无待终止进程")
-                        .font(.system(size: 11, weight: .medium))
+                VStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundStyle(Color(nsColor: .systemBlue))
+
+                    Text("当前无待结束进程")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.primary)
+
+                    Text("所有前台图形应用均受白名单保护")
+                        .font(.system(size: 10.5))
                         .foregroundStyle(.secondary)
+
+                    Button(action: {
+                        withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+                            viewModel.selectedTab = .all
+                        }
+                    }) {
+                        Text("查看全部 \(viewModel.summary?.scanned_total ?? 0) 个活动进程")
+                            .font(.system(size: 11, weight: .medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 30)
+                .padding(.vertical, 40)
             } else {
                 ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
                     NativeTargetRow(app: app, isWorking: viewModel.isWorking) {
@@ -246,7 +275,7 @@ public struct TaskCleanerMenuView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 30)
+                    .padding(.vertical, 40)
             } else {
                 ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
                     NativeProtectedRow(app: app)
@@ -255,6 +284,75 @@ public struct TaskCleanerMenuView: View {
                         Divider()
                             .opacity(0.35)
                             .padding(.leading, 38)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    // 全部活动进程浏览视图
+    private var allAppsList: some View {
+        let targets = viewModel.summary?.targets ?? []
+        let protectedList = viewModel.summary?.protected_apps ?? []
+
+        return VStack(spacing: 0) {
+            if targets.isEmpty && protectedList.isEmpty {
+                Text("未检测到前台图形进程")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+            } else {
+                // 1. 待结束进程组 (若有)
+                if !targets.isEmpty {
+                    HStack {
+                        Text("待结束进程")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
+
+                    ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
+                        NativeTargetRow(app: app, isWorking: viewModel.isWorking) {
+                            viewModel.whitelistApp(app)
+                        }
+
+                        if index < targets.count - 1 {
+                            Divider()
+                                .opacity(0.35)
+                                .padding(.leading, 40)
+                        }
+                    }
+
+                    Divider()
+                        .opacity(0.6)
+                        .padding(.vertical, 6)
+                }
+
+                // 2. 受保护进程组
+                if !protectedList.isEmpty {
+                    HStack {
+                        Text("受保护进程")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.top, 4)
+                    .padding(.bottom, 2)
+
+                    ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
+                        NativeProtectedRow(app: app)
+
+                        if index < protectedList.count - 1 {
+                            Divider()
+                                .opacity(0.35)
+                                .padding(.leading, 38)
+                        }
                     }
                 }
             }
