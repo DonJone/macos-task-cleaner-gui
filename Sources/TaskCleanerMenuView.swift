@@ -15,7 +15,7 @@ public struct TaskCleanerMenuView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 10) {
-                // 1. 顶栏 (Header Bar - 鲜艳文本与状态徽标)
+                // 1. 顶栏 (Header Bar - 极简排版，参考 macOS 网络托盘，去除芯片图示)
                 headerSection
 
                 // 2. 状态提示 (Status Toast - 液态玻璃浮层)
@@ -23,10 +23,10 @@ public struct TaskCleanerMenuView: View {
                     statusToastView(message: msg)
                 }
 
-                // 3. 核心操作面板 (Hero Action Card - macOS 27 收敛圆角与薄材质)
+                // 3. 核心操作面板 (Hero Action Card - 结束任务采用暖调琥珀橙，避免与蓝色选中冲突)
                 actionSection
 
-                // 4. 分段选择器 (Segmented Switcher - 目标进程 vs 受保护进程)
+                // 4. 分段选择器 (Segmented Switcher - 参考 macOS 网络托盘活跃网络蓝色 Pill 呈现)
                 segmentedSection
 
                 // 5. 应用列表区 (Inset Grouped App List)
@@ -44,13 +44,9 @@ public struct TaskCleanerMenuView: View {
         .animation(.spring(response: 0.28, dampingFraction: 0.82), value: viewModel.statusMessage)
     }
 
-    // MARK: - Header
+    // MARK: - Header (无多余廉价芯片图标，对齐网络托盘简洁标题栏)
     private var headerSection: some View {
         HStack(spacing: 8) {
-            Image(systemName: "cpu")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
-
             Text("Task Cleaner")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.primary)
@@ -106,7 +102,7 @@ public struct TaskCleanerMenuView: View {
         )
     }
 
-    // MARK: - Action Section
+    // MARK: - Action Section (结束全部任务采用橙色/琥珀调，与蓝色选中状态清晰分离)
     private var actionSection: some View {
         SystemCard(cornerRadius: 10) {
             if let summary = viewModel.summary, summary.target_count > 0 {
@@ -133,13 +129,14 @@ public struct TaskCleanerMenuView: View {
                         HStack(spacing: 6) {
                             Spacer()
                             Image(systemName: "xmark.circle")
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.system(size: 11.5, weight: .medium))
                             Text("结束全部目标任务")
                                 .font(.system(size: 12, weight: .semibold))
                             Spacer()
                         }
                     }
                     .buttonStyle(.borderedProminent)
+                    .tint(.orange)
                     .controlSize(.regular)
                     .disabled(viewModel.isWorking)
                 }
@@ -148,7 +145,7 @@ public struct TaskCleanerMenuView: View {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(Color.accentColor)
+                        .foregroundStyle(Color(nsColor: .systemBlue))
 
                     VStack(alignment: .leading, spacing: 1.5) {
                         Text("无待终止的前台进程")
@@ -167,18 +164,65 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Segmented Switcher
+    // MARK: - Segmented Switcher (参考 macOS 网络托盘当前连接高亮样式：激活项采用 System Blue)
     private var segmentedSection: some View {
-        Picker("", selection: $viewModel.selectedTab) {
-            Text("目标进程 (\(viewModel.summary?.target_count ?? 0))")
-                .tag(CleanerTab.targets)
+        HStack(spacing: 3) {
+            segmentTabButton(
+                title: "目标进程",
+                count: viewModel.summary?.target_count ?? 0,
+                tab: .targets
+            )
 
-            Text("受保护进程 (\(viewModel.summary?.protected_count ?? 0))")
-                .tag(CleanerTab.protected)
+            segmentTabButton(
+                title: "受保护进程",
+                count: viewModel.summary?.protected_count ?? 0,
+                tab: .protected
+            )
         }
-        .pickerStyle(.segmented)
-        .labelsHidden()
+        .padding(2.5)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(nsColor: .quaternaryLabelColor))
+        )
         .disabled(viewModel.isWorking)
+    }
+
+    private func segmentTabButton(title: String, count: Int, tab: CleanerTab) -> some View {
+        let isSelected = viewModel.selectedTab == tab
+        return Button(action: {
+            withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+                viewModel.selectedTab = tab
+            }
+        }) {
+            HStack(spacing: 5) {
+                Text(title)
+                    .font(.system(size: 11.5, weight: isSelected ? .semibold : .regular))
+
+                Text("\(count)")
+                    .font(.system(size: 9.5, weight: .medium, design: .monospaced))
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 1)
+                    .background(
+                        Capsule()
+                            .fill(isSelected ? Color.white.opacity(0.24) : Color.primary.opacity(0.08))
+                    )
+            }
+            .foregroundStyle(isSelected ? Color.white : Color.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4.5)
+            .background(
+                Group {
+                    if isSelected {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .fill(Color(nsColor: .systemBlue))
+                            .shadow(color: Color.blue.opacity(0.25), radius: 2, x: 0, y: 1)
+                    } else {
+                        Color.clear
+                    }
+                }
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - App List View
@@ -357,7 +401,7 @@ struct NativeProtectedRow: View {
 
             Image(systemName: "checkmark.shield")
                 .font(.system(size: 11))
-                .foregroundStyle(.secondary.opacity(0.75))
+                .foregroundStyle(Color(nsColor: .systemBlue).opacity(0.85))
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4.5)
