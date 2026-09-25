@@ -10,29 +10,29 @@ public struct TaskCleanerMenuView: View {
 
     public var body: some View {
         ZStack {
-            // macOS 原生系统级毛玻璃基质
+            // macOS 27 原生系统级全尺寸毛玻璃背板 (支持底层折射与动态虚化)
             VisualEffectBackground(material: .popover, blendingMode: .behindWindow)
                 .ignoresSafeArea()
 
             VStack(spacing: 10) {
-                // 1. 顶栏 (Header)
+                // 1. 顶栏 (Header Bar - 鲜艳文本与状态徽标)
                 headerSection
 
-                // 2. 状态提示 (Status Toast)
+                // 2. 状态提示 (Status Toast - 液态玻璃浮层)
                 if let msg = viewModel.statusMessage {
                     statusToastView(message: msg)
                 }
 
-                // 3. 核心操作面板 (Hero Action Card)
+                // 3. 核心操作面板 (Hero Action Card - macOS 27 收敛圆角与薄材质)
                 actionSection
 
-                // 4. 分段选择器 (Segmented Switcher)
+                // 4. 分段选择器 (Segmented Switcher - 系统原生控件)
                 segmentedSection
 
                 // 5. 应用列表区 (Inset Grouped App List)
                 appListView
 
-                // 6. 底栏工具 (Footer Dock)
+                // 6. 底栏工具 (Footer Toolbar)
                 footerSection
             }
             .padding(.horizontal, 12)
@@ -40,8 +40,8 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 320)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.selectedTab)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: viewModel.statusMessage)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: viewModel.selectedTab)
+        .animation(.spring(response: 0.28, dampingFraction: 0.82), value: viewModel.statusMessage)
     }
 
     // MARK: - Header
@@ -49,11 +49,11 @@ public struct TaskCleanerMenuView: View {
         HStack(spacing: 8) {
             Image(systemName: "broom.fill")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.accentColor)
+                .foregroundStyle(Color.accentColor)
 
             Text("Task Cleaner")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(.primary)
+                .foregroundStyle(.primary)
 
             if let summary = viewModel.summary {
                 SystemBadge("\(summary.scanned_total) 运行中", color: .secondary)
@@ -66,7 +66,7 @@ public struct TaskCleanerMenuView: View {
             }) {
                 Image(systemName: "arrow.clockwise")
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .rotationEffect(.degrees(viewModel.isWorking ? 360 : 0))
                     .animation(
                         viewModel.isWorking
@@ -76,6 +76,7 @@ public struct TaskCleanerMenuView: View {
                     )
             }
             .buttonStyle(.plain)
+            .disabled(viewModel.isWorking)
             .help("刷新扫描前台应用")
         }
     }
@@ -85,11 +86,11 @@ public struct TaskCleanerMenuView: View {
         HStack(spacing: 6) {
             Image(systemName: "info.circle.fill")
                 .font(.system(size: 11))
-                .foregroundColor(.accentColor)
+                .foregroundStyle(Color.accentColor)
 
             Text(message)
                 .font(.system(size: 11, weight: .medium))
-                .foregroundColor(.primary)
+                .foregroundStyle(.primary)
 
             Spacer()
         }
@@ -97,7 +98,11 @@ public struct TaskCleanerMenuView: View {
         .padding(.vertical, 5)
         .background(
             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color(nsColor: .quaternaryLabelColor))
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
         )
     }
 
@@ -107,14 +112,14 @@ public struct TaskCleanerMenuView: View {
             if let summary = viewModel.summary, summary.target_count > 0 {
                 VStack(alignment: .leading, spacing: 9) {
                     HStack {
-                        VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading, spacing: 1.5) {
                             Text("\(summary.target_count) 个应用待清场")
                                 .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.primary)
+                                .foregroundStyle(.primary)
 
                             Text("关闭所有未加白名单的活动应用")
                                 .font(.system(size: 10.5))
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
 
                         Spacer()
@@ -137,22 +142,23 @@ public struct TaskCleanerMenuView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
                     .controlSize(.regular)
+                    .disabled(viewModel.isWorking)
                 }
                 .padding(11)
             } else {
                 HStack(spacing: 10) {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundColor(.green)
+                        .foregroundStyle(.green)
 
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 1.5) {
                         Text("当前工作区已完全清场")
                             .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
 
                         Text("所有前台图形应用均在受保护白名单中")
                             .font(.system(size: 10))
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
 
                     Spacer()
@@ -173,6 +179,7 @@ public struct TaskCleanerMenuView: View {
         }
         .pickerStyle(.segmented)
         .labelsHidden()
+        .disabled(viewModel.isWorking)
     }
 
     // MARK: - App List View
@@ -196,13 +203,13 @@ public struct TaskCleanerMenuView: View {
                 VStack(spacing: 4) {
                     Text("暂无待清场前台应用")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 30)
             } else {
                 ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
-                    NativeTargetRow(app: app) {
+                    NativeTargetRow(app: app, isWorking: viewModel.isWorking) {
                         viewModel.whitelistApp(app)
                     }
 
@@ -223,7 +230,7 @@ public struct TaskCleanerMenuView: View {
             if protectedList.isEmpty {
                 Text("暂无白名单匹配记录")
                     .font(.system(size: 11))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
             } else {
@@ -257,7 +264,7 @@ public struct TaskCleanerMenuView: View {
                         Text("配置文件")
                             .font(.system(size: 11))
                     }
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
 
@@ -268,7 +275,7 @@ public struct TaskCleanerMenuView: View {
                 }) {
                     Text("退出")
                         .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -278,9 +285,10 @@ public struct TaskCleanerMenuView: View {
     }
 }
 
-// MARK: - 原生待清场应用行组件
+// MARK: - 原生待清场应用行组件 (支持 Default / Hover / Active / Disabled 状态)
 struct NativeTargetRow: View {
     let app: TargetAppEntry
+    let isWorking: Bool
     let onWhitelist: () -> Void
 
     var body: some View {
@@ -297,12 +305,12 @@ struct NativeTargetRow: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(app.name)
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
 
                 Text(app.bundle_id.isEmpty ? "PID: \(app.pid)" : app.bundle_id)
                     .font(.system(size: 9.5, design: .monospaced))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
 
@@ -313,6 +321,7 @@ struct NativeTargetRow: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)
+            .disabled(isWorking)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
@@ -337,19 +346,19 @@ struct NativeProtectedRow: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(app.name)
                     .font(.system(size: 11.5, weight: .medium))
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                     .lineLimit(1)
 
                 Text(app.tier)
                     .font(.system(size: 9.5))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
 
             Spacer()
 
             Image(systemName: "checkmark.shield.fill")
                 .font(.system(size: 11))
-                .foregroundColor(.secondary.opacity(0.75))
+                .foregroundStyle(.secondary.opacity(0.75))
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 4.5)
