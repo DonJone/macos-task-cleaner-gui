@@ -508,7 +508,7 @@ public struct TaskCleanerMenuView: View {
 
                 Spacer()
 
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     Menu {
                         ForEach(LanguagePreference.allCases) { pref in
                             Button(action: {
@@ -526,11 +526,10 @@ public struct TaskCleanerMenuView: View {
                         Image(systemName: "globe")
                             .font(.system(size: 11))
                             .foregroundStyle(.secondary)
-                            .frame(width: 16, height: 16)
-                            .contentShape(Rectangle())
                     }
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.hidden)
+                    .frame(width: 16, height: 16)
                     .help(i18n.t(.btn_language))
 
                     Button(action: {
