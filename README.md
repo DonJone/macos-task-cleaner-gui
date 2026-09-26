@@ -16,26 +16,69 @@
   <a href="https://apple.com/macos"><img src="https://img.shields.io/badge/Platform-macOS%2013%2B-000000?logo=apple&logoColor=white" alt="Platform: macOS 13+" /></a>
   <img src="https://img.shields.io/badge/Architecture-Apple%20Silicon%20%7C%20AMD64-blue" alt="Architecture: Apple Silicon | AMD64" />
   <a href="https://swift.org/"><img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white" alt="Swift: 5.9+" /></a>
-  <img src="https://img.shields.io/badge/UI-SwiftUI-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI" />
+  <img src="https://img.shields.io/badge/UI-SwiftUI%20%7C%20AppKit-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI | AppKit" />
+  <a href="https://brew.sh/"><img src="https://img.shields.io/badge/Homebrew-Cask%20Available-orange?logo=homebrew&logoColor=white" alt="Homebrew: Cask Available" /></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Core%20Engine-Rust-dea584?logo=rust&logoColor=white" alt="Core Engine: Rust" /></a>
   <img src="https://img.shields.io/badge/Languages-24%20Locales-teal" alt="Languages: 24 Locales" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GNU%20AGPLv3-blue" alt="License: GNU AGPLv3" /></a>
   <a href="COMMERCIAL.md"><img src="https://img.shields.io/badge/Commercial-License%20Available-orange" alt="Commercial License Available" /></a>
 </p>
 
+A native macOS menu bar status item application for high-precision foreground application cleanup and whitelist management. Built with Swift and SwiftUI on top of the high-performance `macos-task-cleaner-core` Rust engine.
+
 ---
 
-## Interface Showcase
+## Visual Interface Showcase
+
+### Native Menu Bar Popover Interface
 
 <p align="center">
-  <img src="docs/images/gui-menubar.png" width="400" alt="macOS Task Cleaner Menu Bar Popover Interface" />
+  <img src="docs/images/gui-main-en.png" width="380" alt="macOS Task Cleaner Menu Bar Popover Interface" />
 </p>
+
+### Companion CLI Interactive Console & Batch Report
+
+| Interactive Console Wizard (`mtc -i`) | Batch Execution Report (`mtc --execute`) |
+| :---: | :---: |
+| <img src="docs/images/cli-interactive-en.png" width="460" alt="macOS Task Cleaner Interactive CLI Wizard" /> | <img src="docs/images/cli-exec-en.png" width="460" alt="macOS Task Cleaner Batch Execution Report" /> |
+
+---
+
+## Key Features
+
+* **Native Menu Bar Status Item**: Resides quietly in the macOS menu bar with a live badge displaying the number of active foreground tasks.
+* **Three-Part Summary Dashboard**:
+  * **Clear Foreground Apps**: Real-time counter of unwhitelisted foreground applications scheduled for cleanup.
+  * **Keep Active / Protected**: Count of protected applications across L1-L4 whitelist tiers.
+  * **Total Active Apps**: Quick overview of all discovered foreground graphical processes.
+* **Granular Process Control**:
+  * **Individual Trash Icon**: Terminate specific foreground applications instantly with a single click.
+  * **One-Click Whitelist Toggle**: Add or remove applications from persistent configuration directly from the list.
+* **Clean All One-Click Action**: Smoothly terminates all unexempted foreground tasks simultaneously.
+* **Native AppKit Finder Voluntary Quit**: Quits Finder using AppKit `NSRunningApplication.terminate()` to prevent `launchd` from treating it as an abnormal crash and immediately respawning it.
+* **Non-Intrusive POSIX Escalation**: Triggers `SIGTERM -> polling grace period -> SIGKILL` sequence, bypassing modal save/confirm dialogs without system friction.
+* **Authentic macOS System Utility Styling**: Follows Apple Human Interface Guidelines with dark chassis aesthetics, technical micro-grid backgrounds, and crisp typography.
+* **24 Global Languages & Automatic Locale Detection**: Automatically detects macOS system locale across 24 languages with seamless runtime switching.
+* **Modern Launch at Login**: Native macOS 13+ `SMAppService` integration with zero background daemon overhead.
 
 ---
 
 ## Download & Quick Install
 
-### 1. Recommended: Drag-and-Drop DMG Installer
+### Option 1: Homebrew Cask (Recommended)
+
+```bash
+# Add official tap repository
+brew tap macos-task-cleaner/tap
+
+# Install GUI application (includes embedded CLI tool)
+brew install --cask task-cleaner
+
+# Launch application
+open -a "Task Cleaner"
+```
+
+### Option 2: Drag-and-Drop DMG Installer
 
 Download the pre-built, ready-to-use disk image for your Mac architecture from [GitHub Releases](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest):
 
@@ -47,7 +90,7 @@ Download the pre-built, ready-to-use disk image for your Mac architecture from [
 
 Open the `.dmg` file and drag `Task Cleaner.app` into your `Applications` directory.
 
-### 2. Build from Source
+### Option 3: Build from Source
 
 Requires macOS 13.0+ and Xcode / Swift 5.9+:
 
@@ -62,22 +105,6 @@ cd macos-task-cleaner-gui
 cp -R build/TaskCleaner.app /Applications/
 open /Applications/TaskCleaner.app
 ```
-
----
-
-## Key Features
-
-* **Native Menu Bar Status Item**: Resides quietly in the macOS status bar with a pill-shaped template icon, displaying a live badge of active unexempted foreground tasks.
-* **Modern Popover Panel**: Single-click access to a translucent, native popover displaying active foreground applications, high-resolution icons, and Bundle Identifiers.
-* **Dynamic Window Height**: Automatically adapts popover panel height to list size (holds 3 to 6 applications with smooth scrolling for larger lists).
-* **Single-Task Termination & Whitelist Management**:
-  * **Individual Trash Icon**: Terminate specific foreground applications instantly.
-  * **Vertical Ellipsis Menu (`⋮`)**: Add applications permanently to `~/.config/mtc/config.toml` or copy Bundle Identifiers.
-  * **Protected List Management**: Review and remove applications from the protection whitelist directly from the GUI.
-* **Non-Intrusive POSIX Escalation**: Triggers `SIGTERM -> grace polling -> SIGKILL` via the embedded `mtc` bridge, bypassing modal save/confirm dialogs.
-* **Authentic macOS System Utility Styling**: Employs dark monitor screen squircle aesthetics matching macOS Terminal and Activity Monitor.
-* **24 Global Languages & Automatic Locale Detection**: Automatically detects macOS system language across 24 common languages (English, 简体中文, 繁體中文, 日本語, 한국어, Français, Deutsch, Español, Português, Italiano, Русский, Nederlands, Polski, Türkçe, العربية, ไทย, Tiếng Việt, Bahasa Indonesia, Svenska, Dansk, Norsk Bokmål, Suomi, Čeština, Українська) with seamless manual switching via the bottom toolbar.
-* **First-Launch Onboarding & Launch at Login**: Features a native onboarding card on first run, powered by modern macOS 13+ `SMAppService` with zero daemon overhead and instant toggling in settings.
 
 ---
 
