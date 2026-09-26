@@ -49,10 +49,11 @@ public struct ProtectedAppEntry: Codable, Identifiable, Equatable {
     public let name: String
     public let bundle_id: String
     public let tier: String
+    public let tier_id: String?
     public let rule: String
 
     public static func == (lhs: ProtectedAppEntry, rhs: ProtectedAppEntry) -> Bool {
-        return lhs.pid == rhs.pid && lhs.name == rhs.name && lhs.bundle_id == rhs.bundle_id && lhs.tier == rhs.tier && lhs.rule == rhs.rule
+        return lhs.pid == rhs.pid && lhs.name == rhs.name && lhs.bundle_id == rhs.bundle_id && lhs.tier == rhs.tier && lhs.tier_id == rhs.tier_id && lhs.rule == rhs.rule
     }
 
     public var appIcon: NSImage {

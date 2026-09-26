@@ -289,7 +289,17 @@ public class I18n: ObservableObject {
         return String(format: tmpl, arguments: args)
     }
 
-    public func localizeTier(_ rawTier: String) -> String {
+    public func localizeTier(_ rawTier: String, id: String? = nil) -> String {
+        if let id = id {
+            switch id {
+            case "l1_core_os": return t(.tier_l1)
+            case "l2_context_shell": return t(.tier_l2)
+            case "l3_persistent_utilities": return t(.tier_l3)
+            case "l4_user_config": return t(.tier_l4)
+            case "l4_cli_override": return t(.tier_cli)
+            default: break
+            }
+        }
         if rawTier.contains("L1") || rawTier.contains("核心") {
             return t(.tier_l1)
         } else if rawTier.contains("L2") || rawTier.contains("终端") || rawTier.contains("終端") {

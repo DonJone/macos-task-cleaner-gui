@@ -844,7 +844,7 @@ struct NativeProtectedRow: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                Text(I18n.shared.localizeTier(app.tier))
+                Text(I18n.shared.localizeTier(app.tier, id: app.tier_id))
                     .font(.system(size: 9.5))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
