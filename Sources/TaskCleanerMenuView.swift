@@ -295,7 +295,7 @@ public struct TaskCleanerMenuView: View {
             }
             .foregroundStyle(isSelected ? Color.white : Color.secondary)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 4.5)
+            .frame(height: 25)
             .background(
                 Group {
                     if isSelected {
@@ -307,6 +307,7 @@ public struct TaskCleanerMenuView: View {
                     }
                 }
             )
+            .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -352,12 +353,27 @@ public struct TaskCleanerMenuView: View {
                             viewModel.selectedTab = .all
                         }
                     }) {
-                        Text(i18n.format(.btn_view_all, viewModel.summary?.scanned_total ?? 0))
-                            .font(.system(size: 10, weight: .medium))
+                        HStack(spacing: 4) {
+                            Image(systemName: "list.bullet")
+                                .font(.system(size: 9.5, weight: .semibold))
+                            Text(i18n.format(.btn_view_all, viewModel.summary?.scanned_total ?? 0))
+                                .font(.system(size: 10.5, weight: .medium))
+                        }
+                        .foregroundStyle(Color(nsColor: .systemBlue))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4.5)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color(nsColor: .systemBlue).opacity(0.1))
+                        )
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .strokeBorder(Color(nsColor: .systemBlue).opacity(0.22), lineWidth: 0.5)
+                        )
+                        .contentShape(Capsule(style: .continuous))
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.mini)
-                    .padding(.top, 2)
+                    .buttonStyle(.plain)
+                    .padding(.top, 4)
                 }
                 .frame(maxWidth: .infinity, minHeight: minHeight)
                 .padding(.vertical, 8)
