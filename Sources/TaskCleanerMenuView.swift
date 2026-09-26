@@ -508,42 +508,40 @@ public struct TaskCleanerMenuView: View {
 
                 Spacer()
 
-                Menu {
-                    ForEach(LanguagePreference.allCases) { pref in
-                        Button(action: {
-                            i18n.setLanguage(pref)
-                        }) {
-                            HStack {
-                                Text(pref.localizedTitle(in: i18n))
-                                if i18n.preference == pref {
-                                    Image(systemName: "checkmark")
+                HStack(spacing: 8) {
+                    Menu {
+                        ForEach(LanguagePreference.allCases) { pref in
+                            Button(action: {
+                                i18n.setLanguage(pref)
+                            }) {
+                                HStack {
+                                    Text(pref.localizedTitle(in: i18n))
+                                    if i18n.preference == pref {
+                                        Image(systemName: "checkmark")
+                                    }
                                 }
                             }
                         }
-                    }
-                } label: {
-                    HStack(spacing: 3) {
+                    } label: {
                         Image(systemName: "globe")
-                            .font(.system(size: 10.5))
-                        Text(i18n.preference == .auto ? i18n.t(.lang_auto) : i18n.currentLanguage.displayName)
-                            .font(.system(size: 10))
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 16, height: 16)
+                            .contentShape(Rectangle())
                     }
-                    .foregroundStyle(.secondary)
-                }
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .help(i18n.t(.btn_language))
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
+                    .help(i18n.t(.btn_language))
 
-                Spacer()
-
-                Button(action: {
-                    NSApplication.shared.terminate(nil)
-                }) {
-                    Text(i18n.t(.btn_quit))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                    Button(action: {
+                        NSApplication.shared.terminate(nil)
+                    }) {
+                        Text(i18n.t(.btn_quit))
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 2)
             .padding(.bottom, 2)
