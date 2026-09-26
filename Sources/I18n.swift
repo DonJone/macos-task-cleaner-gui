@@ -530,7 +530,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "ログイン時に自動起動",
         .status_launch_enabled: "ログイン時起動を有効化しました",
         .status_launch_disabled: "ログイン時起動を無効化しました",
-        .btn_about: "Task Cleaner について"
+        .btn_about: "Task Cleaner について",
+        .action_reveal_in_finder: "Finder で表示",
+        .action_copy_pid: "プロセス PID をコピー",
+        .action_remove_whitelist: "ホワイトリストから削除",
+        .action_terminate_app: "プロセスを終了",
+        .status_copied: "クリップボードにコピーしました",
+        .menu_open_config_dir: "設定ディレクトリを開く",
+        .menu_github_repo: "GitHub リポジトリ",
+        .clean_mode_normal: "標準終了 (SIGTERM)",
+        .clean_mode_force: "強制終了 (SIGKILL)",
+        .clean_mode_purge: "終了してシステムキャッシュを解放 (purge)",
+        .clean_mode_options: "終了シグナルとキャッシュ解放オプション"
     ],
     .ko: [
         .header_running: "%d 실행 중",
@@ -582,7 +593,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "로그인 시 자동 실행",
         .status_launch_enabled: "로그인 시 자동 실행 켜짐",
         .status_launch_disabled: "로그인 시 자동 실행 꺼짐",
-        .btn_about: "Task Cleaner 정보"
+        .btn_about: "Task Cleaner 정보",
+        .action_reveal_in_finder: "Finder에서 보기",
+        .action_copy_pid: "프로세스 PID 복사",
+        .action_remove_whitelist: "화이트리스트에서 제거",
+        .action_terminate_app: "프로세스 종료",
+        .status_copied: "클립보드에 복사됨",
+        .menu_open_config_dir: "설정 디렉토리 열기",
+        .menu_github_repo: "GitHub 저장소",
+        .clean_mode_normal: "표준 종료 (SIGTERM)",
+        .clean_mode_force: "강제 종료 (SIGKILL)",
+        .clean_mode_purge: "종료 및 시스템 캐시 비우기 (purge)",
+        .clean_mode_options: "종료 신호 및 캐시 옵션"
     ],
     .fr: [
         .header_running: "%d en cours",
@@ -634,7 +656,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Lancer à la connexion",
         .status_launch_enabled: "Lancement à la connexion activé",
         .status_launch_disabled: "Lancement à la connexion désactivé",
-        .btn_about: "À propos de Task Cleaner"
+        .btn_about: "À propos de Task Cleaner",
+        .action_reveal_in_finder: "Afficher dans le Finder",
+        .action_copy_pid: "Copier le PID du processus",
+        .action_remove_whitelist: "Retirer de la liste blanche",
+        .action_terminate_app: "Terminer le processus",
+        .status_copied: "Copié dans le presse-papiers",
+        .menu_open_config_dir: "Ouvrir le dossier de configuration",
+        .menu_github_repo: "Dépôt GitHub",
+        .clean_mode_normal: "Terminaison standard (SIGTERM)",
+        .clean_mode_force: "Arrêt forcé (SIGKILL)",
+        .clean_mode_purge: "Terminer et purger le cache système (purge)",
+        .clean_mode_options: "Options de signal et de purge"
     ],
     .de: [
         .header_running: "%d aktiv",
@@ -686,7 +719,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Beim Login automatisch starten",
         .status_launch_enabled: "Beim Login starten aktiviert",
         .status_launch_disabled: "Beim Login starten deaktiviert",
-        .btn_about: "Über Task Cleaner"
+        .btn_about: "Über Task Cleaner",
+        .action_reveal_in_finder: "Im Finder anzeigen",
+        .action_copy_pid: "Prozess-PID kopieren",
+        .action_remove_whitelist: "Aus Whitelist entfernen",
+        .action_terminate_app: "Prozess beenden",
+        .status_copied: "In Zwischenablage kopiert",
+        .menu_open_config_dir: "Konfigurationsverzeichnis öffnen",
+        .menu_github_repo: "GitHub-Repository",
+        .clean_mode_normal: "Standard-Beenden (SIGTERM)",
+        .clean_mode_force: "Sofort beenden (SIGKILL)",
+        .clean_mode_purge: "Beenden und System-Cache leeren (purge)",
+        .clean_mode_options: "Signal- und Cache-Optionen"
     ],
     .es: [
         .header_running: "%d en ejecución",
@@ -738,7 +782,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Iniciar al iniciar sesión",
         .status_launch_enabled: "Inicio de sesión activado",
         .status_launch_disabled: "Inicio de sesión desactivado",
-        .btn_about: "Acerca de Task Cleaner"
+        .btn_about: "Acerca de Task Cleaner",
+        .action_reveal_in_finder: "Mostrar en Finder",
+        .action_copy_pid: "Copiar PID del proceso",
+        .action_remove_whitelist: "Eliminar de la lista blanca",
+        .action_terminate_app: "Terminar proceso",
+        .status_copied: "Copiado al portapapeles",
+        .menu_open_config_dir: "Abrir directorio de configuración",
+        .menu_github_repo: "Repositorio GitHub",
+        .clean_mode_normal: "Terminación estándar (SIGTERM)",
+        .clean_mode_force: "Forzar detención (SIGKILL)",
+        .clean_mode_purge: "Terminar y purgar caché del sistema (purge)",
+        .clean_mode_options: "Opciones de señal y purga"
     ],
     .pt: [
         .header_running: "%d em execução",
@@ -790,7 +845,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Iniciar ao fazer login",
         .status_launch_enabled: "Inicialização ativada",
         .status_launch_disabled: "Inicialização desativada",
-        .btn_about: "Sobre o Task Cleaner"
+        .btn_about: "Sobre o Task Cleaner",
+        .action_reveal_in_finder: "Mostrar no Finder",
+        .action_copy_pid: "Copiar PID do processo",
+        .action_remove_whitelist: "Remover da lista de permissões",
+        .action_terminate_app: "Encerrar processo",
+        .status_copied: "Copiado para a área de transferência",
+        .menu_open_config_dir: "Abrir pasta de configurações",
+        .menu_github_repo: "Repositório GitHub",
+        .clean_mode_normal: "Finalização padrão (SIGTERM)",
+        .clean_mode_force: "Forçar encerramento (SIGKILL)",
+        .clean_mode_purge: "Encerrar e limpar cache do sistema (purge)",
+        .clean_mode_options: "Opções de sinal e limpeza"
     ],
     .it: [
         .header_running: "%d in esecuzione",
@@ -842,7 +908,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Avvia al login",
         .status_launch_enabled: "Avvio al login attivato",
         .status_launch_disabled: "Avvio al login disattivato",
-        .btn_about: "Informazioni su Task Cleaner"
+        .btn_about: "Informazioni su Task Cleaner",
+        .action_reveal_in_finder: "Mostra nel Finder",
+        .action_copy_pid: "Copia PID del processo",
+        .action_remove_whitelist: "Rimuovi dalla whitelist",
+        .action_terminate_app: "Termina processo",
+        .status_copied: "Copiato negli appunti",
+        .menu_open_config_dir: "Apri cartella di configurazione",
+        .menu_github_repo: "Repository GitHub",
+        .clean_mode_normal: "Terminazione standard (SIGTERM)",
+        .clean_mode_force: "Uccisione forzata (SIGKILL)",
+        .clean_mode_purge: "Termina e svuota cache di sistema (purge)",
+        .clean_mode_options: "Opzioni di segnale e svuotamento"
     ],
     .ru: [
         .header_running: "%d запущено",
@@ -894,7 +971,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Автозапуск при входе",
         .status_launch_enabled: "Автозапуск включен",
         .status_launch_disabled: "Автозапуск отключен",
-        .btn_about: "О программе Task Cleaner"
+        .btn_about: "О программе Task Cleaner",
+        .action_reveal_in_finder: "Показать в Finder",
+        .action_copy_pid: "Скопировать PID процесса",
+        .action_remove_whitelist: "Удалить из белого списка",
+        .action_terminate_app: "Завершить процесс",
+        .status_copied: "Скопировано в буфер обмена",
+        .menu_open_config_dir: "Открыть папку конфигурации",
+        .menu_github_repo: "Репозиторий GitHub",
+        .clean_mode_normal: "Стандартное завершение (SIGTERM)",
+        .clean_mode_force: "Принудительное завершение (SIGKILL)",
+        .clean_mode_purge: "Завершить и очистить системный кэш (purge)",
+        .clean_mode_options: "Параметры сигналов и очистки кэша"
     ],
     .nl: [
         .header_running: "%d actief",
@@ -946,7 +1034,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Starten bij inloggen",
         .status_launch_enabled: "Starten bij inloggen ingeschakeld",
         .status_launch_disabled: "Starten bij inloggen uitgeschakeld",
-        .btn_about: "Over Task Cleaner"
+        .btn_about: "Over Task Cleaner",
+        .action_reveal_in_finder: "Toon in Finder",
+        .action_copy_pid: "Kopieer proces-PID",
+        .action_remove_whitelist: "Verwijder van witte lijst",
+        .action_terminate_app: "Proces beëindigen",
+        .status_copied: "Gekopieerd naar klembord",
+        .menu_open_config_dir: "Open configuratiemap",
+        .menu_github_repo: "GitHub-repository",
+        .clean_mode_normal: "Standaard beëindigen (SIGTERM)",
+        .clean_mode_force: "Geforceerd beëindigen (SIGKILL)",
+        .clean_mode_purge: "Beëindigen en systeemcache wissen (purge)",
+        .clean_mode_options: "Signaal- en cache-opties"
     ],
     .pl: [
         .header_running: "%d aktywnych",
@@ -998,7 +1097,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Uruchamiaj przy logowaniu",
         .status_launch_enabled: "Uruchamianie włączone",
         .status_launch_disabled: "Uruchamianie wyłączone",
-        .btn_about: "O programie Task Cleaner"
+        .btn_about: "O programie Task Cleaner",
+        .action_reveal_in_finder: "Pokaż w Finderze",
+        .action_copy_pid: "Kopiuj PID procesu",
+        .action_remove_whitelist: "Usuń z białej listy",
+        .action_terminate_app: "Zakończ proces",
+        .status_copied: "Skopiowano do schowka",
+        .menu_open_config_dir: "Otwórz katalog konfiguracji",
+        .menu_github_repo: "Repozytorium GitHub",
+        .clean_mode_normal: "Standardowe zakończenie (SIGTERM)",
+        .clean_mode_force: "Wymuszone zakończenie (SIGKILL)",
+        .clean_mode_purge: "Zakończ i wyczyść pamięć podręczną (purge)",
+        .clean_mode_options: "Opcje sygnału i pamięci podręcznej"
     ],
     .tr: [
         .header_running: "%d çalışıyor",
@@ -1050,7 +1160,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Girişte otomatik başlat",
         .status_launch_enabled: "Girişte başlatma etkinleştirildi",
         .status_launch_disabled: "Girişte başlatma devre dışı",
-        .btn_about: "Task Cleaner Hakkında"
+        .btn_about: "Task Cleaner Hakkında",
+        .action_reveal_in_finder: "Finder'da Göster",
+        .action_copy_pid: "İşlem PID'sini Kopyala",
+        .action_remove_whitelist: "Beyaz Listeden Kaldır",
+        .action_terminate_app: "İşlemi Sonlandır",
+        .status_copied: "Panoya kopyalandı",
+        .menu_open_config_dir: "Yapılandırma Dizinini Aç",
+        .menu_github_repo: "GitHub Deposu",
+        .clean_mode_normal: "Standart Sonlandırma (SIGTERM)",
+        .clean_mode_force: "Zorla Sonlandır (SIGKILL)",
+        .clean_mode_purge: "Sonlandır ve Sistem Önberleğini Temizle (purge)",
+        .clean_mode_options: "Sinyal ve Önberlek Seçenekleri"
     ],
     .ar: [
         .header_running: "%d قيد التشغيل",
@@ -1102,7 +1223,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "التشغيل التلقائي عند الدخول",
         .status_launch_enabled: "تم تفعيل التشغيل عند الدخول",
         .status_launch_disabled: "تم تعطيل التشغيل عند الدخول",
-        .btn_about: "حول Task Cleaner"
+        .btn_about: "حول Task Cleaner",
+        .action_reveal_in_finder: "إظهار في Finder",
+        .action_copy_pid: "نسخ معرف العملية (PID)",
+        .action_remove_whitelist: "إزالة من القائمة البيضاء",
+        .action_terminate_app: "إنهاء العملية",
+        .status_copied: "تم النسخ إلى الحافظة",
+        .menu_open_config_dir: "فتح مجلد التكوين",
+        .menu_github_repo: "مستودع GitHub",
+        .clean_mode_normal: "إنهاء قياسي (SIGTERM)",
+        .clean_mode_force: "إنهاء إجباري (SIGKILL)",
+        .clean_mode_purge: "إنهاء وتفريغ ذاكرة النظام المؤقتة (purge)",
+        .clean_mode_options: "خيارات إشارة الإنهاء وتفريغ الذاكرة"
     ],
     .th: [
         .header_running: "%d กำลังทำงาน",
@@ -1154,7 +1286,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "เริ่มทำงานเมื่อเข้าสู่ระบบอัตโนมัติ",
         .status_launch_enabled: "เปิดใช้งานการเริ่มอัตโนมัติแล้ว",
         .status_launch_disabled: "ปิดการเริ่มอัตโนมัติแล้ว",
-        .btn_about: "เกี่ยวกับ Task Cleaner"
+        .btn_about: "เกี่ยวกับ Task Cleaner",
+        .action_reveal_in_finder: "แสดงใน Finder",
+        .action_copy_pid: "คัดลอก PID กระบวนการ",
+        .action_remove_whitelist: "นำออกจากไวต์ลิสต์",
+        .action_terminate_app: "ยุติการทำงานของกระบวนการ",
+        .status_copied: "คัดลอกไปยังคลิปบอร์ดแล้ว",
+        .menu_open_config_dir: "เปิดไดเรกทอรีการกำหนดค่า",
+        .menu_github_repo: "ที่เก็บ GitHub",
+        .clean_mode_normal: "ยุติการทำงานมาตรฐาน (SIGTERM)",
+        .clean_mode_force: "บังคับปิด (SIGKILL)",
+        .clean_mode_purge: "ยุติการทำงานและล้างแคชระบบ (purge)",
+        .clean_mode_options: "ตัวเลือกสัญญาณและการล้างแคช"
     ],
     .vi: [
         .header_running: "%d đang chạy",
@@ -1206,7 +1349,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Tự động khởi chạy khi đăng nhập",
         .status_launch_enabled: "Đã bật khởi chạy cùng hệ thống",
         .status_launch_disabled: "Đã tắt khởi chạy cùng hệ thống",
-        .btn_about: "Giới thiệu về Task Cleaner"
+        .btn_about: "Giới thiệu về Task Cleaner",
+        .action_reveal_in_finder: "Hiển thị trong Finder",
+        .action_copy_pid: "Sao chép PID tiến trình",
+        .action_remove_whitelist: "Xóa khỏi danh sách trắng",
+        .action_terminate_app: "Chấm dứt tiến trình",
+        .status_copied: "Đã sao chép vào bộ nhớ tạm",
+        .menu_open_config_dir: "Mở thư mục cấu hình",
+        .menu_github_repo: "Kho lưu trữ GitHub",
+        .clean_mode_normal: "Chấm dứt tiêu chuẩn (SIGTERM)",
+        .clean_mode_force: "Buộc dừng (SIGKILL)",
+        .clean_mode_purge: "Chấm dứt và giải phóng bộ đệm hệ thống (purge)",
+        .clean_mode_options: "Tùy chọn tín hiệu và bộ đệm"
     ],
     .id: [
         .header_running: "%d berjalan",
@@ -1258,7 +1412,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Buka otomatis saat login",
         .status_launch_enabled: "Mulai saat login diaktifkan",
         .status_launch_disabled: "Mulai saat login dinonaktifkan",
-        .btn_about: "Tentang Task Cleaner"
+        .btn_about: "Tentang Task Cleaner",
+        .action_reveal_in_finder: "Tampilkan di Finder",
+        .action_copy_pid: "Salin PID Proses",
+        .action_remove_whitelist: "Hapus dari Daftar Putih",
+        .action_terminate_app: "Hentikan Proses",
+        .status_copied: "Disalin ke papan klip",
+        .menu_open_config_dir: "Buka Direktori Konfigurasi",
+        .menu_github_repo: "Repositori GitHub",
+        .clean_mode_normal: "Penghentian Standar (SIGTERM)",
+        .clean_mode_force: "Paksa Berhenti (SIGKILL)",
+        .clean_mode_purge: "Hentikan & Bersihkan Cache Sistem (purge)",
+        .clean_mode_options: "Opsi Sinyal & Cache"
     ],
     .sv: [
         .header_running: "%d körs",
@@ -1310,7 +1475,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Starta automatiskt vid inloggning",
         .status_launch_enabled: "Autostart aktiverad",
         .status_launch_disabled: "Autostart inaktiverad",
-        .btn_about: "Om Task Cleaner"
+        .btn_about: "Om Task Cleaner",
+        .action_reveal_in_finder: "Visa i Finder",
+        .action_copy_pid: "Kopiera process-PID",
+        .action_remove_whitelist: "Ta bort från vitlista",
+        .action_terminate_app: "Avsluta process",
+        .status_copied: "Kopierad till urklipp",
+        .menu_open_config_dir: "Öppna konfigurationsmapp",
+        .menu_github_repo: "GitHub-arkiv",
+        .clean_mode_normal: "Standardavslut (SIGTERM)",
+        .clean_mode_force: "Tvinga avslut (SIGKILL)",
+        .clean_mode_purge: "Avsluta och rensa systemcache (purge)",
+        .clean_mode_options: "Signal- och cachealternativ"
     ],
     .da: [
         .header_running: "%d kører",
@@ -1362,7 +1538,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Start automatisk ved login",
         .status_launch_enabled: "Start ved login aktiveret",
         .status_launch_disabled: "Start ved login deaktiveret",
-        .btn_about: "Om Task Cleaner"
+        .btn_about: "Om Task Cleaner",
+        .action_reveal_in_finder: "Vis i Finder",
+        .action_copy_pid: "Kopier proces-PID",
+        .action_remove_whitelist: "Fjern fra hvidliste",
+        .action_terminate_app: "Afslut proces",
+        .status_copied: "Kopieret til udklipsholder",
+        .menu_open_config_dir: "Åbn konfigurationsmappe",
+        .menu_github_repo: "GitHub-lager",
+        .clean_mode_normal: "Standardafslutning (SIGTERM)",
+        .clean_mode_force: "Gennemtving afslutning (SIGKILL)",
+        .clean_mode_purge: "Afslut og ryd systemcache (purge)",
+        .clean_mode_options: "Signal- og cacheindstillinger"
     ],
     .nb: [
         .header_running: "%d kjører",
@@ -1414,7 +1601,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Start automatisk ved pålogging",
         .status_launch_enabled: "Start ved pålogging aktivert",
         .status_launch_disabled: "Start ved pålogging deaktivert",
-        .btn_about: "Om Task Cleaner"
+        .btn_about: "Om Task Cleaner",
+        .action_reveal_in_finder: "Vis i Finder",
+        .action_copy_pid: "Kopier prosess-PID",
+        .action_remove_whitelist: "Fjern fra hviteliste",
+        .action_terminate_app: "Avslutt prosess",
+        .status_copied: "Kopiert til utklippstavle",
+        .menu_open_config_dir: "Åpne konfigurasjonsmappe",
+        .menu_github_repo: "GitHub-depot",
+        .clean_mode_normal: "Standardavslutning (SIGTERM)",
+        .clean_mode_force: "Tving avslutning (SIGKILL)",
+        .clean_mode_purge: "Avslutt og tøm systemhurtigbuffer (purge)",
+        .clean_mode_options: "Signal- og hurtigbuffervalg"
     ],
     .fi: [
         .header_running: "%d käynnissä",
@@ -1466,7 +1664,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Käynnistä automaattisesti",
         .status_launch_enabled: "Automaattikäynnistys käytössä",
         .status_launch_disabled: "Automaattikäynnistys poistettu käytöstä",
-        .btn_about: "Tietoja: Task Cleaner"
+        .btn_about: "Tietoja: Task Cleaner",
+        .action_reveal_in_finder: "Näytä Finderissa",
+        .action_copy_pid: "Kopioi prosessin PID",
+        .action_remove_whitelist: "Poista sallittujen luettelosta",
+        .action_terminate_app: "Lopeta prosessi",
+        .status_copied: "Kopioitu leikepöydälle",
+        .menu_open_config_dir: "Avaa määrityskansio",
+        .menu_github_repo: "GitHub-tietovarasto",
+        .clean_mode_normal: "Vakio lopetus (SIGTERM)",
+        .clean_mode_force: "Pakota lopetus (SIGKILL)",
+        .clean_mode_purge: "Lopeta ja tyhjennä järjestelmän välimuisti (purge)",
+        .clean_mode_options: "Signaali- ja välimuistivaihtoehdot"
     ],
     .cs: [
         .header_running: "%d běží",
@@ -1518,7 +1727,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Spustit při přihlášení",
         .status_launch_enabled: "Spouštění při přihlášení povoleno",
         .status_launch_disabled: "Spouštění při přihlášení zakázáno",
-        .btn_about: "O aplikaci Task Cleaner"
+        .btn_about: "O aplikaci Task Cleaner",
+        .action_reveal_in_finder: "Zobrazit ve Finderu",
+        .action_copy_pid: "Kopírovat PID procesu",
+        .action_remove_whitelist: "Odebrat z bílé listiny",
+        .action_terminate_app: "Ukončit proces",
+        .status_copied: "Zkopírováno do schránky",
+        .menu_open_config_dir: "Otevřít složku konfigurace",
+        .menu_github_repo: "Repozitář GitHub",
+        .clean_mode_normal: "Standardní ukončení (SIGTERM)",
+        .clean_mode_force: "Vynutit ukončení (SIGKILL)",
+        .clean_mode_purge: "Ukončit a vyprázdnit systémovou mezipaměť (purge)",
+        .clean_mode_options: "Možnosti signálu a mezipaměti"
     ],
     .uk: [
         .header_running: "%d запущено",
@@ -1570,6 +1790,17 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "Автозапуск під час входу",
         .status_launch_enabled: "Автозапуск увімкнено",
         .status_launch_disabled: "Автозапуск вимкнено",
-        .btn_about: "Про Task Cleaner"
+        .btn_about: "Про Task Cleaner",
+        .action_reveal_in_finder: "Показати у Finder",
+        .action_copy_pid: "Скопіювати PID процесу",
+        .action_remove_whitelist: "Вилучити з білого списку",
+        .action_terminate_app: "Завершити процес",
+        .status_copied: "Скопійовано в буфер обміну",
+        .menu_open_config_dir: "Відкрити папку конфігурації",
+        .menu_github_repo: "Репозиторій GitHub",
+        .clean_mode_normal: "Стандартне завершення (SIGTERM)",
+        .clean_mode_force: "Примусове завершення (SIGKILL)",
+        .clean_mode_purge: "Завершити та очистити системний кеш (purge)",
+        .clean_mode_options: "Параметри сигналів та очищення кешу"
     ]
 ]
