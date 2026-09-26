@@ -200,8 +200,8 @@ public class I18n: ObservableObject {
     public static func detectSystemLanguage() -> AppLanguage {
         let preferred = Locale.preferredLanguages
         for pref in preferred {
-            let lower = pref.lowercased()
-            if lower.starts(with: "zh-hant") || lower.starts(with: "zh-tw") || lower.starts(with: "zh-hk") || lower.starts(with: "zh-mo") {
+            let lower = pref.lowercased().replacingOccurrences(of: "_", with: "-")
+            if lower.starts(with: "zh-hant") || lower.starts(with: "zh-tw") || lower.starts(with: "zh-hk") || lower.starts(with: "zh-mo") || lower.starts(with: "zh-cht") {
                 return .zhHant
             }
             if lower.starts(with: "zh") {
@@ -251,13 +251,13 @@ public class I18n: ObservableObject {
     public func localizeTier(_ rawTier: String) -> String {
         if rawTier.contains("L1") || rawTier.contains("核心") {
             return t(.tier_l1)
-        } else if rawTier.contains("L2") || rawTier.contains("终端") {
+        } else if rawTier.contains("L2") || rawTier.contains("终端") || rawTier.contains("終端") {
             return t(.tier_l2)
-        } else if rawTier.contains("L3") || rawTier.contains("设施") {
+        } else if rawTier.contains("L3") || rawTier.contains("设施") || rawTier.contains("設施") {
             return t(.tier_l3)
         } else if rawTier.contains("CLI") {
             return t(.tier_cli)
-        } else if rawTier.contains("L4") || rawTier.contains("配置") {
+        } else if rawTier.contains("L4") || rawTier.contains("配置") || rawTier.contains("設定") {
             return t(.tier_l4)
         }
         return rawTier
@@ -320,11 +320,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
     ],
     .zhHans: [
         .header_running: "%d 运行中",
-        .header_refresh_help: "重新扫描前台进程",
-        .targets_count: "%d 个待结束进程",
+        .header_refresh_help: "重新扫描前台应用",
+        .targets_count: "%d 个待结束应用",
         .all_protected_title: "前台应用均受保护",
-        .targets_desc: "结束未受保护的前台应用进程",
-        .all_protected_desc: "当前活动应用均符合白名单规则",
+        .targets_desc: "结束未受保护的前台应用",
+        .all_protected_desc: "当前运行的应用均符合白名单规则",
         .badge_pending: "待处理",
         .badge_protected: "受保护",
         .btn_terminate: "结束",
@@ -332,25 +332,25 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tab_targets: "待结束",
         .tab_protected: "已保护",
         .tab_all: "全部活动",
-        .empty_targets_title: "当前无待结束进程",
-        .empty_targets_subtitle: "所有前台图形应用均受白名单保护",
-        .btn_view_all: "查看全部 %d 个活动进程",
+        .empty_targets_title: "当前无待结束应用",
+        .empty_targets_subtitle: "所有前台应用均受白名单保护",
+        .btn_view_all: "查看全部 %d 个活动应用",
         .empty_protected: "暂无匹配的白名单规则",
-        .empty_all: "未检测到前台图形进程",
-        .group_targets: "待结束进程",
-        .group_protected: "受保护进程",
+        .empty_all: "未检测到前台图形应用",
+        .group_targets: "待结束应用",
+        .group_protected: "受保护应用",
         .btn_config: "配置文件",
         .btn_language: "语言",
         .btn_quit: "退出",
         .lang_auto: "自动 (系统默认)",
-        .action_terminate_help: "结束任务",
+        .action_terminate_help: "结束应用",
         .action_add_whitelist: "加入白名单",
-        .action_copy_id: "复制标识符",
-        .action_more_help: "拓展操作",
+        .action_copy_id: "拷贝标识符",
+        .action_more_help: "更多操作",
         .btn_remove_protected: "移除",
-        .status_terminating_all: "正在结束进程...",
-        .status_all_terminated: "进程已结束",
-        .status_some_unresponsive: "部分进程未响应",
+        .status_terminating_all: "正在结束应用...",
+        .status_all_terminated: "应用已结束",
+        .status_some_unresponsive: "部分应用未响应",
         .status_terminating_app: "正在结束 %@...",
         .status_app_terminated: "已结束 %@",
         .status_app_terminate_failed: "无法结束 %@",
@@ -362,7 +362,7 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .tier_l4: "L4: 用户配置",
         .tier_cli: "L4: CLI保留",
         .launch_at_login_title: "开机自启动",
-        .launch_at_login_desc: "登录系统时常驻菜单栏，随时快速清场",
+        .launch_at_login_desc: "登录系统时常驻菜单栏，随时快速清理",
         .btn_enable: "启用",
         .btn_later: "稍后",
         .launch_at_login_menu: "开机自动启动",
@@ -371,55 +371,55 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_about: "关于 Task Cleaner"
     ],
     .zhHant: [
-        .header_running: "%d 運行中",
-        .header_refresh_help: "重新掃描前景處理程序",
-        .targets_count: "%d 個待結束處理程序",
+        .header_running: "%d 執行中",
+        .header_refresh_help: "重新掃描前景應用程式",
+        .targets_count: "%d 個待結束應用程式",
         .all_protected_title: "前景應用程式均受保護",
-        .targets_desc: "結束未受保護的前景應用程式處理程序",
-        .all_protected_desc: "目前活躍應用程式均符合白名單規則",
+        .targets_desc: "結束未受保護的前景應用程式",
+        .all_protected_desc: "目前執行中的應用程式均符合白名單規則",
         .badge_pending: "待處理",
         .badge_protected: "受保護",
         .btn_terminate: "結束",
         .btn_ready: "已就緒",
         .tab_targets: "待結束",
         .tab_protected: "已保護",
-        .tab_all: "全部活動",
-        .empty_targets_title: "目前無待結束處理程序",
-        .empty_targets_subtitle: "所有前景圖形應用程式均受白名單保護",
-        .btn_view_all: "檢視全部 %d 個活動處理程序",
+        .tab_all: "全部現用",
+        .empty_targets_title: "目前無待結束應用程式",
+        .empty_targets_subtitle: "所有前景應用程式均受白名單保護",
+        .btn_view_all: "檢視全部 %d 個現用應用程式",
         .empty_protected: "暫無符合的白名單規則",
-        .empty_all: "未偵測到前景圖形處理程序",
-        .group_targets: "待結束處理程序",
-        .group_protected: "受保護處理程序",
+        .empty_all: "未偵測到前景應用程式",
+        .group_targets: "待結束應用程式",
+        .group_protected: "受保護應用程式",
         .btn_config: "設定檔",
         .btn_language: "語言",
-        .btn_quit: "結束",
-        .lang_auto: "自動 (系統預設)",
-        .action_terminate_help: "結束工作",
+        .btn_quit: "離開",
+        .lang_auto: "自動（系統預設）",
+        .action_terminate_help: "結束應用程式",
         .action_add_whitelist: "加入白名單",
-        .action_copy_id: "複製識別碼",
-        .action_more_help: "擴充操作",
+        .action_copy_id: "拷貝識別碼",
+        .action_more_help: "更多操作",
         .btn_remove_protected: "移除",
-        .status_terminating_all: "正在結束處理程序...",
-        .status_all_terminated: "處理程序已結束",
-        .status_some_unresponsive: "部分處理程序未回應",
+        .status_terminating_all: "正在結束應用程式...",
+        .status_all_terminated: "應用程式已結束",
+        .status_some_unresponsive: "部分應用程式沒有回應",
         .status_terminating_app: "正在結束 %@...",
         .status_app_terminated: "已結束 %@",
         .status_app_terminate_failed: "無法結束 %@",
         .status_added_whitelist: "已將 %@ 加入白名單",
         .status_removed_whitelist: "已將 %@ 移出白名單",
         .tier_l1: "L1: 系統核心",
-        .tier_l2: "L2: 工作階段終端機",
+        .tier_l2: "L2: 會話終端機",
         .tier_l3: "L3: 常駐設施",
         .tier_l4: "L4: 使用者設定",
         .tier_cli: "L4: CLI保留",
-        .launch_at_login_title: "開機自動啟動",
-        .launch_at_login_desc: "登入系統時常駐選單列，隨時快速清場",
+        .launch_at_login_title: "登入時開啟",
+        .launch_at_login_desc: "登入系統時常駐於選單列，隨時快速清理",
         .btn_enable: "啟用",
         .btn_later: "稍後",
-        .launch_at_login_menu: "開機自動啟動",
-        .status_launch_enabled: "已啟用開機自動啟動",
-        .status_launch_disabled: "已停用開機自動啟動",
+        .launch_at_login_menu: "登入時開啟",
+        .status_launch_enabled: "已啟用登入時開啟",
+        .status_launch_disabled: "已停用登入時開啟",
         .btn_about: "關於 Task Cleaner"
     ],
     .ja: [
@@ -471,7 +471,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "後で",
         .launch_at_login_menu: "ログイン時に自動起動",
         .status_launch_enabled: "ログイン時起動を有効化しました",
-        .status_launch_disabled: "ログイン時起動を無効化しました"
+        .status_launch_disabled: "ログイン時起動を無効化しました",
+        .btn_about: "Task Cleaner について"
     ],
     .ko: [
         .header_running: "%d 실행 중",
@@ -522,7 +523,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "나중에",
         .launch_at_login_menu: "로그인 시 자동 실행",
         .status_launch_enabled: "로그인 시 자동 실행 켜짐",
-        .status_launch_disabled: "로그인 시 자동 실행 꺼짐"
+        .status_launch_disabled: "로그인 시 자동 실행 꺼짐",
+        .btn_about: "Task Cleaner 정보"
     ],
     .fr: [
         .header_running: "%d en cours",
@@ -573,7 +575,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Plus tard",
         .launch_at_login_menu: "Lancer à la connexion",
         .status_launch_enabled: "Lancement à la connexion activé",
-        .status_launch_disabled: "Lancement à la connexion désactivé"
+        .status_launch_disabled: "Lancement à la connexion désactivé",
+        .btn_about: "À propos de Task Cleaner"
     ],
     .de: [
         .header_running: "%d aktiv",
@@ -624,7 +627,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Später",
         .launch_at_login_menu: "Beim Login automatisch starten",
         .status_launch_enabled: "Beim Login starten aktiviert",
-        .status_launch_disabled: "Beim Login starten deaktiviert"
+        .status_launch_disabled: "Beim Login starten deaktiviert",
+        .btn_about: "Über Task Cleaner"
     ],
     .es: [
         .header_running: "%d en ejecución",
@@ -675,7 +679,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Más tarde",
         .launch_at_login_menu: "Iniciar al iniciar sesión",
         .status_launch_enabled: "Inicio de sesión activado",
-        .status_launch_disabled: "Inicio de sesión desactivado"
+        .status_launch_disabled: "Inicio de sesión desactivado",
+        .btn_about: "Acerca de Task Cleaner"
     ],
     .pt: [
         .header_running: "%d em execução",
@@ -726,7 +731,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Mais tarde",
         .launch_at_login_menu: "Iniciar ao fazer login",
         .status_launch_enabled: "Inicialização ativada",
-        .status_launch_disabled: "Inicialização desativada"
+        .status_launch_disabled: "Inicialização desativada",
+        .btn_about: "Sobre o Task Cleaner"
     ],
     .it: [
         .header_running: "%d in esecuzione",
@@ -777,7 +783,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Più tardi",
         .launch_at_login_menu: "Avvia al login",
         .status_launch_enabled: "Avvio al login attivato",
-        .status_launch_disabled: "Avvio al login disattivato"
+        .status_launch_disabled: "Avvio al login disattivato",
+        .btn_about: "Informazioni su Task Cleaner"
     ],
     .ru: [
         .header_running: "%d запущено",
@@ -828,7 +835,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Позже",
         .launch_at_login_menu: "Автозапуск при входе",
         .status_launch_enabled: "Автозапуск включен",
-        .status_launch_disabled: "Автозапуск отключен"
+        .status_launch_disabled: "Автозапуск отключен",
+        .btn_about: "О программе Task Cleaner"
     ],
     .nl: [
         .header_running: "%d actief",
@@ -879,7 +887,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Later",
         .launch_at_login_menu: "Starten bij inloggen",
         .status_launch_enabled: "Starten bij inloggen ingeschakeld",
-        .status_launch_disabled: "Starten bij inloggen uitgeschakeld"
+        .status_launch_disabled: "Starten bij inloggen uitgeschakeld",
+        .btn_about: "Over Task Cleaner"
     ],
     .pl: [
         .header_running: "%d aktywnych",
@@ -930,7 +939,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Później",
         .launch_at_login_menu: "Uruchamiaj przy logowaniu",
         .status_launch_enabled: "Uruchamianie włączone",
-        .status_launch_disabled: "Uruchamianie wyłączone"
+        .status_launch_disabled: "Uruchamianie wyłączone",
+        .btn_about: "O programie Task Cleaner"
     ],
     .tr: [
         .header_running: "%d çalışıyor",
@@ -981,7 +991,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Daha sonra",
         .launch_at_login_menu: "Girişte otomatik başlat",
         .status_launch_enabled: "Girişte başlatma etkinleştirildi",
-        .status_launch_disabled: "Girişte başlatma devre dışı"
+        .status_launch_disabled: "Girişte başlatma devre dışı",
+        .btn_about: "Task Cleaner Hakkında"
     ],
     .ar: [
         .header_running: "%d قيد التشغيل",
@@ -1032,7 +1043,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "لاحقاً",
         .launch_at_login_menu: "التشغيل التلقائي عند الدخول",
         .status_launch_enabled: "تم تفعيل التشغيل عند الدخول",
-        .status_launch_disabled: "تم تعطيل التشغيل عند الدخول"
+        .status_launch_disabled: "تم تعطيل التشغيل عند الدخول",
+        .btn_about: "حول Task Cleaner"
     ],
     .th: [
         .header_running: "%d กำลังทำงาน",
@@ -1083,7 +1095,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "ไว้ทีหลัง",
         .launch_at_login_menu: "เริ่มทำงานเมื่อเข้าสู่ระบบอัตโนมัติ",
         .status_launch_enabled: "เปิดใช้งานการเริ่มอัตโนมัติแล้ว",
-        .status_launch_disabled: "ปิดการเริ่มอัตโนมัติแล้ว"
+        .status_launch_disabled: "ปิดการเริ่มอัตโนมัติแล้ว",
+        .btn_about: "เกี่ยวกับ Task Cleaner"
     ],
     .vi: [
         .header_running: "%d đang chạy",
@@ -1134,7 +1147,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Để sau",
         .launch_at_login_menu: "Tự động khởi chạy khi đăng nhập",
         .status_launch_enabled: "Đã bật khởi chạy cùng hệ thống",
-        .status_launch_disabled: "Đã tắt khởi chạy cùng hệ thống"
+        .status_launch_disabled: "Đã tắt khởi chạy cùng hệ thống",
+        .btn_about: "Giới thiệu về Task Cleaner"
     ],
     .id: [
         .header_running: "%d berjalan",
@@ -1185,7 +1199,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Nanti",
         .launch_at_login_menu: "Buka otomatis saat login",
         .status_launch_enabled: "Mulai saat login diaktifkan",
-        .status_launch_disabled: "Mulai saat login dinonaktifkan"
+        .status_launch_disabled: "Mulai saat login dinonaktifkan",
+        .btn_about: "Tentang Task Cleaner"
     ],
     .sv: [
         .header_running: "%d körs",
@@ -1236,7 +1251,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Senare",
         .launch_at_login_menu: "Starta automatiskt vid inloggning",
         .status_launch_enabled: "Autostart aktiverad",
-        .status_launch_disabled: "Autostart inaktiverad"
+        .status_launch_disabled: "Autostart inaktiverad",
+        .btn_about: "Om Task Cleaner"
     ],
     .da: [
         .header_running: "%d kører",
@@ -1287,7 +1303,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Senere",
         .launch_at_login_menu: "Start automatisk ved login",
         .status_launch_enabled: "Start ved login aktiveret",
-        .status_launch_disabled: "Start ved login deaktiveret"
+        .status_launch_disabled: "Start ved login deaktiveret",
+        .btn_about: "Om Task Cleaner"
     ],
     .nb: [
         .header_running: "%d kjører",
@@ -1338,7 +1355,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Senere",
         .launch_at_login_menu: "Start automatisk ved pålogging",
         .status_launch_enabled: "Start ved pålogging aktivert",
-        .status_launch_disabled: "Start ved pålogging deaktivert"
+        .status_launch_disabled: "Start ved pålogging deaktivert",
+        .btn_about: "Om Task Cleaner"
     ],
     .fi: [
         .header_running: "%d käynnissä",
@@ -1389,7 +1407,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Myöhemmin",
         .launch_at_login_menu: "Käynnistä automaattisesti",
         .status_launch_enabled: "Automaattikäynnistys käytössä",
-        .status_launch_disabled: "Automaattikäynnistys poistettu käytöstä"
+        .status_launch_disabled: "Automaattikäynnistys poistettu käytöstä",
+        .btn_about: "Tietoja: Task Cleaner"
     ],
     .cs: [
         .header_running: "%d běží",
@@ -1440,7 +1459,8 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Později",
         .launch_at_login_menu: "Spustit při přihlášení",
         .status_launch_enabled: "Spouštění při přihlášení povoleno",
-        .status_launch_disabled: "Spouštění při přihlášení zakázáno"
+        .status_launch_disabled: "Spouštění při přihlášení zakázáno",
+        .btn_about: "O aplikaci Task Cleaner"
     ],
     .uk: [
         .header_running: "%d запущено",
@@ -1491,6 +1511,7 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Пізніше",
         .launch_at_login_menu: "Автозапуск під час входу",
         .status_launch_enabled: "Автозапуск увімкнено",
-        .status_launch_disabled: "Автозапуск вимкнено"
+        .status_launch_disabled: "Автозапуск вимкнено",
+        .btn_about: "Про Task Cleaner"
     ]
 ]
