@@ -58,6 +58,19 @@ public enum AppLanguage: String, CaseIterable, Identifiable {
         case .uk: return "Українська"
         }
     }
+
+    public var isRTL: Bool {
+        switch self {
+        case .ar:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public var layoutDirection: LayoutDirection {
+        isRTL ? .rightToLeft : .leftToRight
+    }
 }
 
 public enum LanguagePreference: String, CaseIterable, Identifiable {
@@ -167,6 +180,8 @@ public class I18n: ObservableObject {
     }
 
     @Published public private(set) var currentLanguage: AppLanguage = .en
+    public var isRTL: Bool { currentLanguage.isRTL }
+    public var layoutDirection: LayoutDirection { currentLanguage.layoutDirection }
 
     private init() {
         let stored = UserDefaults.standard.string(forKey: userDefaultsKey) ?? "auto"

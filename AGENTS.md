@@ -61,6 +61,13 @@ This document defines the architectural conventions, engineering rules, and hard
   * When defining an icon-only `Menu` (such as the globe language switcher), always specify `.frame(width: 16, height: 16)` directly on the `Menu` itself, not just on the label's inner `Image`.
   * Keep the globe icon immediately adjacent to the "Quit" button with tight spacing (`HStack(spacing: 6)`).
 
+### E. Right-to-Left (RTL) Layout Adaptations
+* **Problem**: In-app language switching to RTL locales (such as Arabic `.ar`) does not automatically alter SwiftUI or AppKit layout direction if left unhandled.
+* **Rule**:
+  * Inject `.environment(\.layoutDirection, i18n.layoutDirection)` at the root view in `TaskCleanerMenuView`.
+  * Pass `isRTL` to `WindowAutoResizer` to synchronize `contentView.userInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight` on the AppKit `NSWindow`.
+  * Avoid hardcoded absolute horizontal offsets; use directional logic (e.g. `offset(x: i18n.isRTL ? -3 : 3)`) and directional alignments (`.leading` / `.trailing`).
+
 ---
 
 ## 4. Build & Local Testing Conventions

@@ -42,7 +42,8 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 310)
-        .background(WindowAutoResizer(targetWidth: 310))
+        .background(WindowAutoResizer(targetWidth: 310, isRTL: i18n.isRTL))
+        .environment(\.layoutDirection, i18n.layoutDirection)
         // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
             viewModel.startLiveMonitoring()
@@ -641,7 +642,7 @@ struct NativeTargetRow: View {
                 .menuIndicator(.hidden)
                 .help(I18n.shared.t(.action_more_help))
                 .frame(width: 18, height: 22)
-                .offset(x: 3)
+                .offset(x: I18n.shared.isRTL ? -3 : 3)
                 .disabled(isWorking)
             }
             .frame(width: 44, alignment: .trailing)

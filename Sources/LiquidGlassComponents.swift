@@ -94,9 +94,11 @@ public struct SystemBadge: View {
 // 本适配器监听内容尺寸变化，锚定菜单栏顶部原点 (MaxY)，平滑同步调整 NSWindow 尺寸。
 public struct WindowAutoResizer: NSViewRepresentable {
     public let targetWidth: CGFloat
+    public let isRTL: Bool
 
-    public init(targetWidth: CGFloat = 310) {
+    public init(targetWidth: CGFloat = 310, isRTL: Bool = false) {
         self.targetWidth = targetWidth
+        self.isRTL = isRTL
     }
 
     public func makeNSView(context: Context) -> NSView {
@@ -116,6 +118,12 @@ public struct WindowAutoResizer: NSViewRepresentable {
     private func adjustWindow(_ view: NSView) {
         guard let window = view.window else { return }
         guard let contentView = window.contentView else { return }
+
+        // 同步 AppKit 原生窗口布局方向以支持 RTL
+        let desiredLayoutDirection: NSUserInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight
+        if contentView.userInterfaceLayoutDirection != desiredLayoutDirection {
+            contentView.userInterfaceLayoutDirection = desiredLayoutDirection
+        }
 
         let fitting = contentView.fittingSize
         guard fitting.height > 60 else { return }
