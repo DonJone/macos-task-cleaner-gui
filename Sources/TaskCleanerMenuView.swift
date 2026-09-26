@@ -13,32 +13,31 @@ public struct TaskCleanerMenuView: View {
 
     public var body: some View {
         VStack(spacing: 10) {
-            // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
+            // 1. 顶栏：应用标题、活动数徽标与刷新按钮
             headerSection
 
-            // 首次开机自启动引导卡片 (仅首次打开且未开启时展示)
+            // 2. 开机自启动引导横幅 (首次进入且未开启时提示)
             if launchManager.shouldShowPrompt {
-                launchAtLoginPromptCard
+                launchAtLoginBanner
             }
 
-            // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
-            actionSection
+            // 3. 核心操作面板：待清理状态、一键清场与清理模式选项
+            heroActionSection
 
-            // 3. 分段选择器 (对齐 macOS 网络托盘当前连接蓝色高亮，支持待结束/已保护/全部活动进程)
-            segmentedSection
+            // 4. 分段选择器：待结束 / 已保护 / 全部活动进程
+            segmentedControlSection
 
-            // 4. 加长型应用列表区 (支持流畅滚动浏览全部活动进程)
+            // 5. 应用列表核心区：固定高度稳定滚动卡片
             appListView
 
-            // 5. 底栏工具 (Footer Toolbar)
+            // 6. 底栏工具：配置菜单、语言切换与退出
             footerSection
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 14)
         .padding(.top, 12)
-        .padding(.bottom, 8)
-        .frame(width: 310)
+        .padding(.bottom, 10)
+        .frame(width: 320)
         .environment(\.layoutDirection, i18n.layoutDirection)
-        // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
             viewModel.startLiveMonitoring()
         }
@@ -47,9 +46,14 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Header (刚性固定尺寸与锚点，彻底解决图标跳动问题)
+    // MARK: - 1. Header (顶栏)
     private var headerSection: some View {
         HStack(spacing: 8) {
+            Image(nsImage: TrayIconHelper.pillXIcon)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 20, height: 12)
+
             Text("Task Cleaner")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.primary)
@@ -60,33 +64,31 @@ public struct TaskCleanerMenuView: View {
 
             Spacer()
 
-            // 刚性 24x24 点击锚点，内部居中自旋，杜绝任何位移跳跃
             Button(action: {
                 viewModel.refresh()
             }) {
-                ZStack {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .rotationEffect(.degrees(viewModel.isWorking ? 360 : 0))
-                        .animation(
-                            viewModel.isWorking
-                                ? .linear(duration: 0.7).repeatForever(autoreverses: false)
-                                : .default,
-                            value: viewModel.isWorking
-                        )
-                }
-                .frame(width: 24, height: 24, alignment: .center)
-                .contentShape(Rectangle())
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .rotationEffect(.degrees(viewModel.isWorking ? 360 : 0))
+                    .animation(
+                        viewModel.isWorking
+                            ? .linear(duration: 0.7).repeatForever(autoreverses: false)
+                            : .default,
+                        value: viewModel.isWorking
+                    )
+                    .frame(width: 24, height: 24)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .help(i18n.t(.header_refresh_help))
+            .disabled(viewModel.isWorking)
         }
         .frame(height: 24)
     }
 
-    // MARK: - 首次开机自启动引导卡片 (Apple 原生质感，支持立即启用与稍后忽略)
-    private var launchAtLoginPromptCard: some View {
+    // MARK: - 2. Launch At Login Prompt (开机自启横幅)
+    private var launchAtLoginBanner: some View {
         SystemCard(cornerRadius: 10) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
@@ -151,20 +153,20 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Action Section (结构恒定，去除底层命令字样与注释，自然优雅)
-    private var actionSection: some View {
+    // MARK: - 3. Hero Action Section (核心操作面板)
+    private var heroActionSection: some View {
         let hasTargets = (viewModel.summary?.target_count ?? 0) > 0
         let targetCount = viewModel.summary?.target_count ?? 0
 
         return SystemCard(cornerRadius: 10) {
             VStack(alignment: .leading, spacing: 9) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 1.5) {
+                // 上行：状态文本与徽标
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(hasTargets ? i18n.format(.targets_count, targetCount) : i18n.t(.all_protected_title))
-                            .font(.system(size: 12, weight: .semibold))
+                            .font(.system(size: 12.5, weight: .semibold))
                             .foregroundStyle(.primary)
 
-                        // 状态反馈直接就地显示于副标题槽位
                         if let msg = viewModel.statusMessage {
                             Text(msg)
                                 .font(.system(size: 10.5, weight: .medium))
@@ -186,20 +188,39 @@ public struct TaskCleanerMenuView: View {
                     )
                 }
 
-                HStack(spacing: 4) {
-                    Button(action: {
-                        viewModel.cleanAll()
-                    }) {
-                        HStack(spacing: 6) {
-                            Spacer()
-                            Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
-                                .font(.system(size: 11.5, weight: .medium))
-                            Text(hasTargets ? i18n.t(.btn_terminate) : i18n.t(.btn_ready))
-                                .font(.system(size: 12, weight: .semibold))
-                            Spacer()
+                // 下行：主执行按钮与模式下拉菜单
+                HStack(spacing: 5) {
+                    Group {
+                        if hasTargets {
+                            Button(action: {
+                                viewModel.cleanAll()
+                            }) {
+                                HStack(spacing: 6) {
+                                    Spacer()
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 12, weight: .medium))
+                                    Text(i18n.t(.btn_terminate))
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Spacer()
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                        } else {
+                            Button(action: {
+                                viewModel.cleanAll()
+                            }) {
+                                HStack(spacing: 6) {
+                                    Spacer()
+                                    Image(systemName: "checkmark.circle")
+                                        .font(.system(size: 12, weight: .medium))
+                                    Text(i18n.t(.btn_ready))
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Spacer()
+                                }
+                            }
+                            .buttonStyle(.bordered)
                         }
                     }
-                    .buttonStyle(.bordered)
                     .controlSize(.regular)
                     .disabled(!hasTargets || viewModel.isWorking)
 
@@ -217,7 +238,7 @@ public struct TaskCleanerMenuView: View {
                             }
                         } label: {
                             Image(systemName: "chevron.down")
-                                .font(.system(size: 9, weight: .semibold))
+                                .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(.secondary)
                                 .frame(width: 22, height: 26)
                                 .background(
@@ -237,8 +258,8 @@ public struct TaskCleanerMenuView: View {
         }
     }
 
-    // MARK: - Segmented Switcher (对齐 macOS 网络托盘当前连接高亮：支持 待结束 / 已保护 / 全部活动)
-    private var segmentedSection: some View {
+    // MARK: - 4. Segmented Control Section (分段选择器)
+    private var segmentedControlSection: some View {
         HStack(spacing: 3) {
             segmentTabButton(
                 title: i18n.t(.tab_targets),
@@ -269,7 +290,7 @@ public struct TaskCleanerMenuView: View {
     private func segmentTabButton(title: String, count: Int, tab: CleanerTab) -> some View {
         let isSelected = viewModel.selectedTab == tab
         return Button(action: {
-            withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+            withAnimation(.spring(response: 0.22, dampingFraction: 0.82)) {
                 viewModel.selectedTab = tab
             }
         }) {
@@ -304,12 +325,9 @@ public struct TaskCleanerMenuView: View {
         .buttonStyle(.plain)
     }
 
-    // MARK: - 动态自适应应用列表区 (最少容纳 3 个，最多容纳 6 个，高度由首次打开时的待结束进程数量锁定)
+    // MARK: - 5. App List View (稳定高度列表区，恒定 216pt 保证弹出层绝对无抖动)
     private var appListView: some View {
-        let capacity = viewModel.initialTargetCapacity
-        let listHeight = CGFloat(capacity) * 38.0 + CGFloat(capacity - 1) * 1.0 + 8.0
-
-        return SystemCard(cornerRadius: 10) {
+        SystemCard(cornerRadius: 10) {
             ScrollView(.vertical, showsIndicators: true) {
                 switch viewModel.selectedTab {
                 case .targets:
@@ -320,41 +338,43 @@ public struct TaskCleanerMenuView: View {
                     allAppsList
                 }
             }
-            .frame(height: listHeight)
+            .frame(height: 216)
         }
     }
 
+    // 待结束应用列表
     private var targetAppsList: some View {
         let targets = viewModel.summary?.targets ?? []
         return VStack(spacing: 0) {
             if targets.isEmpty {
-                VStack(spacing: 5) {
+                VStack(spacing: 6) {
+                    Spacer()
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20))
+                        .font(.system(size: 24))
                         .foregroundStyle(Color(nsColor: .systemBlue))
 
                     Text(i18n.t(.empty_targets_title))
-                        .font(.system(size: 11.5, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(.primary)
 
                     Text(i18n.t(.empty_targets_subtitle))
-                        .font(.system(size: 10))
+                        .font(.system(size: 10.5))
                         .foregroundStyle(.secondary)
 
                     Button(action: {
-                        withAnimation(.spring(response: 0.24, dampingFraction: 0.82)) {
+                        withAnimation(.spring(response: 0.22, dampingFraction: 0.82)) {
                             viewModel.selectedTab = .all
                         }
                     }) {
                         Text(i18n.format(.btn_view_all, viewModel.summary?.scanned_total ?? 0))
-                            .font(.system(size: 10, weight: .medium))
+                            .font(.system(size: 10.5, weight: .medium))
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.mini)
-                    .padding(.top, 2)
+                    .padding(.top, 4)
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 200)
             } else {
                 ForEach(Array(targets.enumerated()), id: \.element.pid) { index, app in
                     NativeTargetRow(
@@ -389,15 +409,23 @@ public struct TaskCleanerMenuView: View {
         .padding(.vertical, 4)
     }
 
+    // 已保护应用列表
     private var protectedAppsList: some View {
         let protectedList = viewModel.summary?.protected_apps ?? []
         return VStack(spacing: 0) {
             if protectedList.isEmpty {
-                Text(i18n.t(.empty_protected))
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.vertical, 16)
+                VStack(spacing: 6) {
+                    Spacer()
+                    Image(systemName: "shield.slash")
+                        .font(.system(size: 22))
+                        .foregroundStyle(.secondary)
+
+                    Text(i18n.t(.empty_protected))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, minHeight: 200)
             } else {
                 ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
                     NativeProtectedRow(
@@ -421,7 +449,7 @@ public struct TaskCleanerMenuView: View {
                     if index < protectedList.count - 1 {
                         Divider()
                             .opacity(0.35)
-                            .padding(.leading, 38)
+                            .padding(.leading, 40)
                     }
                 }
             }
@@ -429,20 +457,23 @@ public struct TaskCleanerMenuView: View {
         .padding(.vertical, 4)
     }
 
-    // 全部活动进程浏览视图
+    // 全部活动应用列表 (分组展示)
     private var allAppsList: some View {
         let targets = viewModel.summary?.targets ?? []
         let protectedList = viewModel.summary?.protected_apps ?? []
 
         return VStack(spacing: 0) {
             if targets.isEmpty && protectedList.isEmpty {
-                Text(i18n.t(.empty_all))
-                    .font(.system(size: 11))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.vertical, 16)
+                VStack(spacing: 6) {
+                    Spacer()
+                    Text(i18n.t(.empty_all))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, minHeight: 200)
             } else {
-                // 1. 待结束进程组 (若有)
+                // 1. 待结束进程组
                 if !targets.isEmpty {
                     HStack {
                         Text(i18n.t(.group_targets))
@@ -484,7 +515,7 @@ public struct TaskCleanerMenuView: View {
                     }
 
                     Divider()
-                        .opacity(0.6)
+                        .opacity(0.5)
                         .padding(.vertical, 6)
                 }
 
@@ -522,7 +553,7 @@ public struct TaskCleanerMenuView: View {
                         if index < protectedList.count - 1 {
                             Divider()
                                 .opacity(0.35)
-                                .padding(.leading, 38)
+                                .padding(.leading, 40)
                         }
                     }
                 }
@@ -531,13 +562,14 @@ public struct TaskCleanerMenuView: View {
         .padding(.vertical, 4)
     }
 
-    // MARK: - Footer
+    // MARK: - 6. Footer (底栏工具区)
     private var footerSection: some View {
         VStack(spacing: 6) {
             Divider()
-                .opacity(0.4)
+                .opacity(0.35)
 
             HStack {
+                // 配置设置主菜单
                 Menu {
                     Button(action: {
                         launchManager.toggle()
@@ -561,7 +593,7 @@ public struct TaskCleanerMenuView: View {
                                 shortcutManager.setPreset(preset)
                             }) {
                                 if shortcutManager.isEnabled && shortcutManager.currentPreset == preset {
-                                    Text("\(preset.displayString)  ✓")
+                                    Text("\(preset.displayString)  [Active]")
                                 } else {
                                     Text(preset.displayString)
                                 }
@@ -575,7 +607,7 @@ public struct TaskCleanerMenuView: View {
                         }) {
                             Label(
                                 shortcutManager.isEnabled && shortcutManager.currentPreset == nil
-                                    ? "\(i18n.t(.menu_custom_shortcut)) (\(shortcutManager.displayString))  ✓"
+                                    ? "\(i18n.t(.menu_custom_shortcut)) (\(shortcutManager.displayString))"
                                     : i18n.t(.menu_custom_shortcut),
                                 systemImage: "keyboard"
                             )
@@ -649,6 +681,7 @@ public struct TaskCleanerMenuView: View {
                 Spacer()
 
                 HStack(spacing: 6) {
+                    // 语言切换下拉菜单
                     Menu {
                         ForEach(LanguagePreference.allCases) { pref in
                             Button(action: {
@@ -672,6 +705,7 @@ public struct TaskCleanerMenuView: View {
                     .frame(width: 16, height: 16)
                     .help(i18n.t(.btn_language))
 
+                    // 退出按钮
                     Button(action: {
                         NSApplication.shared.terminate(nil)
                     }) {
@@ -688,7 +722,7 @@ public struct TaskCleanerMenuView: View {
     }
 }
 
-// MARK: - 辅助绘制原生矢量纵向三点图标 (避免 AppKit 丢弃旋转 modifier)
+// MARK: - 辅助绘制原生矢量纵向三点图标
 private func makeVerticalEllipsisImage() -> NSImage {
     let img = NSImage(size: NSSize(width: 14, height: 16), flipped: false) { rect in
         let dotRadius: CGFloat = 1.35
@@ -710,7 +744,7 @@ private func makeVerticalEllipsisImage() -> NSImage {
     return img
 }
 
-// MARK: - 原生待清场应用行组件 (支持单独结束任务、右键上下文与拓展选项，统一右对齐)
+// MARK: - 原生待清场应用行组件 (支持快捷结束、右键菜单、悬浮态与对齐)
 struct NativeTargetRow: View {
     let app: TargetAppEntry
     let isWorking: Bool
@@ -746,7 +780,7 @@ struct NativeTargetRow: View {
             Spacer()
 
             HStack(spacing: 0) {
-                // 1. 单独结束任务按钮 (小垃圾桶图标)
+                // 单独结束任务按钮 (垃圾桶)
                 Button(action: onTerminate) {
                     Image(systemName: "trash")
                         .font(.system(size: 11))
@@ -758,7 +792,7 @@ struct NativeTargetRow: View {
                 .help(I18n.shared.t(.action_terminate_help))
                 .disabled(isWorking)
 
-                // 2. 拓展项 (竖三点)：加入白名单位于拓展菜单，严格右对齐
+                // 拓展菜单 (竖三点)
                 Menu {
                     Button(action: onWhitelist) {
                         Label(I18n.shared.t(.action_add_whitelist), systemImage: "checkmark.shield")
@@ -821,7 +855,7 @@ struct NativeTargetRow: View {
     }
 }
 
-// MARK: - 原生受保护应用行组件 (统一右对齐基线与右键上下文菜单)
+// MARK: - 原生受保护应用行组件 (统一右对齐基线、右键菜单与悬浮态)
 struct NativeProtectedRow: View {
     let app: ProtectedAppEntry
     let isWorking: Bool
@@ -856,7 +890,7 @@ struct NativeProtectedRow: View {
             Spacer()
 
             HStack(spacing: 0) {
-                // 1. 快捷移出受保护按钮 (盾牌划线图标，22x22 对齐)
+                // 快捷移出受保护按钮 (盾牌划线)
                 Button(action: onRemove) {
                     Image(systemName: "shield.slash")
                         .font(.system(size: 11))
@@ -868,7 +902,7 @@ struct NativeProtectedRow: View {
                 .help(I18n.shared.t(.action_remove_whitelist))
                 .disabled(isWorking)
 
-                // 2. 拓展项 (竖三点)：同等质感与对齐
+                // 拓展菜单 (竖三点)
                 Menu {
                     Button(action: onRemove) {
                         Label(I18n.shared.t(.action_remove_whitelist), systemImage: "shield.slash")
