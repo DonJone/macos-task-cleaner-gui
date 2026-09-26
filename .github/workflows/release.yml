@@ -35,13 +35,13 @@ jobs:
       - name: Checkout Core Repository
         uses: actions/checkout@v4
         with:
-          repository: DonJone/macos-task-cleaner-core
+          repository: macos-task-cleaner/macos-task-cleaner-core
           path: macos-task-cleaner-core
 
       - name: Checkout CLI Repository
         uses: actions/checkout@v4
         with:
-          repository: DonJone/macos-task-cleaner-cli
+          repository: macos-task-cleaner/macos-task-cleaner-cli
           path: macos-task-cleaner-cli
 
       - name: Setup Rust Toolchain
@@ -115,9 +115,9 @@ jobs:
 
             | 架构 / Architecture | 适用设备 / Applicable Devices | 安装包直链下载 / Download DMG |
             | :--- | :--- | :--- |
-            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-arm64.dmg) |
-            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-x86_64.dmg) |
-            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-universal.dmg) |
+            | **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 系列芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-arm64.dmg) |
+            | **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-x86_64.dmg) |
+            | **Universal** (通用架构) | 兼容所有 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/download/${{ steps.meta.outputs.tag }}/TaskCleaner-macOS-universal.dmg) |
           files: |
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg
             macos-task-cleaner-gui/build/TaskCleaner-macOS-arm64.dmg.sha256

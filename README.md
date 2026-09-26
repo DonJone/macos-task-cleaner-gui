@@ -37,13 +37,13 @@
 
 ### 1. Recommended: Drag-and-Drop DMG Installer
 
-Download the pre-built, ready-to-use disk image for your Mac architecture from [GitHub Releases](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest):
+Download the pre-built, ready-to-use disk image for your Mac architecture from [GitHub Releases](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest):
 
 | Architecture | Applicable Hardware | Direct Download Link |
 | :--- | :--- | :--- |
-| **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 Macs | [TaskCleaner-macOS-arm64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-arm64.dmg) |
-| **AMD64 / Intel** (`x86_64`) | Intel-based Macs | [TaskCleaner-macOS-x86_64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-x86_64.dmg) |
-| **Universal** (`universal`) | Compatible with all Macs | [TaskCleaner-macOS-universal.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-universal.dmg) |
+| **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 Macs | [TaskCleaner-macOS-arm64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-arm64.dmg) |
+| **AMD64 / Intel** (`x86_64`) | Intel-based Macs | [TaskCleaner-macOS-x86_64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-x86_64.dmg) |
+| **Universal** (`universal`) | Compatible with all Macs | [TaskCleaner-macOS-universal.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-universal.dmg) |
 
 Open the `.dmg` file and drag `Task Cleaner.app` into your `Applications` directory.
 
@@ -52,7 +52,7 @@ Open the `.dmg` file and drag `Task Cleaner.app` into your `Applications` direct
 Requires macOS 13.0+ and Xcode / Swift 5.9+:
 
 ```bash
-git clone https://github.com/DonJone/macos-task-cleaner-gui.git
+git clone https://github.com/macos-task-cleaner/macos-task-cleaner-gui.git
 cd macos-task-cleaner-gui
 
 # Compile and package Release bundle (supports: arm64 | x86_64 | universal | all | native)
@@ -98,8 +98,8 @@ open /Applications/TaskCleaner.app
 
 ## Related Projects
 
-* **Core Engine Library (Rust)**: [macos-task-cleaner-core](https://github.com/DonJone/macos-task-cleaner-core)
-* **Command-Line Interface (Rust)**: [macos-task-cleaner-cli](https://github.com/DonJone/macos-task-cleaner-cli)
+* **Core Engine Library (Rust)**: [macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
+* **Command-Line Interface (Rust)**: [macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
 
 ---
 

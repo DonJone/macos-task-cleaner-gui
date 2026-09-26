@@ -37,13 +37,13 @@
 
 ### 1. 推荐：DMG 拖拽式安装镜像
 
-前往 [GitHub Releases](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest) 直接下载适用于您 Mac 架构的安装镜像：
+前往 [GitHub Releases](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest) 直接下载适用于您 Mac 架构的安装镜像：
 
 | 硬件架构 | 适用设备 | 安装包直链下载 |
 | :--- | :--- | :--- |
-| **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-arm64.dmg) |
-| **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-x86_64.dmg) |
-| **Universal** (`universal`) | 兼容全部 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/DonJone/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-universal.dmg) |
+| **Apple Silicon** (`arm64`) | Apple M1 / M2 / M3 / M4 芯片 Mac | [TaskCleaner-macOS-arm64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-arm64.dmg) |
+| **AMD64 / Intel** (`x86_64`) | Intel 处理器 / AMD64 架构 Mac | [TaskCleaner-macOS-x86_64.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-x86_64.dmg) |
+| **Universal** (`universal`) | 兼容全部 Apple Silicon 及 Intel Mac | [TaskCleaner-macOS-universal.dmg](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest/download/TaskCleaner-macOS-universal.dmg) |
 
 双击打开下载的 `.dmg` 文件后，直接将 `Task Cleaner.app` 拖入 `Applications` 文件夹即可完成安装。
 
@@ -52,7 +52,7 @@
 要求 macOS 13.0+ 及 Swift 5.9+ / Xcode 环境：
 
 ```bash
-git clone https://github.com/DonJone/macos-task-cleaner-gui.git
+git clone https://github.com/macos-task-cleaner/macos-task-cleaner-gui.git
 cd macos-task-cleaner-gui
 
 # 使用内置脚本一键编译并组装（支持参数: arm64 | x86_64 | universal | all | native）
@@ -98,8 +98,8 @@ open /Applications/TaskCleaner.app
 
 ## 关联项目
 
-* **核心算法与进程引擎库 (Rust)**：[macos-task-cleaner-core](https://github.com/DonJone/macos-task-cleaner-core)
-* **命令行客户端 (Rust)**：[macos-task-cleaner-cli](https://github.com/DonJone/macos-task-cleaner-cli)
+* **核心算法与进程引擎库 (Rust)**：[macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
+* **命令行客户端 (Rust)**：[macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
 
 ---
 

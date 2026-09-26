@@ -319,11 +319,11 @@ public class TaskCleanerViewModel: ObservableObject {
         NSApp.activate(ignoringOtherApps: true)
         let response = alert.runModal()
         if response == .alertSecondButtonReturn {
-            if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner/blob/main/COMMERCIAL.md") {
+            if let url = URL(string: "https://github.com/macos-task-cleaner/macos-task-cleaner-gui/blob/main/COMMERCIAL.md") {
                 NSWorkspace.shared.open(url)
             }
         } else if response == .alertThirdButtonReturn {
-            if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner") {
+            if let url = URL(string: "https://github.com/macos-task-cleaner/macos-task-cleaner-gui") {
                 NSWorkspace.shared.open(url)
             }
         }

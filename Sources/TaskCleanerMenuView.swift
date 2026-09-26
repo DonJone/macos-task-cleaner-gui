@@ -619,7 +619,7 @@ public struct TaskCleanerMenuView: View {
                     Divider()
 
                     Button(action: {
-                        if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner") {
+                        if let url = URL(string: "https://github.com/macos-task-cleaner/macos-task-cleaner-gui") {
                             NSWorkspace.shared.open(url)
                         }
                     }) {
