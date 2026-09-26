@@ -190,21 +190,52 @@ public struct TaskCleanerMenuView: View {
                     )
                 }
 
-                Button(action: {
-                    viewModel.cleanAll()
-                }) {
-                    HStack(spacing: 6) {
-                        Spacer()
-                        Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
-                            .font(.system(size: 11.5, weight: .medium))
-                        Text(hasTargets ? i18n.t(.btn_terminate) : i18n.t(.btn_ready))
-                            .font(.system(size: 12, weight: .semibold))
-                        Spacer()
+                HStack(spacing: 4) {
+                    Button(action: {
+                        viewModel.cleanAll()
+                    }) {
+                        HStack(spacing: 6) {
+                            Spacer()
+                            Image(systemName: hasTargets ? "xmark.circle" : "checkmark.circle")
+                                .font(.system(size: 11.5, weight: .medium))
+                            Text(hasTargets ? i18n.t(.btn_terminate) : i18n.t(.btn_ready))
+                                .font(.system(size: 12, weight: .semibold))
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
+                    .disabled(!hasTargets || viewModel.isWorking)
+
+                    if hasTargets {
+                        Menu {
+                            Button(action: { viewModel.cleanAll(force: false, purge: false) }) {
+                                Label(i18n.t(.clean_mode_normal), systemImage: "sparkles")
+                            }
+                            Button(action: { viewModel.cleanAll(force: true, purge: false) }) {
+                                Label(i18n.t(.clean_mode_force), systemImage: "bolt.fill")
+                            }
+                            Divider()
+                            Button(action: { viewModel.cleanAll(force: false, purge: true) }) {
+                                Label(i18n.t(.clean_mode_purge), systemImage: "memorychip")
+                            }
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 22, height: 26)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                        .fill(Color.primary.opacity(0.06))
+                                )
+                        }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
+                        .frame(width: 24, height: 26)
+                        .disabled(viewModel.isWorking)
+                        .help(i18n.t(.clean_mode_options))
                     }
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.regular)
-                .disabled(!hasTargets || viewModel.isWorking)
             }
             .padding(11)
         }
@@ -338,6 +369,16 @@ public struct TaskCleanerMenuView: View {
                         },
                         onWhitelist: {
                             viewModel.whitelistApp(app)
+                        },
+                        onRevealInFinder: {
+                            viewModel.revealInFinder(pid: app.pid)
+                        },
+                        onCopyId: {
+                            let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
+                            viewModel.copyToClipboard(text: identifier, label: i18n.t(.status_copied))
+                        },
+                        onCopyPid: {
+                            viewModel.copyToClipboard(text: "\(app.pid)", label: i18n.t(.status_copied))
                         }
                     )
 
@@ -363,9 +404,23 @@ public struct TaskCleanerMenuView: View {
                     .padding(.vertical, 16)
             } else {
                 ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
-                    NativeProtectedRow(app: app, isWorking: viewModel.isWorking) {
-                        viewModel.unprotectApp(app)
-                    }
+                    NativeProtectedRow(
+                        app: app,
+                        isWorking: viewModel.isWorking,
+                        onRemove: {
+                            viewModel.unprotectApp(app)
+                        },
+                        onRevealInFinder: {
+                            viewModel.revealInFinder(pid: app.pid)
+                        },
+                        onCopyId: {
+                            let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
+                            viewModel.copyToClipboard(text: identifier, label: i18n.t(.status_copied))
+                        },
+                        onCopyPid: {
+                            viewModel.copyToClipboard(text: "\(app.pid)", label: i18n.t(.status_copied))
+                        }
+                    )
 
                     if index < protectedList.count - 1 {
                         Divider()
@@ -412,6 +467,16 @@ public struct TaskCleanerMenuView: View {
                             },
                             onWhitelist: {
                                 viewModel.whitelistApp(app)
+                            },
+                            onRevealInFinder: {
+                                viewModel.revealInFinder(pid: app.pid)
+                            },
+                            onCopyId: {
+                                let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
+                                viewModel.copyToClipboard(text: identifier, label: i18n.t(.status_copied))
+                            },
+                            onCopyPid: {
+                                viewModel.copyToClipboard(text: "\(app.pid)", label: i18n.t(.status_copied))
                             }
                         )
 
@@ -440,9 +505,23 @@ public struct TaskCleanerMenuView: View {
                     .padding(.bottom, 2)
 
                     ForEach(Array(protectedList.enumerated()), id: \.element.pid) { index, app in
-                        NativeProtectedRow(app: app, isWorking: viewModel.isWorking) {
-                            viewModel.unprotectApp(app)
-                        }
+                        NativeProtectedRow(
+                            app: app,
+                            isWorking: viewModel.isWorking,
+                            onRemove: {
+                                viewModel.unprotectApp(app)
+                            },
+                            onRevealInFinder: {
+                                viewModel.revealInFinder(pid: app.pid)
+                            },
+                            onCopyId: {
+                                let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
+                                viewModel.copyToClipboard(text: identifier, label: i18n.t(.status_copied))
+                            },
+                            onCopyPid: {
+                                viewModel.copyToClipboard(text: "\(app.pid)", label: i18n.t(.status_copied))
+                            }
+                        )
 
                         if index < protectedList.count - 1 {
                             Divider()
@@ -472,12 +551,10 @@ public struct TaskCleanerMenuView: View {
                             viewModel.statusMessage = nil
                         }
                     }) {
-                        HStack {
-                            Text(i18n.t(.launch_at_login_menu))
-                            if launchManager.isEnabled {
-                                Image(systemName: "checkmark")
-                            }
-                        }
+                        Label(
+                            i18n.t(.launch_at_login_menu),
+                            systemImage: launchManager.isEnabled ? "checkmark.circle.fill" : "circle"
+                        )
                     }
 
                     Divider()
@@ -485,15 +562,29 @@ public struct TaskCleanerMenuView: View {
                     Button(action: {
                         viewModel.openConfigFile()
                     }) {
-                        Text(i18n.t(.btn_config))
+                        Label(i18n.t(.btn_config), systemImage: "slider.horizontal.3")
+                    }
+
+                    Button(action: {
+                        viewModel.openConfigDirectory()
+                    }) {
+                        Label(i18n.t(.menu_open_config_dir), systemImage: "folder.badge.gear")
                     }
 
                     Divider()
 
                     Button(action: {
+                        if let url = URL(string: "https://github.com/DonJone/macos-task-cleaner") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }) {
+                        Label(i18n.t(.menu_github_repo), systemImage: "arrow.up.right.square")
+                    }
+
+                    Button(action: {
                         viewModel.showAboutDialog()
                     }) {
-                        Text(i18n.t(.btn_about))
+                        Label(i18n.t(.btn_about), systemImage: "info.circle")
                     }
                 } label: {
                     HStack(spacing: 4) {
@@ -571,12 +662,15 @@ private func makeVerticalEllipsisImage() -> NSImage {
     return img
 }
 
-// MARK: - 原生待清场应用行组件 (支持单独结束任务与拓展选项，统一右对齐)
+// MARK: - 原生待清场应用行组件 (支持单独结束任务、右键上下文与拓展选项，统一右对齐)
 struct NativeTargetRow: View {
     let app: TargetAppEntry
     let isWorking: Bool
     let onTerminate: () -> Void
     let onWhitelist: () -> Void
+    let onRevealInFinder: () -> Void
+    let onCopyId: () -> Void
+    let onCopyPid: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
@@ -624,14 +718,17 @@ struct NativeTargetRow: View {
 
                     Divider()
 
-                    Button(action: {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(
-                            !app.bundle_id.isEmpty ? app.bundle_id : app.name,
-                            forType: .string
-                        )
-                    }) {
+                    Button(action: onRevealInFinder) {
+                        Label(I18n.shared.t(.action_reveal_in_finder), systemImage: "folder")
+                    }
+
+                    Divider()
+
+                    Button(action: onCopyId) {
                         Label(I18n.shared.t(.action_copy_id), systemImage: "doc.on.doc")
+                    }
+                    Button(action: onCopyPid) {
+                        Label(I18n.shared.t(.action_copy_pid), systemImage: "number")
                     }
                 } label: {
                     Image(nsImage: makeVerticalEllipsisImage())
@@ -649,14 +746,41 @@ struct NativeTargetRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button(action: onTerminate) {
+                Label(I18n.shared.t(.action_terminate_app), systemImage: "trash")
+            }
+            Button(action: onWhitelist) {
+                Label(I18n.shared.t(.action_add_whitelist), systemImage: "checkmark.shield")
+            }
+
+            Divider()
+
+            Button(action: onRevealInFinder) {
+                Label(I18n.shared.t(.action_reveal_in_finder), systemImage: "folder")
+            }
+
+            Divider()
+
+            Button(action: onCopyId) {
+                Label(I18n.shared.t(.action_copy_id), systemImage: "doc.on.doc")
+            }
+            Button(action: onCopyPid) {
+                Label(I18n.shared.t(.action_copy_pid), systemImage: "number")
+            }
+        }
     }
 }
 
-// MARK: - 原生受保护应用行组件 (统一右对齐基线)
+// MARK: - 原生受保护应用行组件 (统一右对齐基线与右键上下文菜单)
 struct NativeProtectedRow: View {
     let app: ProtectedAppEntry
     let isWorking: Bool
     let onRemove: () -> Void
+    let onRevealInFinder: () -> Void
+    let onCopyId: () -> Void
+    let onCopyPid: () -> Void
 
     var body: some View {
         HStack(spacing: 8) {
@@ -683,15 +807,75 @@ struct NativeProtectedRow: View {
 
             Spacer()
 
-            Button(action: onRemove) {
-                Text(I18n.shared.t(.btn_remove_protected))
+            HStack(spacing: 0) {
+                // 1. 快捷移出受保护按钮 (盾牌划线图标，22x22 对齐)
+                Button(action: onRemove) {
+                    Image(systemName: "shield.slash")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(I18n.shared.t(.action_remove_whitelist))
+                .disabled(isWorking)
+
+                // 2. 拓展项 (竖三点)：同等质感与对齐
+                Menu {
+                    Button(action: onRemove) {
+                        Label(I18n.shared.t(.action_remove_whitelist), systemImage: "shield.slash")
+                    }
+
+                    Divider()
+
+                    Button(action: onRevealInFinder) {
+                        Label(I18n.shared.t(.action_reveal_in_finder), systemImage: "folder")
+                    }
+
+                    Divider()
+
+                    Button(action: onCopyId) {
+                        Label(I18n.shared.t(.action_copy_id), systemImage: "doc.on.doc")
+                    }
+                    Button(action: onCopyPid) {
+                        Label(I18n.shared.t(.action_copy_pid), systemImage: "number")
+                    }
+                } label: {
+                    Image(nsImage: makeVerticalEllipsisImage())
+                        .frame(width: 14, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .help(I18n.shared.t(.action_more_help))
+                .frame(width: 18, height: 22)
+                .offset(x: I18n.shared.isRTL ? -3 : 3)
+                .disabled(isWorking)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.mini)
             .frame(width: 44, alignment: .trailing)
-            .disabled(isWorking)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
+        .contentShape(Rectangle())
+        .contextMenu {
+            Button(action: onRemove) {
+                Label(I18n.shared.t(.action_remove_whitelist), systemImage: "shield.slash")
+            }
+
+            Divider()
+
+            Button(action: onRevealInFinder) {
+                Label(I18n.shared.t(.action_reveal_in_finder), systemImage: "folder")
+            }
+
+            Divider()
+
+            Button(action: onCopyId) {
+                Label(I18n.shared.t(.action_copy_id), systemImage: "doc.on.doc")
+            }
+            Button(action: onCopyPid) {
+                Label(I18n.shared.t(.action_copy_pid), systemImage: "number")
+            }
+        }
     }
 }

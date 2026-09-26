@@ -223,6 +223,36 @@ public class TaskCleanerViewModel: ObservableObject {
         MTCBridge.shared.openConfigFile()
     }
 
+    public func openConfigDirectory() {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let dir = home.appendingPathComponent(".config/taskcleaner")
+        if FileManager.default.fileExists(atPath: dir.path) {
+            NSWorkspace.shared.open(dir)
+        } else {
+            let legacy = home.appendingPathComponent(".config/mtc")
+            NSWorkspace.shared.open(legacy)
+        }
+    }
+
+    public func revealInFinder(pid: Int) {
+        if let app = NSRunningApplication(processIdentifier: pid_t(pid)),
+           let url = app.bundleURL {
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        }
+    }
+
+    public func copyToClipboard(text: String, label: String? = nil) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        if let label = label {
+            self.statusMessage = label
+            Task {
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                self.statusMessage = nil
+            }
+        }
+    }
+
     public func showAboutDialog() {
         let alert = NSAlert()
         alert.messageText = "Task Cleaner 0.1.0"

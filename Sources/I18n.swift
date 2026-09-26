@@ -164,6 +164,17 @@ public enum I18nKey: String {
     case status_launch_enabled
     case status_launch_disabled
     case btn_about
+    case action_reveal_in_finder
+    case action_copy_pid
+    case action_remove_whitelist
+    case action_terminate_app
+    case status_copied
+    case menu_open_config_dir
+    case menu_github_repo
+    case clean_mode_normal
+    case clean_mode_force
+    case clean_mode_purge
+    case clean_mode_options
 }
 
 @MainActor
@@ -330,8 +341,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_later: "Later",
         .launch_at_login_menu: "Launch at Login",
         .status_launch_enabled: "Launch at login enabled",
-        .status_launch_disabled: "Launch at login disabled",
-        .btn_about: "About Task Cleaner"
+        .btn_about: "About Task Cleaner",
+        .action_reveal_in_finder: "Reveal in Finder",
+        .action_copy_pid: "Copy Process ID (PID)",
+        .action_remove_whitelist: "Remove from Whitelist",
+        .action_terminate_app: "Terminate Process",
+        .status_copied: "Copied to clipboard",
+        .menu_open_config_dir: "Open Config Directory",
+        .menu_github_repo: "GitHub Repository",
+        .clean_mode_normal: "Graceful Quit (SIGTERM)",
+        .clean_mode_force: "Force Kill (SIGKILL)",
+        .clean_mode_purge: "Clean & Purge Memory",
+        .clean_mode_options: "Cleaning Modes"
     ],
     .zhHans: [
         .header_running: "%d 运行中",
@@ -383,7 +404,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "开机自动启动",
         .status_launch_enabled: "已启用开机自启动",
         .status_launch_disabled: "已停用开机自启动",
-        .btn_about: "关于 Task Cleaner"
+        .btn_about: "关于 Task Cleaner",
+        .action_reveal_in_finder: "在访达中显示",
+        .action_copy_pid: "复制进程 PID",
+        .action_remove_whitelist: "移出白名单",
+        .action_terminate_app: "结束此进程",
+        .status_copied: "已复制到剪贴板",
+        .menu_open_config_dir: "打开配置所在目录",
+        .menu_github_repo: "GitHub 源码仓库",
+        .clean_mode_normal: "常规平滑下线 (SIGTERM)",
+        .clean_mode_force: "极速秒杀强退 (SIGKILL)",
+        .clean_mode_purge: "清场并强制回收内存 (Purge)",
+        .clean_mode_options: "清场模式选择"
     ],
     .zhHant: [
         .header_running: "%d 執行中",
@@ -435,7 +467,18 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .launch_at_login_menu: "登入時開啟",
         .status_launch_enabled: "已啟用登入時開啟",
         .status_launch_disabled: "已停用登入時開啟",
-        .btn_about: "關於 Task Cleaner"
+        .btn_about: "關於 Task Cleaner",
+        .action_reveal_in_finder: "在訪達中顯示",
+        .action_copy_pid: "拷貝行程 PID",
+        .action_remove_whitelist: "移出白名單",
+        .action_terminate_app: "結束此行程",
+        .status_copied: "已拷貝至剪貼簿",
+        .menu_open_config_dir: "開啟設定所在目錄",
+        .menu_github_repo: "GitHub 原始碼庫",
+        .clean_mode_normal: "常規平滑離線 (SIGTERM)",
+        .clean_mode_force: "極速強制結束 (SIGKILL)",
+        .clean_mode_purge: "清場並強制釋放記憶體 (Purge)",
+        .clean_mode_options: "清場模式選擇"
     ],
     .ja: [
         .header_running: "%d 実行中",

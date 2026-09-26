@@ -74,6 +74,12 @@ This document defines the architectural conventions, engineering rules, and hard
   * All foreground applications displayed in `NativeProtectedRow` (including Finder) can be removed from protection by the user via the "Remove" button, moving them to the targets list.
   * When Finder is terminated (either via individual trash icon or batch clean), the underlying `mtc` engine utilizes native AppKit `NSRunningApplication.terminate()` so that Finder exits cleanly without `launchd` respawning it.
 
+### G. Native macOS Context Menus & Action Symmetry
+* **Rule**:
+  * All application rows (both `NativeTargetRow` and `NativeProtectedRow`) must maintain identical 44pt trailing control footprints (primary action icon + three-dot `Menu`).
+  * Both row types must attach full native `.contextMenu` containing `Reveal in Finder` (`folder`), clipboard tools (`doc.on.doc`, `number`), and tier/lifecycle actions.
+  * Secondary menus (such as the action section split chevron and footer gear menu) must use SF Symbols with `Label(...)` for authentic macOS vibrancy aesthetics.
+
 ---
 
 ## 4. Build & Local Testing Conventions
