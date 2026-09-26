@@ -605,6 +605,14 @@ public struct TaskCleanerMenuView: View {
                     Divider()
 
                     Button(action: {
+                        viewModel.installCliCommand()
+                    }) {
+                        Label(i18n.t(.menu_install_cli), systemImage: "terminal")
+                    }
+
+                    Divider()
+
+                    Button(action: {
                         viewModel.openConfigFile()
                     }) {
                         Label(i18n.t(.menu_open_config_file), systemImage: "slider.horizontal.3")

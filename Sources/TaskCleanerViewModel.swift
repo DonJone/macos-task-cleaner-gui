@@ -281,6 +281,69 @@ public class TaskCleanerViewModel: ObservableObject {
         }
     }
 
+    // MARK: - 安装 CLI 到系统 PATH
+    public func installCliCommand() {
+        let fileManager = FileManager.default
+        let home = fileManager.homeDirectoryForCurrentUser
+        let localBin = home.appendingPathComponent(".local/bin")
+        let targetSymlinkMtc = localBin.appendingPathComponent("mtc")
+        let targetSymlinkTc = localBin.appendingPathComponent("taskcleaner")
+
+        let appInternal = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/mtc").path
+        let standardApp = "/Applications/TaskCleaner.app/Contents/MacOS/mtc"
+
+        let sourceMtc: String
+        if fileManager.isExecutableFile(atPath: standardApp) {
+            sourceMtc = standardApp
+        } else if fileManager.isExecutableFile(atPath: appInternal) {
+            sourceMtc = appInternal
+        } else if let found = MTCBridge.shared.findMTCBinary(), found != targetSymlinkMtc.path {
+            sourceMtc = found
+        } else {
+            self.statusMessage = I18n.shared.t(.status_cli_install_failed)
+            return
+        }
+
+        do {
+            if !fileManager.fileExists(atPath: localBin.path) {
+                try fileManager.createDirectory(at: localBin, withIntermediateDirectories: true, attributes: nil)
+            }
+
+            // 创建/更新 mtc 软链接
+            if fileManager.fileExists(atPath: targetSymlinkMtc.path) || (try? fileManager.destinationOfSymbolicLink(atPath: targetSymlinkMtc.path)) != nil {
+                try? fileManager.removeItem(at: targetSymlinkMtc)
+            }
+            try fileManager.createSymbolicLink(at: targetSymlinkMtc, withDestinationURL: URL(fileURLWithPath: sourceMtc))
+
+            // 创建/更新 taskcleaner 别名软链接
+            if fileManager.fileExists(atPath: targetSymlinkTc.path) || (try? fileManager.destinationOfSymbolicLink(atPath: targetSymlinkTc.path)) != nil {
+                try? fileManager.removeItem(at: targetSymlinkTc)
+            }
+            try fileManager.createSymbolicLink(at: targetSymlinkTc, withDestinationURL: URL(fileURLWithPath: sourceMtc))
+
+            self.statusMessage = I18n.shared.t(.status_cli_installed)
+
+            let alert = NSAlert()
+            alert.messageText = I18n.shared.t(.install_cli_success_title)
+            alert.informativeText = I18n.shared.format(.install_cli_success_desc, targetSymlinkMtc.path)
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: I18n.shared.t(.btn_ready))
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+
+            Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                self.statusMessage = nil
+            }
+        } catch {
+            self.statusMessage = "\(I18n.shared.t(.status_cli_install_failed)): \(error.localizedDescription)"
+            Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                self.statusMessage = nil
+            }
+        }
+    }
+
     public func revealInFinder(pid: Int) {
         if let app = NSRunningApplication(processIdentifier: pid_t(pid)),
            let url = app.bundleURL {

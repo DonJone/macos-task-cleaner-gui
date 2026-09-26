@@ -190,6 +190,11 @@ public enum I18nKey: String {
     case btn_reset_shortcut
     case status_shortcut_bound
     case status_shortcut_disabled
+    case menu_install_cli
+    case install_cli_success_title
+    case install_cli_success_desc
+    case status_cli_installed
+    case status_cli_install_failed
 }
 
 @MainActor
@@ -393,6 +398,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Reset",
         .status_shortcut_bound: "Global shortcut bound: %@",
         .status_shortcut_disabled: "Global shortcut disabled",
+        .menu_install_cli: "Install 'mtc' Command in PATH",
+        .install_cli_success_title: "'mtc' Command Installed",
+        .install_cli_success_desc: "The 'mtc' command-line tool has been linked to:\n%@\n\nYou can now run 'mtc --help' in your terminal.",
+        .status_cli_installed: "Installed 'mtc' to ~/.local/bin/mtc",
+        .status_cli_install_failed: "Failed to install 'mtc'",
     ],
     .zhHans: [
         .header_running: "%d 运行中",
@@ -471,6 +481,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "重设",
         .status_shortcut_bound: "已绑定全局快捷键: %@",
         .status_shortcut_disabled: "已停用全局快捷键",
+        .menu_install_cli: "安装命令行工具 (mtc) 到 PATH",
+        .install_cli_success_title: "已成功安装 mtc 命令行工具",
+        .install_cli_success_desc: "已将 mtc 命令行工具软链接至:\n%@\n\n您现在可以在任何终端窗口直接运行 'mtc --help'。",
+        .status_cli_installed: "已安装 mtc 到 ~/.local/bin/mtc",
+        .status_cli_install_failed: "安装 mtc 命令行工具失败",
     ],
     .zhHant: [
         .header_running: "%d 執行中",
@@ -549,6 +564,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "重設",
         .status_shortcut_bound: "已綁定全域快捷鍵: %@",
         .status_shortcut_disabled: "已停用全域快捷鍵",
+        .menu_install_cli: "安裝命令列工具 (mtc) 到 PATH",
+        .install_cli_success_title: "已成功安裝 mtc 命令列工具",
+        .install_cli_success_desc: "已將 mtc 命令列工具軟連結至:\n%@\n\n您現在可以在任何終端機視窗直接執行 'mtc --help'。",
+        .status_cli_installed: "已安裝 mtc 到 ~/.local/bin/mtc",
+        .status_cli_install_failed: "安裝 mtc 命令列工具失敗",
     ],
     .ja: [
         .header_running: "%d 実行中",
@@ -627,6 +647,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "リセット",
         .status_shortcut_bound: "ショートカットを登録しました: %@",
         .status_shortcut_disabled: "ショートカットを無効化しました",
+        .menu_install_cli: "'mtc' コマンドを PATH にインストール",
+        .install_cli_success_title: "'mtc' コマンドのインストール完了",
+        .install_cli_success_desc: "'mtc' コマンドラインツールを次の場所にリンクしました:\n%@\n\nターミナルで 'mtc --help' を直接実行できます。",
+        .status_cli_installed: "'mtc' を ~/.local/bin/mtc にインストールしました",
+        .status_cli_install_failed: "'mtc' のインストールに失敗しました",
     ],
     .ko: [
         .header_running: "%d 실행 중",
@@ -705,6 +730,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "재설정",
         .status_shortcut_bound: "전역 단축키 등록됨: %@",
         .status_shortcut_disabled: "전역 단축키 비활성화됨",
+        .menu_install_cli: "PATH에 'mtc' 명령 설치",
+        .install_cli_success_title: "'mtc' 명령 설치 완료",
+        .install_cli_success_desc: "'mtc' 명령줄 도구가 다음 위치에 연결되었습니다:\n%@\n\n터미널에서 'mtc --help'를 실행할 수 있습니다.",
+        .status_cli_installed: "'mtc'를 ~/.local/bin/mtc에 설치했습니다",
+        .status_cli_install_failed: "'mtc' 설치 실패",
     ],
     .fr: [
         .header_running: "%d en cours",
@@ -783,6 +813,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Réinitialiser",
         .status_shortcut_bound: "Raccourci assigné : %@",
         .status_shortcut_disabled: "Raccourci désactivé",
+        .menu_install_cli: "Installer la commande 'mtc' dans PATH",
+        .install_cli_success_title: "Commande 'mtc' installée",
+        .install_cli_success_desc: "L'outil 'mtc' a été lié à :\n%@\n\nVous pouvez exécuter 'mtc --help' dans le terminal.",
+        .status_cli_installed: "'mtc' installé dans ~/.local/bin/mtc",
+        .status_cli_install_failed: "Échec de l'installation de 'mtc'",
     ],
     .de: [
         .header_running: "%d aktiv",
@@ -861,6 +896,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Zurücksetzen",
         .status_shortcut_bound: "Kurzbefehl festgelegt: %@",
         .status_shortcut_disabled: "Kurzbefehl deaktiviert",
+        .menu_install_cli: "Befehl 'mtc' im PATH installieren",
+        .install_cli_success_title: "Befehl 'mtc' installiert",
+        .install_cli_success_desc: "Das CLI-Tool 'mtc' wurde verknüpft mit:\n%@\n\nSie können jetzt 'mtc --help' im Terminal ausführen.",
+        .status_cli_installed: "'mtc' in ~/.local/bin/mtc installiert",
+        .status_cli_install_failed: "Installation von 'mtc' fehlgeschlagen",
     ],
     .es: [
         .header_running: "%d en ejecución",
@@ -939,6 +979,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Restablecer",
         .status_shortcut_bound: "Atajo asignado: %@",
         .status_shortcut_disabled: "Atajo desactivado",
+        .menu_install_cli: "Instalar comando 'mtc' en PATH",
+        .install_cli_success_title: "Comando 'mtc' instalado",
+        .install_cli_success_desc: "La herramienta 'mtc' se ha vinculado a:\n%@\n\nPuede ejecutar 'mtc --help' en su terminal.",
+        .status_cli_installed: "'mtc' instalado en ~/.local/bin/mtc",
+        .status_cli_install_failed: "Error al instalar 'mtc'",
     ],
     .pt: [
         .header_running: "%d em execução",
@@ -1017,6 +1062,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Redefinir",
         .status_shortcut_bound: "Atalho vinculado: %@",
         .status_shortcut_disabled: "Atalho desativado",
+        .menu_install_cli: "Instalar comando 'mtc' no PATH",
+        .install_cli_success_title: "Comando 'mtc' instalado",
+        .install_cli_success_desc: "A ferramenta 'mtc' foi vinculada a:\n%@\n\nVocê pode executar 'mtc --help' no terminal.",
+        .status_cli_installed: "'mtc' instalado em ~/.local/bin/mtc",
+        .status_cli_install_failed: "Falha ao instalar 'mtc'",
     ],
     .it: [
         .header_running: "%d in esecuzione",
@@ -1095,6 +1145,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Ripristina",
         .status_shortcut_bound: "Scorciatoia assegnata: %@",
         .status_shortcut_disabled: "Scorciatoia disattivata",
+        .menu_install_cli: "Installa comando 'mtc' nel PATH",
+        .install_cli_success_title: "Comando 'mtc' installato",
+        .install_cli_success_desc: "Lo strumento 'mtc' è stato collegato a:\n%@\n\nPuoi eseguire 'mtc --help' nel terminale.",
+        .status_cli_installed: "'mtc' installato in ~/.local/bin/mtc",
+        .status_cli_install_failed: "Installazione di 'mtc' non riuscita",
     ],
     .ru: [
         .header_running: "%d запущено",
@@ -1173,6 +1228,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Сбросить",
         .status_shortcut_bound: "Сочетание назначено: %@",
         .status_shortcut_disabled: "Сочетание отключено",
+        .menu_install_cli: "Установить команду 'mtc' в PATH",
+        .install_cli_success_title: "Команда 'mtc' установлена",
+        .install_cli_success_desc: "Утилита 'mtc' привязана к:\n%@\n\nТеперь вы можете запускать 'mtc --help' в терминале.",
+        .status_cli_installed: "'mtc' установлен в ~/.local/bin/mtc",
+        .status_cli_install_failed: "Не удалось установить 'mtc'",
     ],
     .nl: [
         .header_running: "%d actief",
@@ -1251,6 +1311,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Resetten",
         .status_shortcut_bound: "Sneltoets gekoppeld: %@",
         .status_shortcut_disabled: "Sneltoets uitgeschakeld",
+        .menu_install_cli: "'mtc'-opdracht installeren in PATH",
+        .install_cli_success_title: "'mtc'-opdracht geïnstalleerd",
+        .install_cli_success_desc: "Het 'mtc'-hulpprogramma is gekoppeld aan:\n%@\n\nU kunt nu 'mtc --help' uitvoeren in uw terminal.",
+        .status_cli_installed: "'mtc' geïnstalleerd in ~/.local/bin/mtc",
+        .status_cli_install_failed: "Installatie van 'mtc' mislukt",
     ],
     .pl: [
         .header_running: "%d aktywnych",
@@ -1329,6 +1394,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Zresetuj",
         .status_shortcut_bound: "Przypisano skrót: %@",
         .status_shortcut_disabled: "Skrót wyłączony",
+        .menu_install_cli: "Zainstaluj polecenie 'mtc' w PATH",
+        .install_cli_success_title: "Polecenie 'mtc' zainstalowane",
+        .install_cli_success_desc: "Narzędzie 'mtc' zostało połączone z:\n%@\n\nMożesz teraz uruchomić 'mtc --help' w terminalu.",
+        .status_cli_installed: "'mtc' zainstalowano w ~/.local/bin/mtc",
+        .status_cli_install_failed: "Nie udało się zainstalować 'mtc'",
     ],
     .tr: [
         .header_running: "%d çalışıyor",
@@ -1407,6 +1477,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Sıfırla",
         .status_shortcut_bound: "Genel kısayol atandı: %@",
         .status_shortcut_disabled: "Genel kısayol devre dışı",
+        .menu_install_cli: "'mtc' komutunu PATH'e yükle",
+        .install_cli_success_title: "'mtc' komutu yüklendi",
+        .install_cli_success_desc: "'mtc' aracı şuraya bağlandı:\n%@\n\nTerminalinizde 'mtc --help' çalıştırabilirsiniz.",
+        .status_cli_installed: "'mtc' ~/.local/bin/mtc konumuna yüklendi",
+        .status_cli_install_failed: "'mtc' yüklenemedi",
     ],
     .ar: [
         .header_running: "%d قيد التشغيل",
@@ -1485,6 +1560,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "إعادة تعيين",
         .status_shortcut_bound: "تم تعيين الاختصار العام: %@",
         .status_shortcut_disabled: "تم تعطيل الاختصار العام",
+        .menu_install_cli: "تثبيت أمر 'mtc' في PATH",
+        .install_cli_success_title: "تم تثبيت أمر 'mtc'",
+        .install_cli_success_desc: "تم ربط أداة 'mtc' بـ:\n%@\n\nيمكنك تشغيل 'mtc --help' في الطرفية.",
+        .status_cli_installed: "تم تثبيت 'mtc' في ~/.local/bin/mtc",
+        .status_cli_install_failed: "فشل تثبيت 'mtc'",
     ],
     .th: [
         .header_running: "%d กำลังทำงาน",
@@ -1563,6 +1643,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "รีเซ็ต",
         .status_shortcut_bound: "กำหนดปุ่มลัดส่วนกลางแล้ว: %@",
         .status_shortcut_disabled: "ปิดใช้งานปุ่มลัดส่วนกลางแล้ว",
+        .menu_install_cli: "ติดตั้งคำสั่ง 'mtc' ใน PATH",
+        .install_cli_success_title: "ติดตั้งคำสั่ง 'mtc' สำเร็จ",
+        .install_cli_success_desc: "เชื่อมโยงเครื่องมือ 'mtc' ไปยัง:\n%@\n\nคุณสามารถเรียกใช้ 'mtc --help' ในเทอร์มินัลได้",
+        .status_cli_installed: "ติดตั้ง 'mtc' ไปยัง ~/.local/bin/mtc แล้ว",
+        .status_cli_install_failed: "ติดตั้ง 'mtc' ไม่สำเร็จ",
     ],
     .vi: [
         .header_running: "%d đang chạy",
@@ -1641,6 +1726,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Đặt lại",
         .status_shortcut_bound: "Đã gán phím tắt: %@",
         .status_shortcut_disabled: "Đã tắt phím tắt",
+        .menu_install_cli: "Cài đặt lệnh 'mtc' vào PATH",
+        .install_cli_success_title: "Đã cài đặt lệnh 'mtc'",
+        .install_cli_success_desc: "Công cụ 'mtc' đã được liên kết tới:\n%@\n\nBạn có thể chạy 'mtc --help' trong cửa sổ lệnh.",
+        .status_cli_installed: "Đã cài đặt 'mtc' vào ~/.local/bin/mtc",
+        .status_cli_install_failed: "Cài đặt 'mtc' thất bại",
     ],
     .id: [
         .header_running: "%d berjalan",
@@ -1719,6 +1809,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Atur Ulang",
         .status_shortcut_bound: "Pintasan ditetapkan: %@",
         .status_shortcut_disabled: "Pintasan dinonaktifkan",
+        .menu_install_cli: "Pasang perintah 'mtc' di PATH",
+        .install_cli_success_title: "Perintah 'mtc' berhasil dipasang",
+        .install_cli_success_desc: "Alat 'mtc' telah ditautkan ke:\n%@\n\nSekarang Anda dapat menjalankan 'mtc --help' di terminal.",
+        .status_cli_installed: "Berhasil memasang 'mtc' di ~/.local/bin/mtc",
+        .status_cli_install_failed: "Gagal memasang 'mtc'",
     ],
     .sv: [
         .header_running: "%d körs",
@@ -1797,6 +1892,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Återställ",
         .status_shortcut_bound: "Kortkommando inställt: %@",
         .status_shortcut_disabled: "Kortkommando inaktiverat",
+        .menu_install_cli: "Installera kommandot 'mtc' i PATH",
+        .install_cli_success_title: "Kommandot 'mtc' installerat",
+        .install_cli_success_desc: "Verktyget 'mtc' har länkats till:\n%@\n\nDu kan köra 'mtc --help' i terminalen.",
+        .status_cli_installed: "Installerade 'mtc' till ~/.local/bin/mtc",
+        .status_cli_install_failed: "Kunde inte installera 'mtc'",
     ],
     .da: [
         .header_running: "%d kører",
@@ -1875,6 +1975,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Nulstil",
         .status_shortcut_bound: "Genvej tildelt: %@",
         .status_shortcut_disabled: "Genvej deaktiveret",
+        .menu_install_cli: "Installer kommandoen 'mtc' i PATH",
+        .install_cli_success_title: "Kommandoen 'mtc' installeret",
+        .install_cli_success_desc: "Værktøjet 'mtc' er blevet linket til:\n%@\n\nDu kan køre 'mtc --help' i terminalen.",
+        .status_cli_installed: "'mtc' installeret i ~/.local/bin/mtc",
+        .status_cli_install_failed: "Kunne ikke installere 'mtc'",
     ],
     .nb: [
         .header_running: "%d kjører",
@@ -1953,6 +2058,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Tilbakestill",
         .status_shortcut_bound: "Snarvei tilordnet: %@",
         .status_shortcut_disabled: "Snarvei deaktivert",
+        .menu_install_cli: "Installer 'mtc'-kommandoen i PATH",
+        .install_cli_success_title: "'mtc'-kommandoen er installert",
+        .install_cli_success_desc: "Verktøyet 'mtc' har blitt koblet til:\n%@\n\nDu kan nå kjøre 'mtc --help' i terminalen.",
+        .status_cli_installed: "'mtc' installert i ~/.local/bin/mtc",
+        .status_cli_install_failed: "Kunne ikke installere 'mtc'",
     ],
     .fi: [
         .header_running: "%d käynnissä",
@@ -2031,6 +2141,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Nollaa",
         .status_shortcut_bound: "Pikanäppäin määritetty: %@",
         .status_shortcut_disabled: "Pikanäppäin poistettu käytöstä",
+        .menu_install_cli: "Asenna 'mtc'-komento PATH-polkuun",
+        .install_cli_success_title: "'mtc'-komento asennettu",
+        .install_cli_success_desc: "Työkalu 'mtc' on linkitetty kohteeseen:\n%@\n\nVoit suorittaa 'mtc --help' päätteessä.",
+        .status_cli_installed: "'mtc' asennettu kohteeseen ~/.local/bin/mtc",
+        .status_cli_install_failed: "'mtc'-komennon asennus epäonnistui",
     ],
     .cs: [
         .header_running: "%d běží",
@@ -2109,6 +2224,11 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Obnovit",
         .status_shortcut_bound: "Zkratka nastavena: %@",
         .status_shortcut_disabled: "Zkratka vypnuta",
+        .menu_install_cli: "Nainstalovat příkaz 'mtc' do PATH",
+        .install_cli_success_title: "Příkaz 'mtc' nainstalován",
+        .install_cli_success_desc: "Nástroj 'mtc' byl propojen s:\n%@\n\nV terminálu můžete spustit 'mtc --help'.",
+        .status_cli_installed: "'mtc' nainstalován do ~/.local/bin/mtc",
+        .status_cli_install_failed: "Instalace 'mtc' se nezdařila",
     ],
     .uk: [
         .header_running: "%d запущено",
@@ -2187,5 +2307,10 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .btn_reset_shortcut: "Скинути",
         .status_shortcut_bound: "Сполучення призначено: %@",
         .status_shortcut_disabled: "Сполучення вимкнено",
+        .menu_install_cli: "Встановити команду 'mtc' у PATH",
+        .install_cli_success_title: "Команду 'mtc' встановлено",
+        .install_cli_success_desc: "Утиліту 'mtc' прив'язано до:\n%@\n\nВи можете запускати 'mtc --help' у терміналі.",
+        .status_cli_installed: "'mtc' встановлено в ~/.local/bin/mtc",
+        .status_cli_install_failed: "Не вдалося встановити 'mtc'",
     ]
 ]
