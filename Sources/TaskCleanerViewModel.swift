@@ -21,6 +21,8 @@ public class TaskCleanerViewModel: ObservableObject {
 
     public static weak var shared: TaskCleanerViewModel?
 
+    public var isMenuTracking: Bool = false
+    private var menuObservers: [NSObjectProtocol] = []
     private var hasCapturedSessionCapacity: Bool = false
     private var timerCancellable: AnyCancellable?
     private var workspaceObservers: [NSObjectProtocol] = []
@@ -28,11 +30,36 @@ public class TaskCleanerViewModel: ObservableObject {
     public init() {
         Self.shared = self
         _ = GlobalShortcutManager.shared
+
+        let dc = NotificationCenter.default
+        let beginObs = dc.addObserver(
+            forName: NSMenu.didBeginTrackingNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.isMenuTracking = true
+            }
+        }
+        let endObs = dc.addObserver(
+            forName: NSMenu.didEndTrackingNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.isMenuTracking = false
+            }
+        }
+        menuObservers = [beginObs, endObs]
+
         refresh(silent: true)
     }
 
     deinit {
         timerCancellable?.cancel()
+        for obs in menuObservers {
+            NotificationCenter.default.removeObserver(obs)
+        }
         let nc = NSWorkspace.shared.notificationCenter
         for obs in workspaceObservers {
             nc.removeObserver(obs)
@@ -48,6 +75,7 @@ public class TaskCleanerViewModel: ObservableObject {
     }
 
     public func refresh(silent: Bool = false) {
+        guard !isMenuTracking else { return }
         Task {
             if !silent {
                 isWorking = true
@@ -57,8 +85,15 @@ public class TaskCleanerViewModel: ObservableObject {
                 MTCBridge.shared.fetchSummary()
             }.value
 
-            self.summary = result
-            self.updateInitialCapacityIfNeeded(from: result)
+            guard !self.isMenuTracking else {
+                if !silent { self.isWorking = false }
+                return
+            }
+
+            if self.summary != result {
+                self.summary = result
+                self.updateInitialCapacityIfNeeded(from: result)
+            }
 
             if !silent {
                 self.isWorking = false
@@ -75,12 +110,12 @@ public class TaskCleanerViewModel: ObservableObject {
         // 1. 弹出瞬间立即执行一次静默刷新
         refresh(silent: true)
 
-        // 2. 开启高频心跳 (每 1.5 秒自动同步一次进程表)
+        // 2. 开启心跳 (每 2 秒自动同步，在 default 模式下运行，菜单追踪时自动静默挂起)
         timerCancellable?.cancel()
-        timerCancellable = Timer.publish(every: 1.5, on: .main, in: .common)
+        timerCancellable = Timer.publish(every: 2.0, on: .main, in: .default)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self = self, !self.isWorking else { return }
+                guard let self = self, !self.isWorking, !self.isMenuTracking else { return }
                 self.refresh(silent: true)
             }
 
@@ -94,7 +129,8 @@ public class TaskCleanerViewModel: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.refresh(silent: true)
+                guard let self = self, !self.isMenuTracking else { return }
+                self.refresh(silent: true)
             }
         }
 
@@ -104,7 +140,8 @@ public class TaskCleanerViewModel: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.refresh(silent: true)
+                guard let self = self, !self.isMenuTracking else { return }
+                self.refresh(silent: true)
             }
         }
 
@@ -114,7 +151,8 @@ public class TaskCleanerViewModel: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
-                self?.refresh(silent: true)
+                guard let self = self, !self.isMenuTracking else { return }
+                self.refresh(silent: true)
             }
         }
 

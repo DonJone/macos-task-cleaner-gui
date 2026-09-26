@@ -561,20 +561,14 @@ public struct TaskCleanerMenuView: View {
                     Divider()
 
                     Menu {
-                        if shortcutManager.isEnabled {
-                            Text(i18n.format(.menu_current_shortcut, shortcutManager.displayString))
-                            Divider()
-                        }
-
                         ForEach(ShortcutPreset.allCases) { preset in
                             Button(action: {
                                 shortcutManager.setPreset(preset)
                             }) {
-                                HStack {
+                                if shortcutManager.isEnabled && shortcutManager.currentPreset == preset {
+                                    Text("\(preset.displayString)  ✓")
+                                } else {
                                     Text(preset.displayString)
-                                    if shortcutManager.isEnabled && shortcutManager.currentPreset == preset {
-                                        Image(systemName: "checkmark")
-                                    }
                                 }
                             }
                         }
@@ -584,12 +578,12 @@ public struct TaskCleanerMenuView: View {
                         Button(action: {
                             shortcutManager.openCustomShortcutRecorder()
                         }) {
-                            HStack {
-                                Label(i18n.t(.menu_custom_shortcut), systemImage: "keyboard")
-                                if shortcutManager.isEnabled && shortcutManager.currentPreset == nil {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
+                            Label(
+                                shortcutManager.isEnabled && shortcutManager.currentPreset == nil
+                                    ? "\(i18n.t(.menu_custom_shortcut)) (\(shortcutManager.displayString))  ✓"
+                                    : i18n.t(.menu_custom_shortcut),
+                                systemImage: "keyboard"
+                            )
                         }
 
                         if shortcutManager.isEnabled {
