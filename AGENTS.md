@@ -68,10 +68,11 @@ This document defines the architectural conventions, engineering rules, and hard
   * Pass `isRTL` to `WindowAutoResizer` to synchronize `contentView.userInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight` on the AppKit `NSWindow`.
   * Avoid hardcoded absolute horizontal offsets; use directional logic (e.g. `offset(x: i18n.isRTL ? -3 : 3)`) and directional alignments (`.leading` / `.trailing`).
 
-### F. Core OS (L1) Whitelist Protection in UI
-* **Problem**: macOS `launchd` immediately restarts system core daemons (such as Finder or Dock) if terminated. Stripping them of whitelist protection causes user confusion.
+### F. AppKit Termination & Protected App Management
+* **Problem**: macOS `launchd` monitors `Finder`. If killed via raw POSIX signals, `launchd` treats it as a crash and immediately respawns it.
 * **Rule**:
-  * In `NativeProtectedRow`, check if the app tier contains `L1` or `核心`. If so, replace the "Remove" button with an `Image(systemName: "lock.shield")` icon to visually enforce that L1 Core OS processes cannot be unwhitelisted.
+  * All foreground applications displayed in `NativeProtectedRow` (including Finder) can be removed from protection by the user via the "Remove" button, moving them to the targets list.
+  * When Finder is terminated (either via individual trash icon or batch clean), the underlying `mtc` engine utilizes native AppKit `NSRunningApplication.terminate()` so that Finder exits cleanly without `launchd` respawning it.
 
 ---
 
