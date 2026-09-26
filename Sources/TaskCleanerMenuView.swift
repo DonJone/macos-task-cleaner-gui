@@ -210,10 +210,10 @@ public struct TaskCleanerMenuView: View {
                     if hasTargets {
                         Menu {
                             Button(action: { viewModel.cleanAll(force: false, purge: false) }) {
-                                Label(i18n.t(.clean_mode_normal), systemImage: "sparkles")
+                                Label(i18n.t(.clean_mode_normal), systemImage: "stop.circle")
                             }
                             Button(action: { viewModel.cleanAll(force: true, purge: false) }) {
-                                Label(i18n.t(.clean_mode_force), systemImage: "bolt.fill")
+                                Label(i18n.t(.clean_mode_force), systemImage: "xmark.octagon")
                             }
                             Divider()
                             Button(action: { viewModel.cleanAll(force: false, purge: true) }) {

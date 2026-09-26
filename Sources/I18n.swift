@@ -349,10 +349,10 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .status_copied: "Copied to clipboard",
         .menu_open_config_dir: "Open Config Directory",
         .menu_github_repo: "GitHub Repository",
-        .clean_mode_normal: "Graceful Quit (SIGTERM)",
+        .clean_mode_normal: "Standard Terminate (SIGTERM)",
         .clean_mode_force: "Force Kill (SIGKILL)",
-        .clean_mode_purge: "Clean & Purge Memory",
-        .clean_mode_options: "Cleaning Modes"
+        .clean_mode_purge: "Terminate & Purge System Cache",
+        .clean_mode_options: "Termination Signals & Purge Options"
     ],
     .zhHans: [
         .header_running: "%d 运行中",
@@ -412,10 +412,10 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .status_copied: "已复制到剪贴板",
         .menu_open_config_dir: "打开配置所在目录",
         .menu_github_repo: "GitHub 源码仓库",
-        .clean_mode_normal: "常规平滑下线 (SIGTERM)",
-        .clean_mode_force: "极速秒杀强退 (SIGKILL)",
-        .clean_mode_purge: "清场并强制回收内存 (Purge)",
-        .clean_mode_options: "清场模式选择"
+        .clean_mode_normal: "标准终止 (SIGTERM)",
+        .clean_mode_force: "强制终止 (SIGKILL)",
+        .clean_mode_purge: "终止并清空系统缓存 (purge)",
+        .clean_mode_options: "终止信号与缓存选项"
     ],
     .zhHant: [
         .header_running: "%d 執行中",
@@ -475,10 +475,10 @@ private let translations: [AppLanguage: [I18nKey: String]] = [
         .status_copied: "已拷貝至剪貼簿",
         .menu_open_config_dir: "開啟設定所在目錄",
         .menu_github_repo: "GitHub 原始碼庫",
-        .clean_mode_normal: "常規平滑離線 (SIGTERM)",
-        .clean_mode_force: "極速強制結束 (SIGKILL)",
-        .clean_mode_purge: "清場並強制釋放記憶體 (Purge)",
-        .clean_mode_options: "清場模式選擇"
+        .clean_mode_normal: "標準終止 (SIGTERM)",
+        .clean_mode_force: "強制終止 (SIGKILL)",
+        .clean_mode_purge: "終止並清空系統快取 (purge)",
+        .clean_mode_options: "終止訊號與快取選項"
     ],
     .ja: [
         .header_running: "%d 実行中",
