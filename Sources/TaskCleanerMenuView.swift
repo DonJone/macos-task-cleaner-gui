@@ -683,13 +683,21 @@ struct NativeProtectedRow: View {
 
             Spacer()
 
-            Button(action: onRemove) {
-                Text(I18n.shared.t(.btn_remove_protected))
+            if !app.tier.contains("L1") && !app.tier.contains("核心") {
+                Button(action: onRemove) {
+                    Text(I18n.shared.t(.btn_remove_protected))
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.mini)
+                .frame(width: 44, alignment: .trailing)
+                .disabled(isWorking)
+            } else {
+                Image(systemName: "lock.shield")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary.opacity(0.6))
+                    .frame(width: 44, alignment: .trailing)
+                    .help(I18n.shared.t(.badge_protected))
             }
-            .buttonStyle(.bordered)
-            .controlSize(.mini)
-            .frame(width: 44, alignment: .trailing)
-            .disabled(isWorking)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)

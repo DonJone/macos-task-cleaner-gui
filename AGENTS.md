@@ -68,6 +68,11 @@ This document defines the architectural conventions, engineering rules, and hard
   * Pass `isRTL` to `WindowAutoResizer` to synchronize `contentView.userInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight` on the AppKit `NSWindow`.
   * Avoid hardcoded absolute horizontal offsets; use directional logic (e.g. `offset(x: i18n.isRTL ? -3 : 3)`) and directional alignments (`.leading` / `.trailing`).
 
+### F. Core OS (L1) Whitelist Protection in UI
+* **Problem**: macOS `launchd` immediately restarts system core daemons (such as Finder or Dock) if terminated. Stripping them of whitelist protection causes user confusion.
+* **Rule**:
+  * In `NativeProtectedRow`, check if the app tier contains `L1` or `核心`. If so, replace the "Remove" button with an `Image(systemName: "lock.shield")` icon to visually enforce that L1 Core OS processes cannot be unwhitelisted.
+
 ---
 
 ## 4. Build & Local Testing Conventions
