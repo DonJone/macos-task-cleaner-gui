@@ -562,7 +562,7 @@ public struct TaskCleanerMenuView: View {
                     Button(action: {
                         viewModel.openConfigFile()
                     }) {
-                        Label(i18n.t(.btn_config), systemImage: "slider.horizontal.3")
+                        Label(i18n.t(.menu_open_config_file), systemImage: "slider.horizontal.3")
                     }
 
                     Button(action: {
