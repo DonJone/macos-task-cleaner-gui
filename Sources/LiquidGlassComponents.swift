@@ -1,15 +1,15 @@
 import SwiftUI
 import AppKit
 
-// MARK: - macOS 27 原生系统级毛玻璃背板 (System Vibrancy Background)
-// 依据 macOS 27 原生渲染规范：承载底层混合模式与透明通道
+// MARK: - macOS 原生系统级毛玻璃背板 (System Menu Vibrancy Background)
+// 依据 macOS 原生渲染规范：采用与 NSMenu 相同的原生 .menu 材质，呈现纯净深邃的动态折射
 public struct VisualEffectBackground: NSViewRepresentable {
     public var material: NSVisualEffectView.Material
     public var blendingMode: NSVisualEffectView.BlendingMode
     public var state: NSVisualEffectView.State
 
     public init(
-        material: NSVisualEffectView.Material = .popover,
+        material: NSVisualEffectView.Material = .menu,
         blendingMode: NSVisualEffectView.BlendingMode = .behindWindow,
         state: NSVisualEffectView.State = .active
     ) {
@@ -33,11 +33,9 @@ public struct VisualEffectBackground: NSViewRepresentable {
     }
 }
 
-// MARK: - macOS 27 官方液态玻璃规范容器 (Liquid Glass Inset Card)
-// 依据 macOS 27 规范：
-// 1. 采用原生 .thinMaterial 自动激活底层复合渲染机制 (反射 + 折射 + 动态微变形)
-// 2. 规范更收敛的转角半径 (10pt 连续曲率)
-// 3. 采用 Color.primary.opacity(0.08) 实现深色模式自适应灰调边缘高光
+// MARK: - macOS 晶体悬浮卡片容器 (Crystal Inset Card)
+// 彻底解决毛玻璃嵌套叠加变灰发暗问题：
+// 内部区块不重复叠加第二层 Material 模糊通道，而是采用半透明微透层与上边缘光泽描边，与底板 .menu 材质浑然天成
 public struct SystemCard<Content: View>: View {
     public let cornerRadius: CGFloat
     public let content: Content
@@ -51,11 +49,22 @@ public struct SystemCard<Content: View>: View {
         content
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.thinMaterial)
+                    .fill(Color(nsColor: .controlBackgroundColor).opacity(0.38))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
+                    .strokeBorder(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.18),
+                                Color.white.opacity(0.06),
+                                Color.primary.opacity(0.04)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        lineWidth: 0.5
+                    )
             )
     }
 }
@@ -79,11 +88,11 @@ public struct SystemBadge: View {
             .padding(.vertical, 2)
             .background(
                 Capsule(style: .continuous)
-                    .fill(.ultraThinMaterial)
+                    .fill(tint.opacity(0.12))
             )
             .overlay(
                 Capsule(style: .continuous)
-                    .strokeBorder(tint.opacity(0.22), lineWidth: 0.5)
+                    .strokeBorder(tint.opacity(0.24), lineWidth: 0.5)
             )
     }
 }
@@ -118,6 +127,14 @@ public struct WindowAutoResizer: NSViewRepresentable {
     private func adjustWindow(_ view: NSView) {
         guard let window = view.window else { return }
         guard let contentView = window.contentView else { return }
+
+        // 确保窗口背景完全透明，由 VisualEffectBackground 承载原生 .menu 毛玻璃折射与圆角
+        if window.isOpaque {
+            window.isOpaque = false
+        }
+        if window.backgroundColor != .clear {
+            window.backgroundColor = .clear
+        }
 
         // 同步 AppKit 原生窗口布局方向以支持 RTL
         let desiredLayoutDirection: NSUserInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight

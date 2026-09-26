@@ -12,8 +12,8 @@ public struct TaskCleanerMenuView: View {
 
     public var body: some View {
         ZStack(alignment: .top) {
-            // macOS 27 原生系统级毛玻璃背板 (支持底层折射与动态虚化)
-            VisualEffectBackground(material: .popover, blendingMode: .behindWindow)
+            // macOS 原生系统级毛玻璃背板 (采用与 NSMenu 相同材质与折射层级)
+            VisualEffectBackground(material: .menu, blendingMode: .behindWindow)
                 .ignoresSafeArea()
 
             VStack(spacing: 10) {
@@ -42,6 +42,23 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 310)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.20),
+                            Color.white.opacity(0.05),
+                            Color.clear
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 0.5
+                )
+                .allowsHitTesting(false)
+        )
         .background(WindowAutoResizer(targetWidth: 310, isRTL: i18n.isRTL))
         .environment(\.layoutDirection, i18n.layoutDirection)
         // 打开即刷新，并保持实时常驻前台进程感知
@@ -265,7 +282,21 @@ public struct TaskCleanerMenuView: View {
         .padding(2.5)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color(nsColor: .quaternaryLabelColor))
+                .fill(Color(nsColor: .quaternaryLabelColor).opacity(0.7))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.16),
+                            Color.white.opacity(0.04)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 0.5
+                )
         )
         .disabled(viewModel.isWorking)
     }
@@ -672,6 +703,12 @@ struct NativeTargetRow: View {
     let onCopyId: () -> Void
     let onCopyPid: () -> Void
 
+    private var isHoveredState = State(initialValue: false)
+    private var isHovered: Bool {
+        get { isHoveredState.wrappedValue }
+        nonmutating set { isHoveredState.wrappedValue = newValue }
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             Image(nsImage: app.appIcon)
@@ -702,7 +739,7 @@ struct NativeTargetRow: View {
                 Button(action: onTerminate) {
                     Image(systemName: "trash")
                         .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(isHovered ? Color.primary.opacity(0.85) : Color.secondary.opacity(0.65))
                         .frame(width: 22, height: 22)
                         .contentShape(Rectangle())
                 }
@@ -734,6 +771,7 @@ struct NativeTargetRow: View {
                     Image(nsImage: makeVerticalEllipsisImage())
                         .frame(width: 14, height: 22)
                         .contentShape(Rectangle())
+                        .opacity(isHovered ? 0.95 : 0.65)
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
@@ -744,9 +782,19 @@ struct NativeTargetRow: View {
             }
             .frame(width: 44, alignment: .trailing)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(isHovered ? Color.primary.opacity(0.065) : Color.clear)
+        )
+        .padding(.horizontal, 4)
         .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.12)) {
+                isHovered = hovering
+            }
+        }
         .contextMenu {
             Button(action: onTerminate) {
                 Label(I18n.shared.t(.action_terminate_app), systemImage: "trash")
@@ -782,6 +830,12 @@ struct NativeProtectedRow: View {
     let onCopyId: () -> Void
     let onCopyPid: () -> Void
 
+    private var isHoveredState = State(initialValue: false)
+    private var isHovered: Bool {
+        get { isHoveredState.wrappedValue }
+        nonmutating set { isHoveredState.wrappedValue = newValue }
+    }
+
     var body: some View {
         HStack(spacing: 8) {
             Image(nsImage: app.appIcon)
@@ -812,7 +866,7 @@ struct NativeProtectedRow: View {
                 Button(action: onRemove) {
                     Image(systemName: "shield.slash")
                         .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(isHovered ? Color.primary.opacity(0.85) : Color.secondary.opacity(0.65))
                         .frame(width: 22, height: 22)
                         .contentShape(Rectangle())
                 }
@@ -844,6 +898,7 @@ struct NativeProtectedRow: View {
                     Image(nsImage: makeVerticalEllipsisImage())
                         .frame(width: 14, height: 22)
                         .contentShape(Rectangle())
+                        .opacity(isHovered ? 0.95 : 0.65)
                 }
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
@@ -854,9 +909,19 @@ struct NativeProtectedRow: View {
             }
             .frame(width: 44, alignment: .trailing)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(isHovered ? Color.primary.opacity(0.065) : Color.clear)
+        )
+        .padding(.horizontal, 4)
         .contentShape(Rectangle())
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.12)) {
+                isHovered = hovering
+            }
+        }
         .contextMenu {
             Button(action: onRemove) {
                 Label(I18n.shared.t(.action_remove_whitelist), systemImage: "shield.slash")
