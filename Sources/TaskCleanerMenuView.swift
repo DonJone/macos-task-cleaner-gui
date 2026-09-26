@@ -12,38 +12,31 @@ public struct TaskCleanerMenuView: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .top) {
-            // macOS 27 原生系统级毛玻璃背板 (支持底层折射与动态虚化)
-            VisualEffectBackground(material: .popover, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+        VStack(spacing: 10) {
+            // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
+            headerSection
 
-            VStack(spacing: 10) {
-                // 1. 顶栏 (固定 24pt 高度，绝对禁止抖动跳跃)
-                headerSection
-
-                // 首次开机自启动引导卡片 (仅首次打开且未开启时展示)
-                if launchManager.shouldShowPrompt {
-                    launchAtLoginPromptCard
-                }
-
-                // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
-                actionSection
-
-                // 3. 分段选择器 (对齐 macOS 网络托盘当前连接蓝色高亮，支持待结束/已保护/全部活动进程)
-                segmentedSection
-
-                // 4. 加长型应用列表区 (支持流畅滚动浏览全部活动进程)
-                appListView
-
-                // 5. 底栏工具 (Footer Toolbar)
-                footerSection
+            // 首次开机自启动引导卡片 (仅首次打开且未开启时展示)
+            if launchManager.shouldShowPrompt {
+                launchAtLoginPromptCard
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
+
+            // 2. 核心操作面板 (恒定高度刚性卡片，内嵌动态反馈，绝不产生上下跳跃)
+            actionSection
+
+            // 3. 分段选择器 (对齐 macOS 网络托盘当前连接蓝色高亮，支持待结束/已保护/全部活动进程)
+            segmentedSection
+
+            // 4. 加长型应用列表区 (支持流畅滚动浏览全部活动进程)
+            appListView
+
+            // 5. 底栏工具 (Footer Toolbar)
+            footerSection
         }
+        .padding(.horizontal, 12)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
         .frame(width: 310)
-        .background(WindowAutoResizer(targetWidth: 310, isRTL: i18n.isRTL))
         .environment(\.layoutDirection, i18n.layoutDirection)
         // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
