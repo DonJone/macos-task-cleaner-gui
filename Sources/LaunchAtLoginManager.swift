@@ -26,9 +26,7 @@ public final class LaunchAtLoginManager: ObservableObject {
 
     public func dismissPrompt() {
         UserDefaults.standard.set(true, forKey: promptKey)
-        withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-            self.shouldShowPrompt = false
-        }
+        self.shouldShowPrompt = false
     }
 
     public func toggle() {

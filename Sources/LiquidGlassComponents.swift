@@ -87,3 +87,50 @@ public struct SystemBadge: View {
             )
     }
 }
+
+// MARK: - 原生窗口尺寸自适应适配器 (Window Auto Resizer)
+// 依据 macOS AppKit 原生渲染机制：
+// MenuBarExtraWindow 在动态内容展开/折叠时无法自动缩减窗口高度，易导致空白或残影。
+// 本适配器监听内容尺寸变化，锚定菜单栏顶部原点 (MaxY)，平滑同步调整 NSWindow 尺寸。
+public struct WindowAutoResizer: NSViewRepresentable {
+    public let targetWidth: CGFloat
+
+    public init(targetWidth: CGFloat = 310) {
+        self.targetWidth = targetWidth
+    }
+
+    public func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            self.adjustWindow(view)
+        }
+        return view
+    }
+
+    public func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async {
+            self.adjustWindow(nsView)
+        }
+    }
+
+    private func adjustWindow(_ view: NSView) {
+        guard let window = view.window else { return }
+        guard let contentView = window.contentView else { return }
+
+        let fitting = contentView.fittingSize
+        guard fitting.height > 60 else { return }
+
+        let currentFrame = window.frame
+        if abs(currentFrame.height - fitting.height) > 1.0 {
+            let heightDiff = currentFrame.height - fitting.height
+            let newY = currentFrame.origin.y + heightDiff
+            let newFrame = NSRect(
+                x: currentFrame.origin.x,
+                y: newY,
+                width: targetWidth,
+                height: fitting.height
+            )
+            window.setFrame(newFrame, display: true, animate: false)
+        }
+    }
+}

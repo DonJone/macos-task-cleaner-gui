@@ -11,7 +11,7 @@ public struct TaskCleanerMenuView: View {
     }
 
     public var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             // macOS 27 原生系统级毛玻璃背板 (支持底层折射与动态虚化)
             VisualEffectBackground(material: .popover, blendingMode: .behindWindow)
                 .ignoresSafeArea()
@@ -42,6 +42,7 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 310)
+        .background(WindowAutoResizer(targetWidth: 310))
         // 打开即刷新，并保持实时常驻前台进程感知
         .onAppear {
             viewModel.startLiveMonitoring()
@@ -136,10 +137,12 @@ public struct TaskCleanerMenuView: View {
 
                     Button(action: {
                         launchManager.enableFromPrompt()
-                        viewModel.statusMessage = i18n.t(.status_launch_enabled)
-                        Task {
-                            try? await Task.sleep(nanoseconds: 2_000_000_000)
-                            viewModel.statusMessage = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            viewModel.statusMessage = i18n.t(.status_launch_enabled)
+                            Task {
+                                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                viewModel.statusMessage = nil
+                            }
                         }
                     }) {
                         Text(i18n.t(.btn_enable))
@@ -151,7 +154,6 @@ public struct TaskCleanerMenuView: View {
             }
             .padding(9)
         }
-        .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
     // MARK: - Action Section (结构恒定，去除底层命令字样与注释，自然优雅)
