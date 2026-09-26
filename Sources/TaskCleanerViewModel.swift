@@ -365,7 +365,7 @@ public class TaskCleanerViewModel: ObservableObject {
 
     public func showAboutDialog() {
         let alert = NSAlert()
-        alert.messageText = "Task Cleaner 0.1.0"
+        alert.messageText = "Task Cleaner 1.0.0"
         alert.informativeText = """
         Copyright (c) 2026 DonJone. All rights reserved.
 
