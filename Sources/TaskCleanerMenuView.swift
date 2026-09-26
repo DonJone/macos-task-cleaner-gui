@@ -43,11 +43,6 @@ public struct TaskCleanerMenuView: View {
             .padding(.bottom, 8)
         }
         .frame(width: 310)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 0.5)
-        )
         .background(WindowAutoResizer(targetWidth: 310, isRTL: i18n.isRTL))
         .environment(\.layoutDirection, i18n.layoutDirection)
         // 打开即刷新，并保持实时常驻前台进程感知

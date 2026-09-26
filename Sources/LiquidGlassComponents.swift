@@ -23,9 +23,6 @@ public struct VisualEffectBackground: NSViewRepresentable {
         view.material = material
         view.blendingMode = blendingMode
         view.state = state
-        view.wantsLayer = true
-        view.layer?.cornerRadius = 14.0
-        view.layer?.masksToBounds = true
         return view
     }
 
@@ -33,9 +30,6 @@ public struct VisualEffectBackground: NSViewRepresentable {
         nsView.material = material
         nsView.blendingMode = blendingMode
         nsView.state = state
-        nsView.wantsLayer = true
-        nsView.layer?.cornerRadius = 14.0
-        nsView.layer?.masksToBounds = true
     }
 }
 
@@ -94,10 +88,8 @@ public struct SystemBadge: View {
     }
 }
 
-// MARK: - 原生窗口尺寸自适应适配器 (Window Auto Resizer)
-// 依据 macOS AppKit 原生渲染机制：
-// MenuBarExtraWindow 在动态内容展开/折叠时无法自动缩减窗口高度，易导致空白或残影。
-// 本适配器监听内容尺寸变化，锚定菜单栏顶部原点 (MaxY)，平滑同步调整 NSWindow 尺寸。
+// MARK: - 原生窗口布局方向适配器 (Window RTL Layout Adapter)
+// 仅同步 AppKit 原生窗口布局方向以支持 RTL 语言，严禁调用 window.setFrame 避免破坏系统原生 popover 连续圆角
 public struct WindowAutoResizer: NSViewRepresentable {
     public let targetWidth: CGFloat
     public let isRTL: Bool
@@ -109,55 +101,14 @@ public struct WindowAutoResizer: NSViewRepresentable {
 
     public func makeNSView(context: Context) -> NSView {
         let view = NSView()
-        DispatchQueue.main.async {
-            self.adjustWindow(view)
-        }
         return view
     }
 
     public func updateNSView(_ nsView: NSView, context: Context) {
-        DispatchQueue.main.async {
-            self.adjustWindow(nsView)
-        }
-    }
-
-    private func adjustWindow(_ view: NSView) {
-        guard let window = view.window else { return }
-        guard let contentView = window.contentView else { return }
-
-        // 核心修复：确保窗口底色透明，内容层强制 14pt 连续圆角裁剪，杜绝直角黑边与方角崩坏
-        window.isOpaque = false
-        window.backgroundColor = .clear
-        window.hasShadow = true
-
-        contentView.wantsLayer = true
-        contentView.layer?.cornerRadius = 14.0
-        contentView.layer?.masksToBounds = true
-
-        // 同步 AppKit 原生窗口布局方向以支持 RTL
+        guard let window = nsView.window, let contentView = window.contentView else { return }
         let desiredLayoutDirection: NSUserInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight
         if contentView.userInterfaceLayoutDirection != desiredLayoutDirection {
             contentView.userInterfaceLayoutDirection = desiredLayoutDirection
-        }
-
-        let fitting = contentView.fittingSize
-        guard fitting.height > 60 else { return }
-
-        let currentFrame = window.frame
-        // 阈值提升为 8pt，防止微小字号/文本度量波动引起频繁 setFrame
-        if abs(currentFrame.height - fitting.height) > 8.0 {
-            let heightDiff = currentFrame.height - fitting.height
-            let newY = currentFrame.origin.y + heightDiff
-            let newFrame = NSRect(
-                x: currentFrame.origin.x,
-                y: newY,
-                width: targetWidth,
-                height: fitting.height
-            )
-            window.setFrame(newFrame, display: true, animate: false)
-            contentView.layer?.cornerRadius = 14.0
-            contentView.layer?.masksToBounds = true
-            window.invalidateShadow()
         }
     }
 }
