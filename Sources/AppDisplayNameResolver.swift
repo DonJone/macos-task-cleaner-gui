@@ -165,6 +165,148 @@ public final class AppDisplayNameResolver {
             .ja: "App Store", .ko: "App Store", .fr: "App Store",
             .de: "App Store", .es: "App Store", .it: "App Store",
             .ru: "App Store", .ar: "App Store"
+        ],
+        "com.apple.MobileSMS": [
+            .en: "Messages", .zhHans: "信息", .zhHant: "訊息",
+            .ja: "メッセージ", .ko: "메시지", .fr: "Messages",
+            .de: "Nachrichten", .es: "Mensajes", .it: "Messaggi",
+            .ru: "Сообщения", .nl: "Berichten", .pl: "Wiadomości",
+            .tr: "Mesajlar", .ar: "الرسائل", .th: "ข้อความ",
+            .vi: "Tin nhắn", .id: "Pesan", .sv: "Meddelanden",
+            .da: "Beskeder", .nb: "Meldinger", .fi: "Viestit",
+            .cs: "Zprávy", .uk: "Повідомлення"
+        ],
+        "com.apple.mail": [
+            .en: "Mail", .zhHans: "邮件", .zhHant: "郵件",
+            .ja: "メール", .ko: "Mail", .fr: "Mail",
+            .de: "Mail", .es: "Mail", .it: "Mail",
+            .ru: "Почта", .nl: "Mail", .pl: "Poczta",
+            .tr: "Mail", .ar: "البريد", .th: "เมล",
+            .vi: "Mail", .id: "Mail", .sv: "Brev",
+            .da: "Mail", .nb: "Mail", .fi: "Mail",
+            .cs: "Mail", .uk: "Пошта"
+        ],
+        "com.apple.Maps": [
+            .en: "Maps", .zhHans: "地图", .zhHant: "地圖",
+            .ja: "マップ", .ko: "지도", .fr: "Plans",
+            .de: "Karten", .es: "Mapas", .it: "Mappe",
+            .ru: "Карты", .nl: "Kaarten", .pl: "Mapy",
+            .tr: "Harita", .ar: "الخرائط", .th: "แผนที่",
+            .vi: "Bản đồ", .id: "Peta", .sv: "Kartor",
+            .da: "Kort", .nb: "Kart", .fi: "Kartat",
+            .cs: "Mapy", .uk: "Карти"
+        ],
+        "com.apple.FaceTime": [
+            .en: "FaceTime", .zhHans: "FaceTime 通话", .zhHant: "FaceTime 通話",
+            .ja: "FaceTime", .ko: "FaceTime", .fr: "FaceTime",
+            .de: "FaceTime", .es: "FaceTime", .it: "FaceTime",
+            .ru: "FaceTime", .ar: "FaceTime"
+        ],
+        "com.apple.clock": [
+            .en: "Clock", .zhHans: "时钟", .zhHant: "時鐘",
+            .ja: "時計", .ko: "시계", .fr: "Horloge",
+            .de: "Uhr", .es: "Reloj", .it: "Orologio",
+            .ru: "Часы", .nl: "Klok", .pl: "Zegar",
+            .tr: "Saat", .ar: "الساعة", .th: "นาฬิกา",
+            .vi: "Đồng hồ", .id: "Jam", .sv: "Klocka",
+            .da: "Ur", .nb: "Klokke", .fi: "Kello",
+            .cs: "Hodiny", .uk: "Годинник"
+        ],
+        "com.apple.shortcuts": [
+            .en: "Shortcuts", .zhHans: "快捷指令", .zhHant: "捷徑",
+            .ja: "ショートカット", .ko: "단축어", .fr: "Raccourcis",
+            .de: "Kurzbefehle", .es: "Atajos", .it: "Comandi Rapidi",
+            .ru: "Быстрые команды", .nl: "Opdrachten", .pl: "Skróty",
+            .tr: "Kestirmeler", .ar: "الاختصارات", .th: "คำสั่งลัด",
+            .vi: "Phím tắt", .id: "Pintasan", .sv: "Genvägar",
+            .da: "Genveje", .nb: "Snarveier", .fi: "Pikakomennot",
+            .cs: "Zkratky", .uk: "Команди"
+        ],
+        "com.apple.weather": [
+            .en: "Weather", .zhHans: "天气", .zhHant: "天氣",
+            .ja: "天気", .ko: "날씨", .fr: "Météo",
+            .de: "Wetter", .es: "Tiempo", .it: "Meteo",
+            .ru: "Погода", .nl: "Weer", .pl: "Pogoda",
+            .tr: "Hava Durumu", .ar: "الطقس", .th: "สภาพอากาศ",
+            .vi: "Thời tiết", .id: "Cuaca", .sv: "Väder",
+            .da: "Vejr", .nb: "Vær", .fi: "Sää",
+            .cs: "Počasí", .uk: "Погода"
+        ],
+        "com.apple.stocks": [
+            .en: "Stocks", .zhHans: "股市", .zhHant: "股市",
+            .ja: "株価", .ko: "주식", .fr: "Bourse",
+            .de: "Aktien", .es: "Bolsa", .it: "Borsa",
+            .ru: "Акции", .nl: "Aandelen", .pl: "Giełda",
+            .tr: "Borsa", .ar: "الأسهم", .th: "หุ้น",
+            .vi: "Chứng khoán", .id: "Saham", .sv: "Aktier",
+            .da: "Værdipapirer", .nb: "Aksjer", .fi: "Pörssi",
+            .cs: "Akcie", .uk: "Біржі"
+        ],
+        "com.apple.VoiceMemos": [
+            .en: "Voice Memos", .zhHans: "语音备忘录", .zhHant: "語音備忘錄",
+            .ja: "ボイスメモ", .ko: "음성 메모", .fr: "Dictaphone",
+            .de: "Sprachmemos", .es: "Notas de Voz", .it: "Memo Vocali",
+            .ru: "Диктофон", .nl: "Dictafoon", .pl: "Dyktafon",
+            .tr: "Sesli Düşler", .ar: "المذكرات الصوتية", .th: "เสียงบันทึก",
+            .vi: "Ghi âm", .id: "Memo Suara", .sv: "Röstmemon",
+            .da: "Memoer", .nb: "Taleopptak", .fi: "Sanelut",
+            .cs: "Diktafon", .uk: "Диктофон"
+        ],
+        "com.apple.podcasts": [
+            .en: "Podcasts", .zhHans: "播客", .zhHant: "播客",
+            .ja: "ポッドキャスト", .ko: "팟캐스트", .fr: "Podcasts",
+            .de: "Podcasts", .es: "Podcasts", .it: "Podcast",
+            .ru: "Подкасты", .nl: "Podcasts", .pl: "Podcasty",
+            .tr: "Podcast'ler", .ar: "البودكاست", .th: "พ็อดคาสท์",
+            .vi: "Podcast", .id: "Podcast", .sv: "Podcaster",
+            .da: "Podcasts", .nb: "Podkaster", .fi: "Podcastit",
+            .cs: "Podcasty", .uk: "Подкасти"
+        ],
+        "com.apple.iBooksX": [
+            .en: "Books", .zhHans: "图书", .zhHant: "書籍",
+            .ja: "ブック", .ko: "도서", .fr: "Livres",
+            .de: "Bücher", .es: "Libros", .it: "Libri",
+            .ru: "Книги", .nl: "Boeken", .pl: "Książki",
+            .tr: "Kitaplar", .ar: "الكتب", .th: "หนังสือ",
+            .vi: "Sách", .id: "Buku", .sv: "Böcker",
+            .da: "Bøger", .nb: "Bøker", .fi: "Kirjat",
+            .cs: "Knihy", .uk: "Книги"
+        ],
+        "com.apple.AddressBook": [
+            .en: "Contacts", .zhHans: "通讯录", .zhHant: "聯絡資訊",
+            .ja: "連絡先", .ko: "연락처", .fr: "Contacts",
+            .de: "Kontakte", .es: "Contactos", .it: "Contatti",
+            .ru: "Контакты", .nl: "Contacten", .pl: "Kontakty",
+            .tr: "Kişiler", .ar: "جهات الاتصال", .th: "รายชื่อ",
+            .vi: "Danh bạ", .id: "Kontak", .sv: "Kontakter",
+            .da: "Kontakter", .nb: "Kontakter", .fi: "Yhteystiedot",
+            .cs: "Kontakty", .uk: "Контакти"
+        ],
+        "com.apple.findmy": [
+            .en: "Find My", .zhHans: "查找", .zhHant: "尋找",
+            .ja: "探す", .ko: "나의 찾기", .fr: "Localiser",
+            .de: "Wo ist?", .es: "Buscar", .it: "Dov'è",
+            .ru: "Локатор", .nl: "Zoek mijn", .pl: "Lokalizator",
+            .tr: "Bul", .ar: "تحديد الموقع", .th: "ค้นหาของฉัน",
+            .vi: "Tìm", .id: "Lacak", .sv: "Hitta",
+            .da: "Find", .nb: "Hvor er?", .fi: "Etsi",
+            .cs: "Najít", .uk: "Локатор"
+        ],
+        "com.apple.Passwords": [
+            .en: "Passwords", .zhHans: "密码", .zhHant: "密碼",
+            .ja: "パスワード", .ko: "암호", .fr: "Mots de passe",
+            .de: "Passwörter", .es: "Contraseñas", .it: "Password",
+            .ru: "Пароли", .nl: "Wachtwoorden", .pl: "Hasła",
+            .tr: "Parolalar", .ar: "كلمات السر", .th: "รหัสผ่าน",
+            .vi: "Mật khẩu", .id: "Kata Sandi", .sv: "Lösenord",
+            .da: "Adgangskoder", .nb: "Passord", .fi: "Salasanat",
+            .cs: "Hesla", .uk: "Паролі"
+        ],
+        "com.apple.freeform": [
+            .en: "Freeform", .zhHans: "无边记", .zhHant: "無邊記",
+            .ja: "フリーボード", .ko: "Freeform", .fr: "Freeform",
+            .de: "Freeform", .es: "Freeform", .it: "Freeform",
+            .ru: "Freeform", .ar: "Freeform"
         ]
     ]
 
