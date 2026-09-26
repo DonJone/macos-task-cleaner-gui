@@ -160,7 +160,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func terminateTarget(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = I18n.shared.format(.status_terminating_app, app.name)
+        statusMessage = I18n.shared.format(.status_terminating_app, app.localizedName(in: I18n.shared))
 
         Task {
             let success = await Task.detached {
@@ -168,9 +168,9 @@ public class TaskCleanerViewModel: ObservableObject {
             }.value
 
             if success {
-                self.statusMessage = I18n.shared.format(.status_app_terminated, app.name)
+                self.statusMessage = I18n.shared.format(.status_app_terminated, app.localizedName(in: I18n.shared))
             } else {
-                self.statusMessage = I18n.shared.format(.status_app_terminate_failed, app.name)
+                self.statusMessage = I18n.shared.format(.status_app_terminate_failed, app.localizedName(in: I18n.shared))
             }
 
             self.isWorking = false
@@ -184,7 +184,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func whitelistApp(_ app: TargetAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = I18n.shared.format(.status_added_whitelist, app.name)
+        statusMessage = I18n.shared.format(.status_added_whitelist, app.localizedName(in: I18n.shared))
 
         Task {
             let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name
@@ -203,7 +203,7 @@ public class TaskCleanerViewModel: ObservableObject {
     public func unprotectApp(_ app: ProtectedAppEntry) {
         guard !isWorking else { return }
         isWorking = true
-        statusMessage = I18n.shared.format(.status_removed_whitelist, app.name)
+        statusMessage = I18n.shared.format(.status_removed_whitelist, app.localizedName(in: I18n.shared))
 
         Task {
             let identifier = !app.bundle_id.isEmpty ? app.bundle_id : app.name

@@ -50,3 +50,25 @@ public struct ProtectedAppEntry: Codable, Identifiable {
         return NSWorkspace.shared.icon(for: .application)
     }
 }
+
+extension TargetAppEntry {
+    @MainActor
+    public func localizedName(in i18n: I18n) -> String {
+        AppDisplayNameResolver.shared.resolve(
+            bundleId: bundle_id,
+            fallback: name,
+            language: i18n.currentLanguage
+        )
+    }
+}
+
+extension ProtectedAppEntry {
+    @MainActor
+    public func localizedName(in i18n: I18n) -> String {
+        AppDisplayNameResolver.shared.resolve(
+            bundleId: bundle_id,
+            fallback: name,
+            language: i18n.currentLanguage
+        )
+    }
+}

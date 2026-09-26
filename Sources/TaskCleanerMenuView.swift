@@ -684,7 +684,7 @@ struct NativeTargetRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(app.name)
+                Text(app.localizedName(in: I18n.shared))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
@@ -794,7 +794,7 @@ struct NativeProtectedRow: View {
                 )
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(app.name)
+                Text(app.localizedName(in: I18n.shared))
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
