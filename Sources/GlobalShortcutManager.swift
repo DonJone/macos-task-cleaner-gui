@@ -191,6 +191,18 @@ public class GlobalShortcutManager: ObservableObject {
         TaskCleanerViewModel.shared?.statusMessage = I18n.shared.t(.status_shortcut_disabled)
     }
 
+    public var currentKeyCode: UInt32 {
+        UInt32(UserDefaults.standard.integer(forKey: userDefaultsKeyKeyCode))
+    }
+
+    public var currentCarbonModifiers: UInt32 {
+        UInt32(UserDefaults.standard.integer(forKey: userDefaultsKeyModifiers))
+    }
+
+    public func resetToDefault() {
+        setPreset(.optShiftK)
+    }
+
     public func openCustomShortcutRecorder() {
         ShortcutRecorderWindowController.shared.showWindow()
     }

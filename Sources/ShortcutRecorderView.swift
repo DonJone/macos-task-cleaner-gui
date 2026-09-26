@@ -41,6 +41,17 @@ public class KeyCodeHelper {
         case kVK_ANSI_7: return "7"
         case kVK_ANSI_8: return "8"
         case kVK_ANSI_9: return "9"
+        case kVK_ANSI_Minus: return "-"
+        case kVK_ANSI_Equal: return "="
+        case kVK_ANSI_LeftBracket: return "["
+        case kVK_ANSI_RightBracket: return "]"
+        case kVK_ANSI_Backslash: return "\\"
+        case kVK_ANSI_Semicolon: return ";"
+        case kVK_ANSI_Quote: return "'"
+        case kVK_ANSI_Comma: return ","
+        case kVK_ANSI_Period: return "."
+        case kVK_ANSI_Slash: return "/"
+        case kVK_ANSI_Grave: return "`"
         case kVK_Space: return "Space"
         case kVK_Return: return "↩"
         case kVK_Tab: return "⇥"
@@ -71,6 +82,15 @@ public class KeyCodeHelper {
         return mods
     }
 
+    public static func modifierFlags(from carbonModifiers: UInt32) -> NSEvent.ModifierFlags {
+        var flags: NSEvent.ModifierFlags = []
+        if (carbonModifiers & UInt32(controlKey)) != 0 { flags.insert(.control) }
+        if (carbonModifiers & UInt32(optionKey)) != 0 { flags.insert(.option) }
+        if (carbonModifiers & UInt32(shiftKey)) != 0 { flags.insert(.shift) }
+        if (carbonModifiers & UInt32(cmdKey)) != 0 { flags.insert(.command) }
+        return flags
+    }
+
     public static func modifierDisplay(from flags: NSEvent.ModifierFlags) -> String {
         var res = ""
         if flags.contains(.control) { res += "⌃" }
@@ -83,11 +103,44 @@ public class KeyCodeHelper {
 
 @MainActor
 public class ShortcutRecorderViewModel: ObservableObject {
-    @Published public var capturedKeyCode: UInt16?
-    @Published public var capturedFlags: NSEvent.ModifierFlags = []
+    @Published public var recordedKeyCode: UInt16?
+    @Published public var recordedModifiers: NSEvent.ModifierFlags = []
+    @Published public var activeModifiers: NSEvent.ModifierFlags = []
+
     private var eventMonitor: Any?
 
-    public init() {}
+    public init() {
+        loadCurrentShortcut()
+    }
+
+    public func loadCurrentShortcut() {
+        let mgr = GlobalShortcutManager.shared
+        if mgr.isEnabled {
+            let key = mgr.currentKeyCode
+            let mods = mgr.currentCarbonModifiers
+            if key > 0 || mods > 0 {
+                self.recordedKeyCode = UInt16(key)
+                self.recordedModifiers = KeyCodeHelper.modifierFlags(from: mods)
+            }
+        }
+    }
+
+    public var hasValidRecordedShortcut: Bool {
+        guard let _ = recordedKeyCode else { return false }
+        return KeyCodeHelper.carbonModifiers(from: recordedModifiers) != 0
+    }
+
+    public func resetToDefault() {
+        self.recordedKeyCode = UInt16(ShortcutPreset.optShiftK.keyCode)
+        self.recordedModifiers = KeyCodeHelper.modifierFlags(from: ShortcutPreset.optShiftK.carbonModifiers)
+        self.activeModifiers = []
+    }
+
+    public func clear() {
+        self.recordedKeyCode = nil
+        self.recordedModifiers = []
+        self.activeModifiers = []
+    }
 
     public func startMonitoring(onClose: @escaping () -> Void, onSave: @escaping () -> Void) {
         stopMonitoring()
@@ -96,25 +149,37 @@ public class ShortcutRecorderViewModel: ObservableObject {
 
             if event.type == .flagsChanged {
                 let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
-                self.capturedFlags = flags
+                self.activeModifiers = flags
                 return nil
             } else if event.type == .keyDown {
-                if event.keyCode == 53 { // Escape
+                // 1. Escape: 取消并退出
+                if event.keyCode == 53 {
                     self.stopMonitoring()
                     onClose()
                     return nil
                 }
 
-                if event.keyCode == 36 && self.capturedKeyCode != nil { // Return
-                    onSave()
+                // 2. Return / Enter: 若已捕获合法快捷键则直接保存退出
+                if event.keyCode == 36 {
+                    if self.hasValidRecordedShortcut {
+                        onSave()
+                        return nil
+                    }
+                }
+
+                // 3. Delete / ForwardDelete: 清空当前捕获组合
+                if event.keyCode == 51 || event.keyCode == 117 {
+                    self.clear()
                     return nil
                 }
 
+                // 4. 普通按键组合录制
                 let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
                 let keyStr = KeyCodeHelper.keyString(for: event.keyCode)
                 if !keyStr.isEmpty && !flags.isEmpty {
-                    self.capturedFlags = flags
-                    self.capturedKeyCode = event.keyCode
+                    self.recordedKeyCode = event.keyCode
+                    self.recordedModifiers = flags
+                    self.activeModifiers = []
                 }
                 return nil
             }
@@ -128,11 +193,6 @@ public class ShortcutRecorderViewModel: ObservableObject {
             eventMonitor = nil
         }
     }
-
-    public func reset() {
-        capturedKeyCode = nil
-        capturedFlags = []
-    }
 }
 
 public struct ShortcutRecorderView: View {
@@ -142,7 +202,7 @@ public struct ShortcutRecorderView: View {
     var onClose: () -> Void
 
     public var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             // Header
             HStack(spacing: 12) {
                 Image(systemName: "keyboard")
@@ -165,48 +225,61 @@ public struct ShortcutRecorderView: View {
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(
-                                vm.capturedKeyCode != nil ? Color.accentColor : Color.secondary.opacity(0.3),
-                                lineWidth: vm.capturedKeyCode != nil ? 2 : 1
+                                vm.hasValidRecordedShortcut ? Color.accentColor : Color.secondary.opacity(0.3),
+                                lineWidth: vm.hasValidRecordedShortcut ? 2 : 1
                             )
                     )
 
-                if let keyCode = vm.capturedKeyCode, !vm.capturedFlags.isEmpty {
+                if let keyCode = vm.recordedKeyCode, !vm.recordedModifiers.isEmpty {
                     HStack(spacing: 8) {
-                        if vm.capturedFlags.contains(.control) {
+                        if vm.recordedModifiers.contains(.control) {
                             keyBadge("⌃ Control")
                         }
-                        if vm.capturedFlags.contains(.option) {
+                        if vm.recordedModifiers.contains(.option) {
                             keyBadge("⌥ Option")
                         }
-                        if vm.capturedFlags.contains(.shift) {
+                        if vm.recordedModifiers.contains(.shift) {
                             keyBadge("⇧ Shift")
                         }
-                        if vm.capturedFlags.contains(.command) {
+                        if vm.recordedModifiers.contains(.command) {
                             keyBadge("⌘ Command")
                         }
                         let keyStr = KeyCodeHelper.keyString(for: keyCode)
                         if !keyStr.isEmpty {
                             keyBadge(keyStr, isPrimary: true)
                         }
+
+                        Spacer()
+
+                        Button(action: {
+                            vm.clear()
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 15))
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .help(i18n.t(.btn_reset_shortcut))
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
-                } else if !vm.capturedFlags.isEmpty {
+                } else if !vm.activeModifiers.isEmpty {
                     HStack(spacing: 8) {
-                        if vm.capturedFlags.contains(.control) {
+                        if vm.activeModifiers.contains(.control) {
                             keyBadge("⌃")
                         }
-                        if vm.capturedFlags.contains(.option) {
+                        if vm.activeModifiers.contains(.option) {
                             keyBadge("⌥")
                         }
-                        if vm.capturedFlags.contains(.shift) {
+                        if vm.activeModifiers.contains(.shift) {
                             keyBadge("⇧")
                         }
-                        if vm.capturedFlags.contains(.command) {
+                        if vm.activeModifiers.contains(.command) {
                             keyBadge("⌘")
                         }
                         Text("...")
                             .foregroundStyle(.secondary)
+                        Spacer()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 14)
@@ -218,6 +291,7 @@ public struct ShortcutRecorderView: View {
                         Text(i18n.t(.shortcut_recorder_prompt))
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
+                        Spacer()
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 18)
@@ -231,13 +305,28 @@ public struct ShortcutRecorderView: View {
                 .foregroundStyle(.secondary)
 
             // Action Buttons
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
+                Button(action: {
+                    vm.resetToDefault()
+                }) {
+                    Text(i18n.t(.btn_restore_default))
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Button(action: {
+                    vm.clear()
+                }) {
+                    Text(i18n.t(.btn_reset_shortcut))
+                }
+
                 Button(action: {
                     vm.stopMonitoring()
                     onClose()
                 }) {
                     Text(i18n.t(.btn_cancel))
-                        .frame(maxWidth: .infinity)
                 }
                 .keyboardShortcut(.cancelAction)
 
@@ -245,15 +334,14 @@ public struct ShortcutRecorderView: View {
                     saveShortcut()
                 }) {
                     Text(i18n.t(.btn_save_shortcut))
-                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
-                .disabled(vm.capturedKeyCode == nil || KeyCodeHelper.carbonModifiers(from: vm.capturedFlags) == 0)
+                .disabled(!vm.hasValidRecordedShortcut)
             }
         }
         .padding(22)
-        .frame(width: 380)
+        .frame(width: 440)
         .onAppear {
             vm.startMonitoring(
                 onClose: onClose,
@@ -282,11 +370,11 @@ public struct ShortcutRecorderView: View {
     }
 
     private func saveShortcut() {
-        guard let keyCode = vm.capturedKeyCode else { return }
-        let mods = KeyCodeHelper.carbonModifiers(from: vm.capturedFlags)
+        guard let keyCode = vm.recordedKeyCode else { return }
+        let mods = KeyCodeHelper.carbonModifiers(from: vm.recordedModifiers)
         guard mods != 0 else { return }
 
-        let displayMod = KeyCodeHelper.modifierDisplay(from: vm.capturedFlags)
+        let displayMod = KeyCodeHelper.modifierDisplay(from: vm.recordedModifiers)
         let keyChar = KeyCodeHelper.keyString(for: keyCode)
         let fullDisplay = "\(displayMod)\(keyChar)"
 
@@ -306,7 +394,7 @@ public class ShortcutRecorderWindowController: NSWindowController {
 
     private init() {
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 220),
+            contentRect: NSRect(x: 0, y: 0, width: 440, height: 230),
             styleMask: [.titled, .closable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -318,11 +406,6 @@ public class ShortcutRecorderWindowController: NSWindowController {
         panel.isMovableByWindowBackground = true
         panel.isReleasedWhenClosed = false
         super.init(window: panel)
-
-        let contentView = ShortcutRecorderView { [weak self] in
-            self?.close()
-        }
-        panel.contentView = NSHostingView(rootView: contentView)
     }
 
     required init?(coder: NSCoder) {
@@ -330,9 +413,15 @@ public class ShortcutRecorderWindowController: NSWindowController {
     }
 
     public func showWindow() {
-        guard let window = self.window else { return }
-        window.center()
-        window.makeKeyAndOrderFront(nil)
+        guard let panel = self.window as? NSPanel else { return }
+
+        // 每次唤起时重新装载全新的 HostingView，确保读取最新绑定的快捷键状态与重设环境
+        let contentView = ShortcutRecorderView { [weak self] in
+            self?.close()
+        }
+        panel.contentView = NSHostingView(rootView: contentView)
+        panel.center()
+        panel.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 }
