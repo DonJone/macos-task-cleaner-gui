@@ -5,6 +5,7 @@ public struct TaskCleanerMenuView: View {
     @ObservedObject public var viewModel: TaskCleanerViewModel
     @ObservedObject private var i18n = I18n.shared
     @ObservedObject private var launchManager = LaunchAtLoginManager.shared
+    @ObservedObject private var shortcutManager = GlobalShortcutManager.shared
 
     public init(viewModel: TaskCleanerViewModel) {
         self.viewModel = viewModel
@@ -554,6 +555,56 @@ public struct TaskCleanerMenuView: View {
                         Label(
                             i18n.t(.launch_at_login_menu),
                             systemImage: launchManager.isEnabled ? "checkmark.circle.fill" : "circle"
+                        )
+                    }
+
+                    Divider()
+
+                    Menu {
+                        if shortcutManager.isEnabled {
+                            Text(i18n.format(.menu_current_shortcut, shortcutManager.displayString))
+                            Divider()
+                        }
+
+                        ForEach(ShortcutPreset.allCases) { preset in
+                            Button(action: {
+                                shortcutManager.setPreset(preset)
+                            }) {
+                                HStack {
+                                    Text(preset.displayString)
+                                    if shortcutManager.isEnabled && shortcutManager.currentPreset == preset {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+
+                        Divider()
+
+                        Button(action: {
+                            shortcutManager.openCustomShortcutRecorder()
+                        }) {
+                            HStack {
+                                Label(i18n.t(.menu_custom_shortcut), systemImage: "keyboard")
+                                if shortcutManager.isEnabled && shortcutManager.currentPreset == nil {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+
+                        if shortcutManager.isEnabled {
+                            Divider()
+
+                            Button(action: {
+                                shortcutManager.disableShortcut()
+                            }) {
+                                Label(i18n.t(.menu_disable_shortcut), systemImage: "xmark.circle")
+                            }
+                        }
+                    } label: {
+                        Label(
+                            shortcutManager.isEnabled ? "\(i18n.t(.menu_global_shortcut)): \(shortcutManager.displayString)" : i18n.t(.menu_global_shortcut),
+                            systemImage: "command"
                         )
                     }
 

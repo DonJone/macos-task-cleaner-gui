@@ -19,11 +19,15 @@ public class TaskCleanerViewModel: ObservableObject {
     @Published public var selectedTab: CleanerTab = .targets
     @Published public var initialTargetCapacity: Int = 3
 
+    public static weak var shared: TaskCleanerViewModel?
+
     private var hasCapturedSessionCapacity: Bool = false
     private var timerCancellable: AnyCancellable?
     private var workspaceObservers: [NSObjectProtocol] = []
 
     public init() {
+        Self.shared = self
+        _ = GlobalShortcutManager.shared
         refresh(silent: true)
     }
 
@@ -155,6 +159,11 @@ public class TaskCleanerViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 2_000_000_000)
             self.statusMessage = nil
         }
+    }
+
+    public func triggerGlobalShortcutClean() {
+        guard !isWorking else { return }
+        cleanAll(force: false, purge: false)
     }
 
     public func terminateTarget(_ app: TargetAppEntry) {
