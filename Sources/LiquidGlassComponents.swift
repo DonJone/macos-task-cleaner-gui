@@ -23,6 +23,9 @@ public struct VisualEffectBackground: NSViewRepresentable {
         view.material = material
         view.blendingMode = blendingMode
         view.state = state
+        view.wantsLayer = true
+        view.layer?.cornerRadius = 14.0
+        view.layer?.masksToBounds = true
         return view
     }
 
@@ -30,6 +33,9 @@ public struct VisualEffectBackground: NSViewRepresentable {
         nsView.material = material
         nsView.blendingMode = blendingMode
         nsView.state = state
+        nsView.wantsLayer = true
+        nsView.layer?.cornerRadius = 14.0
+        nsView.layer?.masksToBounds = true
     }
 }
 
@@ -119,6 +125,15 @@ public struct WindowAutoResizer: NSViewRepresentable {
         guard let window = view.window else { return }
         guard let contentView = window.contentView else { return }
 
+        // 核心修复：确保窗口底色透明，内容层强制 14pt 连续圆角裁剪，杜绝直角黑边与方角崩坏
+        window.isOpaque = false
+        window.backgroundColor = .clear
+        window.hasShadow = true
+
+        contentView.wantsLayer = true
+        contentView.layer?.cornerRadius = 14.0
+        contentView.layer?.masksToBounds = true
+
         // 同步 AppKit 原生窗口布局方向以支持 RTL
         let desiredLayoutDirection: NSUserInterfaceLayoutDirection = isRTL ? .rightToLeft : .leftToRight
         if contentView.userInterfaceLayoutDirection != desiredLayoutDirection {
@@ -129,7 +144,8 @@ public struct WindowAutoResizer: NSViewRepresentable {
         guard fitting.height > 60 else { return }
 
         let currentFrame = window.frame
-        if abs(currentFrame.height - fitting.height) > 1.0 {
+        // 阈值提升为 8pt，防止微小字号/文本度量波动引起频繁 setFrame
+        if abs(currentFrame.height - fitting.height) > 8.0 {
             let heightDiff = currentFrame.height - fitting.height
             let newY = currentFrame.origin.y + heightDiff
             let newFrame = NSRect(
@@ -139,6 +155,9 @@ public struct WindowAutoResizer: NSViewRepresentable {
                 height: fitting.height
             )
             window.setFrame(newFrame, display: true, animate: false)
+            contentView.layer?.cornerRadius = 14.0
+            contentView.layer?.masksToBounds = true
+            window.invalidateShadow()
         }
     }
 }
