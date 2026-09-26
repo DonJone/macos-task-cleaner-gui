@@ -359,16 +359,16 @@ public struct TaskCleanerMenuView: View {
                             Text(i18n.format(.btn_view_all, viewModel.summary?.scanned_total ?? 0))
                                 .font(.system(size: 10.5, weight: .medium))
                         }
-                        .foregroundStyle(Color(nsColor: .systemBlue))
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4.5)
                         .background(
                             Capsule(style: .continuous)
-                                .fill(Color(nsColor: .systemBlue).opacity(0.1))
+                                .fill(Color.primary.opacity(0.06))
                         )
                         .overlay(
                             Capsule(style: .continuous)
-                                .strokeBorder(Color(nsColor: .systemBlue).opacity(0.22), lineWidth: 0.5)
+                                .strokeBorder(Color.primary.opacity(0.12), lineWidth: 0.5)
                         )
                         .contentShape(Capsule(style: .continuous))
                     }
