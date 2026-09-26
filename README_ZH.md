@@ -17,7 +17,6 @@
   <img src="https://img.shields.io/badge/架构-Apple%20Silicon%20%7C%20AMD64-blue" alt="架构: Apple Silicon | AMD64" />
   <a href="https://swift.org/"><img src="https://img.shields.io/badge/编程语言-Swift%205.9%2B-F05138?logo=swift&logoColor=white" alt="Swift: 5.9+" /></a>
   <img src="https://img.shields.io/badge/界面库-SwiftUI%20%7C%20AppKit-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI | AppKit" />
-  <a href="https://brew.sh/"><img src="https://img.shields.io/badge/Homebrew-支持%20Cask%20安装-orange?logo=homebrew&logoColor=white" alt="Homebrew: 支持 Cask 安装" /></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/核心引擎-Rust-dea584?logo=rust&logoColor=white" alt="核心引擎: Rust" /></a>
   <img src="https://img.shields.io/badge/国际化-24%20种常用语言-teal" alt="语言: 24 种语言" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/开源协议-GNU%20AGPLv3-blue" alt="开源协议: GNU AGPLv3" /></a>
@@ -30,17 +29,9 @@
 
 ## 界面效果展示
 
-### 菜单栏常驻交互浮窗
-
 <p align="center">
   <img src="docs/images/gui-main-zh.png" width="380" alt="macOS Task Cleaner 菜单栏常驻浮层" />
 </p>
-
-### 伴随终端交互向导与清场报告
-
-| 终端交互向导 (`mtc -i`) | 批量清场执行报告 (`mtc --execute`) |
-| :---: | :---: |
-| <img src="docs/images/cli-interactive-zh.png" width="460" alt="macOS Task Cleaner 交互式终端向导" /> | <img src="docs/images/cli-exec-zh.png" width="460" alt="macOS Task Cleaner 批量清场执行报告" /> |
 
 ---
 
@@ -65,20 +56,7 @@
 
 ## 下载与快速安装
 
-### 方式一：通过 Homebrew Cask 安装 (推荐)
-
-```bash
-# 添加官方 Tap 软件源
-brew tap macos-task-cleaner/tap
-
-# 一键安装图形客户端 (包含内嵌的命令行工具)
-brew install --cask task-cleaner
-
-# 启动应用
-open -a "Task Cleaner"
-```
-
-### 方式二：推荐 DMG 拖拽式安装镜像
+### 方式一：推荐 DMG 拖拽式安装镜像
 
 前往 [GitHub Releases](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest) 直接下载适用于您 Mac 架构的安装镜像：
 
@@ -90,7 +68,7 @@ open -a "Task Cleaner"
 
 双击打开下载的 `.dmg` 文件后，直接将 `Task Cleaner.app` 拖入 `Applications` 文件夹即可完成安装。
 
-### 方式三：源码本地编译
+### 方式二：源码本地编译
 
 要求 macOS 13.0+ 及 Swift 5.9+ / Xcode 环境：
 
@@ -123,10 +101,14 @@ open /Applications/TaskCleaner.app
 
 ---
 
-## 关联项目
+## 命令行客户端伴随工具
 
-* **核心算法与进程引擎库 (Rust)**：[macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
-* **命令行客户端 (Rust)**：[macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
+如果您习惯纯键盘终端环境、脚本自动化或 Raycast/快捷指令调度，可额外使用配套的独立命令行客户端 **`mtc`**：
+
+* **CLI 仓库**：[macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
+* **核心引擎**：[macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
+
+图形客户端与命令行工具共用同一份白名单配置文件（`~/.config/mtc/config.toml`），无论在菜单栏图形界面还是终端添加的白名单规则均自动保持双向同步。
 
 ---
 

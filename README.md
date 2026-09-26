@@ -17,7 +17,6 @@
   <img src="https://img.shields.io/badge/Architecture-Apple%20Silicon%20%7C%20AMD64-blue" alt="Architecture: Apple Silicon | AMD64" />
   <a href="https://swift.org/"><img src="https://img.shields.io/badge/Swift-5.9%2B-F05138?logo=swift&logoColor=white" alt="Swift: 5.9+" /></a>
   <img src="https://img.shields.io/badge/UI-SwiftUI%20%7C%20AppKit-007AFF?logo=swift&logoColor=white" alt="UI: SwiftUI | AppKit" />
-  <a href="https://brew.sh/"><img src="https://img.shields.io/badge/Homebrew-Cask%20Available-orange?logo=homebrew&logoColor=white" alt="Homebrew: Cask Available" /></a>
   <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Core%20Engine-Rust-dea584?logo=rust&logoColor=white" alt="Core Engine: Rust" /></a>
   <img src="https://img.shields.io/badge/Languages-24%20Locales-teal" alt="Languages: 24 Locales" />
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GNU%20AGPLv3-blue" alt="License: GNU AGPLv3" /></a>
@@ -30,17 +29,9 @@ A native macOS menu bar status item application for high-precision foreground ap
 
 ## Visual Interface Showcase
 
-### Native Menu Bar Popover Interface
-
 <p align="center">
   <img src="docs/images/gui-main-en.png" width="380" alt="macOS Task Cleaner Menu Bar Popover Interface" />
 </p>
-
-### Companion CLI Interactive Console & Batch Report
-
-| Interactive Console Wizard (`mtc -i`) | Batch Execution Report (`mtc --execute`) |
-| :---: | :---: |
-| <img src="docs/images/cli-interactive-en.png" width="460" alt="macOS Task Cleaner Interactive CLI Wizard" /> | <img src="docs/images/cli-exec-en.png" width="460" alt="macOS Task Cleaner Batch Execution Report" /> |
 
 ---
 
@@ -65,20 +56,7 @@ A native macOS menu bar status item application for high-precision foreground ap
 
 ## Download & Quick Install
 
-### Option 1: Homebrew Cask (Recommended)
-
-```bash
-# Add official tap repository
-brew tap macos-task-cleaner/tap
-
-# Install GUI application (includes embedded CLI tool)
-brew install --cask task-cleaner
-
-# Launch application
-open -a "Task Cleaner"
-```
-
-### Option 2: Drag-and-Drop DMG Installer
+### Option 1: Drag-and-Drop DMG Installer (Recommended)
 
 Download the pre-built, ready-to-use disk image for your Mac architecture from [GitHub Releases](https://github.com/macos-task-cleaner/macos-task-cleaner-gui/releases/latest):
 
@@ -90,7 +68,7 @@ Download the pre-built, ready-to-use disk image for your Mac architecture from [
 
 Open the `.dmg` file and drag `Task Cleaner.app` into your `Applications` directory.
 
-### Option 3: Build from Source
+### Option 2: Build from Source
 
 Requires macOS 13.0+ and Xcode / Swift 5.9+:
 
@@ -123,10 +101,14 @@ open /Applications/TaskCleaner.app
 
 ---
 
-## Related Projects
+## Command-Line Tool Companion
 
-* **Core Engine Library (Rust)**: [macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
-* **Command-Line Interface (Rust)**: [macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
+If you prefer terminal-driven workflows, shell scripts, or automation shortcuts, you can also install the companion command-line client **`mtc`**:
+
+* **CLI Repository**: [macos-task-cleaner-cli](https://github.com/macos-task-cleaner/macos-task-cleaner-cli)
+* **Core Engine**: [macos-task-cleaner-core](https://github.com/macos-task-cleaner/macos-task-cleaner-core)
+
+The GUI application shares the same underlying configuration file (`~/.config/mtc/config.toml`) with the CLI tool, so whitelist rules added via the GUI or terminal stay synchronized automatically.
 
 ---
 
